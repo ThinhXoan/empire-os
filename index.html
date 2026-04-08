@@ -418,40 +418,38 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:16px;height:16px;b
   
   <div id="wp1" style="display:none">
     <div class="card" style="margin-top:10px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
         <div class="cl" style="margin:0">&#127947; Gym &amp; B&#417;i</div>
         <div id="gym-week-label" style="font-size:11px;color:var(--ink4);font-weight:600"></div>
       </div>
-      <div id="gym-ex" style="margin-bottom:12px"></div>
-      <div style="border-top:1px solid var(--b);padding-top:12px">
-        <div style="font-size:0.714rem;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Ghi buổi tập hôm nay</div>
-        <div style="display:flex;gap:8px;margin-bottom:10px">
-          <input class="fi" type="date" id="gym-date" style="flex:1;font-size:12px">
-          <select class="fi" id="gym-muscle" style="width:100px;font-size:12px">
-            <option value="Ngực">&#128170; Ngực</option>
-            <option value="Lưng">&#128692; Lưng</option>
-            <option value="Vai">&#129354; Vai</option>
-            <option value="Tay">&#128080; Tay</option>
-            <option value="Chân">&#129461; Chân</option>
-            <option value="Bụng">&#127947; Bụng</option>
-            <option value="Bơi">&#127946; Bơi</option>
-            <option value="Full">&#128293; Full body</option>
-          </select>
-        </div>
-        <div id="gym-rows">
-          <div class="gym-row" style="display:flex;gap:6px;margin-bottom:6px;align-items:center">
-            <input class="fi" placeholder="Tên bài tập" style="flex:2;font-size:12px">
-            <input class="fi" placeholder="Set x Rep" style="flex:1;font-size:12px">
-            <input class="fi" placeholder="kg" style="width:52px;font-size:12px">
-            <span onclick="rmGymRow(this)" style="cursor:pointer;color:var(--ink4);font-size:18px">&#215;</span>
-          </div>
-        </div>
-        <button class="btn btn-outline" onclick="addGymRow()" style="font-size:12px;width:100%;margin-bottom:8px">+ Thêm bài</button>
-        <textarea class="fi" id="gym-note" placeholder="Ghi chú..." style="min-height:52px;resize:vertical;font-size:12px;margin-bottom:8px"></textarea>
-        <button class="btn btn-primary" onclick="saveGymLog()" style="width:100%;font-size:13px">&#128190; Lưu buổi tập</button>
-        <div id="gym-msg" style="font-size:11px;text-align:center;margin-top:6px;min-height:14px;color:var(--ink4)"></div>
+
+      <!-- Date + muscle group selector -->
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <input class="fi" type="date" id="gym-date" style="flex:1;font-size:12px">
+        <select class="fi" id="gym-muscle" style="width:110px;font-size:12px" onchange="renderGymInline()">
+          <option value="Ngực">&#128170; Ngực</option>
+          <option value="Lưng">&#128692; Lưng</option>
+          <option value="Vai">&#129354; Vai</option>
+          <option value="Tay">&#128080; Tay</option>
+          <option value="Chân">&#129461; Chân</option>
+          <option value="Bụng">&#127947; Bụng</option>
+          <option value="Bơi">&#127946; Bơi</option>
+          <option value="Full">&#128293; Full body</option>
+        </select>
       </div>
+
+      <!-- Inline exercise rows from schedule + input fields -->
+      <div id="gym-inline-rows"></div>
+
+      <!-- Extra custom rows -->
+      <div id="gym-rows"></div>
+      <button class="btn btn-outline" onclick="addGymRow()" style="font-size:12px;width:100%;margin-bottom:8px;margin-top:4px">+ Thêm bài</button>
+
+      <textarea class="fi" id="gym-note" placeholder="Ghi chú buổi tập..." style="min-height:48px;resize:vertical;font-size:12px;margin-bottom:8px"></textarea>
+      <button class="btn btn-primary" onclick="saveGymLog()" style="width:100%;font-size:13px">&#128190; Lưu buổi tập</button>
+      <div id="gym-msg" style="font-size:11px;text-align:center;margin-top:6px;min-height:14px;color:var(--ink4)"></div>
     </div>
+
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
         <div class="cl" style="margin:0">&#128202; Lịch sử</div>
@@ -1906,36 +1904,42 @@ var LICH_PHASES=[{"phase": "Master GD1 + Retail GD1", "dates": "07/04 → 05/07/
 function wtab(i){[0,1].forEach(function(j){var t=document.getElementById('wt'+j),p=document.getElementById('wp'+j);if(t)t.classList.toggle('active',j===i);if(p)p.style.display=j===i?'block':'none';});if(i===1)initGym();}
 
 // ── GYM ──────────────────────────────────────────────────
-function initGym(){
-  var d=document.getElementById('gym-date');if(d&&!d.value)d.value=new Date().toISOString().slice(0,10);
-  var started=new Date('2026-04-07');
-  var wi=Math.max(0,Math.min(Math.floor((Date.now()-started)/604800000),(GYM_DATA.length-1)));
-  var lbl=document.getElementById('gym-week-label');if(lbl)lbl.textContent='Tuần '+(wi+1)+' / '+GYM_DATA.length;
-  renderGym();renderGymHist();
-}
-function renderGym(){
-  var el=document.getElementById('gym-ex');if(!el)return;
-  var started=new Date('2026-04-07');
-  var wi=Math.max(0,Math.min(Math.floor((Date.now()-started)/604800000),(GYM_DATA.length-1)));
-  var ex=((GYM_DATA[wi])||{}).exercises||{};
-  var COL={'Ngực':'var(--red)','Lưng':'var(--blu)','Vai':'#8b5cf6','Tay':'var(--amber)','Chân':'var(--grn)','Bụng & Core':'var(--ink2)','Bơi':'#06b6d4'};
-  var html='<div style="font-size:11px;color:var(--ink3);margin-bottom:8px">Tuần '+(wi+1)+'</div>';
-  Object.keys(ex).forEach(function(cat){var vals=ex[cat];if(!vals||(Array.isArray(vals)&&!vals.length))return;var c=COL[cat]||'var(--ink2)';html+='<div style="margin-bottom:8px;padding:8px;border-radius:var(--r);border:1px solid '+c+'30;background:'+c+'08"><div style="font-size:0.714rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:'+c+';margin-bottom:5px">'+cat+'</div>';if(typeof vals==='string')html+='<div style="font-size:0.857rem">🏊 '+vals+'</div>';else vals.forEach(function(v,i){html+='<div style="font-size:0.786rem;color:var(--ink2);padding:2px 0">'+(i+1)+'. '+v+'</div>';});html+='</div>';});
-  el.innerHTML=html||'<div style="color:var(--ink4);font-size:12px">Không có dữ liệu</div>';
-}
 window._fn_addGymRow=function(){var c=document.getElementById('gym-rows');if(!c)return;var row=document.createElement('div');row.className='gym-row';row.style.cssText='display:flex;gap:6px;margin-bottom:6px;align-items:center';row.innerHTML='<input class="fi" placeholder="Tên bài tập" style="flex:2;font-size:12px"><input class="fi" placeholder="Set x Rep" style="flex:1;font-size:12px"><input class="fi" placeholder="kg" style="width:52px;font-size:12px"><span onclick="rmGymRow(this)" style="cursor:pointer;color:var(--ink4);font-size:18px">&#215;</span>';c.appendChild(row);};
 window._fn_saveGymLog=function(){
-  var rows=document.querySelectorAll('.gym-row');var exercises=[];
-  rows.forEach(function(row){var inp=row.querySelectorAll('input');var nm=(inp[0]&&inp[0].value.trim())||'';var sets=(inp[1]&&inp[1].value.trim())||'';var kg=(inp[2]&&inp[2].value.trim())||'';if(nm)exercises.push({name:nm,sets:sets,kg:kg});});
+  var exercises=[];
+  // Collect inline rows (from schedule)
+  document.querySelectorAll('.gym-inline-inp').forEach(function(inp){
+    var cat=inp.getAttribute('data-cat');
+    var ref=inp.getAttribute('data-ref');
+    var val=(inp.value||'').trim();
+    var kgEl=inp.nextElementSibling;
+    var kg=kgEl&&kgEl.classList.contains('gym-inline-inp-kg')?(kgEl.value||'').trim():'';
+    if(val)exercises.push({name:cat+(ref?' ('+ref+')':''),sets:val,kg:kg});
+  });
+  // Collect extra custom rows
+  document.querySelectorAll('#gym-rows .gym-row').forEach(function(row){
+    var inp=row.querySelectorAll('input');
+    var nm=(inp[0]&&inp[0].value.trim())||'';
+    var sets=(inp[1]&&inp[1].value.trim())||'';
+    var kg=(inp[2]&&inp[2].value.trim())||'';
+    if(nm)exercises.push({name:nm,sets:sets,kg:kg});
+  });
   var msg=document.getElementById('gym-msg');
-  if(!exercises.length){if(msg){msg.textContent='Nhập ít nhất 1 bài!';msg.style.color='var(--red)';}return;}
-  var log=gs('gym_log',[]);var dt=document.getElementById('gym-date');var mu=document.getElementById('gym-muscle');var nt=document.getElementById('gym-note');
+  if(!exercises.length){if(msg){msg.textContent='Nh\u1eadp \u00edt nh\u1ea5t 1 b\u00e0i!';msg.style.color='var(--red)';}return;}
+  var log=gs('gym_log',[]);
+  var dt=document.getElementById('gym-date');var mu=document.getElementById('gym-muscle');var nt=document.getElementById('gym-note');
   log.unshift({id:Date.now(),date:(dt&&dt.value)||tdk(),muscle:(mu&&mu.value)||'',exercises:exercises,note:(nt&&nt.value)||''});
-  if(log.length>200)log=log.slice(0,200);ss('gym_log',log);
-  if(msg){msg.textContent='✓ Đã lưu!';msg.style.color='var(--grn)';}
-  var c=document.getElementById('gym-rows');if(c){var k=c.children[0];c.innerHTML='';if(k){k.querySelectorAll('input').forEach(function(i){i.value='';});c.appendChild(k);}}
-  if(nt)nt.value='';renderGymHist();schedulePush();
+  if(log.length>200)log=log.slice(0,200);
+  ss('gym_log',log);
+  if(msg){msg.textContent='\u2713 \u0110\u00e3 l\u01b0u!';msg.style.color='var(--grn)';}
+  // Reset inline inputs
+  document.querySelectorAll('.gym-inline-inp,.gym-inline-inp-kg').forEach(function(i){i.value='';});
+  var c=document.getElementById('gym-rows');
+  if(c){var k=c.children[0];c.innerHTML='';if(k){k.querySelectorAll('input').forEach(function(i){i.value='';});c.appendChild(k);}}
+  if(nt)nt.value='';
+  renderGymHist();schedulePush();
 };
+
 function addGymRow(){window._fn_addGymRow&&window._fn_addGymRow();}
 function saveGymLog(){window._fn_saveGymLog&&window._fn_saveGymLog();}
 function renderGymHist(){
@@ -2336,7 +2340,72 @@ function saveConceptDetail(i){
 function deleteConcept(i){
   if(!confirm('Xóa concept này?'))return;
   concepts.splice(i,1);ss('concepts',concepts);closeConceptDetail();
-}</script>
+}
+
+function initGym(){
+  var d=document.getElementById('gym-date');
+  if(d&&!d.value)d.value=new Date().toISOString().slice(0,10);
+  // Auto-select today's muscle group based on schedule
+  var started=new Date('2026-04-07');
+  var wi=Math.max(0,Math.min(Math.floor((Date.now()-started)/604800000),(GYM_DATA.length-1)));
+  var lbl=document.getElementById('gym-week-label');
+  if(lbl)lbl.textContent='Tuần '+(wi+1)+' / '+GYM_DATA.length;
+  renderGymInline();
+  renderGymHist();
+}
+
+function renderGym(){renderGymInline();}
+
+function renderGymInline(){
+  var el=document.getElementById('gym-inline-rows');if(!el)return;
+  var started=new Date('2026-04-07');
+  var wi=Math.max(0,Math.min(Math.floor((Date.now()-started)/604800000),(GYM_DATA.length-1)));
+  var muscleEl=document.getElementById('gym-muscle');
+  var selectedMuscle=muscleEl?muscleEl.value:'';
+  var ex=((GYM_DATA[wi])||{}).exercises||{};
+  var COL={'Ngực':'var(--red)','Lưng':'var(--blu)','Vai':'#8b5cf6','Tay':'var(--amber)',
+           'Chân':'var(--grn)','Bụng & Core':'var(--ink2)','Bơi':'#06b6d4'};
+
+  var html='';
+  // Show ALL muscle groups as sections
+  Object.keys(ex).forEach(function(cat){
+    var vals=ex[cat];if(!vals||(Array.isArray(vals)&&!vals.length))return;
+    var col=COL[cat]||'var(--ink2)';
+    var isSwim=typeof vals==='string';
+
+    html+='<div style="margin-bottom:12px;border:1.5px solid '+col+'30;border-radius:var(--r);overflow:hidden">';
+    html+='<div style="background:'+col+'12;padding:8px 10px;display:flex;justify-content:space-between;align-items:center">';
+    html+='<span style="font-size:0.714rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:'+col+'">'+cat+'</span>';
+    html+='<span style="font-size:0.714rem;color:'+col+';opacity:.7">';
+    if(isSwim)html+=vals;
+    else html+=vals.length+' b\u00e0i';
+    html+='</span></div>';
+
+    if(isSwim){
+      // Bơi: just distance input
+      html+='<div style="padding:8px 10px;display:flex;gap:8px;align-items:center">';
+      html+='<span style="font-size:0.857rem;flex:1">&#127946; '+vals+'</span>';
+      html+='<input class="fi gym-inline-inp" data-cat="'+cat+'" data-idx="0" data-ref="'+vals+'" placeholder="km th\u1ef1c t\u1ebf" style="width:80px;font-size:12px">';
+      html+='</div>';
+    } else {
+      vals.forEach(function(v,idx){
+        html+='<div style="display:flex;gap:6px;align-items:center;padding:6px 10px;border-top:1px solid '+col+'15">';
+        html+='<div style="flex:1">';
+        html+='<div style="font-size:0.786rem;font-weight:600;color:var(--ink)">'+(idx+1)+'. <span style="font-size:0.714rem;color:var(--ink3)">('+v+')</span></div>';
+        html+='</div>';
+        html+='<input class="fi gym-inline-inp" data-cat="'+cat+'" data-idx="'+idx+'" data-ref="'+v+'" placeholder="Set×Rep" style="width:72px;font-size:11px">';
+        html+='<input class="fi gym-inline-inp-kg" data-cat="'+cat+'" data-idx="'+idx+'" placeholder="kg" style="width:52px;font-size:11px">';
+        html+='</div>';
+      });
+    }
+    html+='</div>';
+  });
+
+  // If no data for this week
+  if(!html)html='<div style="color:var(--ink4);font-size:12px;padding:8px 0">Kh\u00f4ng c\u00f3 d\u1eef li\u1ec7u tu\u1ea7n n\u00e0y</div>';
+  el.innerHTML=html;
+}
+</script>
 </body>
 </html
 
