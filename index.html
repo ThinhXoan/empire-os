@@ -728,6 +728,16 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:16px;height:16px;b
   </div>
 </div>
 <div class="panel" id="p7">
+  <div class="card" style="border:1.5px solid var(--amber);background:var(--ambg);margin-top:10px">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div class="cl" style="margin:0;color:var(--amber)">&#128276; Thông báo</div>
+        <div style="font-size:11px;color:var(--ink3);margin-top:3px">Nh&#7855;c gi&#7901; War Schedule + OBT</div>
+      </div>
+      <button class="btn btn-primary" onclick="requestNotifPermission()" style="font-size:12px;padding:8px 14px">B&#7853;t</button>
+    </div>
+    <div style="font-size:10px;color:var(--ink4);margin-top:8px">&#8226; C&#7847;n m&#7903; app trong background &#8226; iOS: Safari &#8594; Add to Home Screen tr&#432;&#7899;c</div>
+  </div>
   <div class="card" style="margin-top:10px">
     <div class="cl">⚙ Cài đặt</div>
     <div style="font-size:12px;color:var(--ink3);line-height:1.6;margin-bottom:14px">Tất cả lưu trong máy. Sửa xong bấm Lưu.</div>
@@ -879,6 +889,8 @@ function saveGymLog(){setTimeout(function(){if(typeof window._fn_saveGymLog==='f
 function lichtab(i){try{[0,1,2,3].forEach(function(j){var t=document.getElementById('lt9-'+j),p=document.getElementById('lp9-'+j);if(t)t.classList.toggle('active',j===i);if(p)p.style.display=j===i?'block':'none';});setTimeout(function(){if(i===0&&typeof renderLich==='function')renderLich();if(i===1&&typeof renderLichEng==='function')renderLichEng();if(i===2&&typeof renderLichGuitar==='function')renderLichGuitar();if(i===3&&typeof renderLichBiz==='function')renderLichBiz();},100);}catch(e){}}
 
 function addConcept(){setTimeout(function(){if(typeof window._addConcept==='function')window._addConcept();else if(typeof concepts!=='undefined'){var inp=document.getElementById('concept-name');if(inp&&inp.value.trim())addConcept();}},100);}
+
+function requestNotifPermission(){setTimeout(function(){if(typeof window._reqNotif==='function')window._reqNotif();},100);}
 </script>
 
 <div class="nav"><div class="nav-inner">
@@ -2393,6 +2405,92 @@ function renderGymInline(){
   el.innerHTML=html;
 }
 
+
+
+// ── PUSH NOTIFICATIONS ───────────────────────────────────
+var _notifGranted=false;
+var _notifiedBlocks={};
+
+function requestNotifPermission(){
+  if(!('Notification' in window)){showToast('Trình duyệt không hỗ trợ thông báo');return;}
+  if(Notification.permission==='granted'){
+    _notifGranted=true;
+    showToast('✓ Thông báo đã bật!');
+    ss('notif_on',true);
+    return;
+  }
+  Notification.requestPermission().then(function(perm){
+    _notifGranted=perm==='granted';
+    if(_notifGranted){
+      showToast('✓ Thông báo đã bật!');
+      ss('notif_on',true);
+      new Notification('Empire OS ⚔', {body:'Thông báo War Schedule đã bật!',icon:'/icon-192.png'});
+    } else {
+      showToast('Bạn đã từ chối thông báo');
+      ss('notif_on',false);
+    }
+  });
+}
+
+function sendNotif(title, body, tag){
+  if(!_notifGranted)return;
+  try{
+    new Notification(title,{
+      body:body,
+      tag:tag||'empire',
+      icon:'/icon-192.png',
+      badge:'/icon-192.png',
+      vibrate:[200,100,200],
+      requireInteraction:false
+    });
+  }catch(e){console.log('Notif error:',e);}
+}
+
+function checkWarNotif(){
+  if(!_notifGranted)return;
+  var now=new Date();
+  var nm=now.getHours()*60+now.getMinutes();
+  var dateKey=now.toDateString();
+  (WAR||[]).forEach(function(w,i){
+    var wm=tm(w.t);
+    // Notify at exact minute OR 1 min before
+    if(nm===wm||nm===wm-1){
+      var key=dateKey+'_'+i;
+      if(!_notifiedBlocks[key]){
+        _notifiedBlocks[key]=true;
+        var msg=nm===wm-1?'1 phút nữa: ':'Bắt đầu: ';
+        sendNotif('⚔ '+w.ti, msg+w.d.slice(0,60), 'war_'+i);
+      }
+    }
+  });
+  // OBT reminder: 7:15 every day
+  if(nm===435){
+    var obtKey=dateKey+'_obt';
+    if(!_notifiedBlocks[obtKey]){
+      _notifiedBlocks[obtKey]=true;
+      var obt=OBTs.find(function(o){return o.date===tdk();});
+      if(obt&&!obt.done)sendNotif('◈ Core Dominance bắt đầu','Chỉ 1 việc: OBT. Deep Work 90p. Tắt thông báo.','obt');
+    }
+  }
+  // Giờ Tỵ: 10:00
+  if(nm===600){
+    var gKey=dateKey+'_gioty';
+    if(!_notifiedBlocks[gKey]){
+      _notifiedBlocks[gKey]=true;
+      sendNotif('⚡ Giờ Tỵ · Quyết định','Hỏa cực thịnh. Chốt 3 ưu tiên. Quyết ở 70% data.','gioty');
+    }
+  }
+}
+
+// Auto-request on load if previously granted
+(function(){
+  if(Notification&&Notification.permission==='granted'){
+    _notifGranted=true;
+  }
+  // Check every minute
+  setInterval(checkWarNotif,60000);
+  setTimeout(checkWarNotif,3000);
+})();
 </script>
 </body>
 </html
