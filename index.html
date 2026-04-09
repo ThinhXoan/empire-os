@@ -48,7 +48,7 @@
 /* ── Reset ── */
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:var(--bg);overflow-x:hidden}
-body{font-family:var(--fb);color:var(--ink);font-size:14px}
+html{font-size:14px}body{font-family:var(--fb);color:var(--ink);font-size:1rem}
 
 /* ════════════════════════════════════════════
    MOBILE LAYOUT (default)
@@ -1135,6 +1135,20 @@ window.addEventListener('appinstalled',()=>document.getElementById('ibanner').cl
   checkAlerts();setInterval(checkAlerts,60000);setInterval(updWarNow,60000);
   selQ('q1');
   renderAll();updWarNow();
+  // Desktop: adjust nav top after header renders
+  setTimeout(function(){
+    if(window.innerWidth>=768){
+      var hdr=document.querySelector('.hdr');
+      var nav=document.querySelector('.nav');
+      if(hdr&&nav){
+        var hh=hdr.offsetHeight;
+        nav.style.top=hh+'px';
+        nav.style.height='calc(100vh - '+hh+'px)';
+        // Also fix hdr padding-left for desktop
+        hdr.style.paddingLeft='var(--sidebar)';
+      }
+    }
+  },100);
 })();
 
 function renderAll(){
@@ -1902,17 +1916,27 @@ function renderQtHist(){
 
 // ── ZOOM ──
 function setZoom(scale){
+  // Scale via root font-size — affects everything including fixed nav
+  var base=14;
+  document.documentElement.style.fontSize=(base*scale)+'px';
   document.documentElement.style.setProperty('--scale',scale);
-  var appEl=document.querySelector('.app');
-  if(appEl){
-    if('zoom' in appEl.style || CSS.supports('zoom',scale)){
-      appEl.style.zoom=scale;
-      appEl.style.transform='';
-      appEl.style.transformOrigin='';
-    } else {
-      appEl.style.transform='scale('+scale+')';
-      appEl.style.transformOrigin='top center';
-    }
+  // On desktop, also scale sidebar width
+  var isMobile=window.innerWidth<768;
+  if(!isMobile){
+    var sw=scale===1?240:scale===1.5?220:200;
+    document.documentElement.style.setProperty('--sidebar',sw+'px');
+    // Update body padding-left to match
+    document.body.style.paddingLeft=sw+'px';
+    // Update nav header offset (fixed header height may change)
+    setTimeout(function(){
+      var hdr=document.querySelector('.hdr');
+      var navEl=document.querySelector('.nav');
+      if(hdr&&navEl){
+        var hh=hdr.offsetHeight;
+        navEl.style.top=hh+'px';
+        navEl.style.height='calc(100vh - '+hh+'px)';
+      }
+    },50);
   }
   localStorage.setItem('zoom',scale);
   document.querySelectorAll('.zoom-btn').forEach(function(b){b.classList.remove('active');});
