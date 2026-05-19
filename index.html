@@ -253,21 +253,163 @@
         body.perf-mode * { animation: none !important; transition: none !important; }
         body.perf-mode .stat-card:hover { transform: none; }
 
+        /* Quick Capture Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); 
+            z-index: 9000; display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: all 0.25s ease;
+        }
+        .modal-overlay.show-modal { opacity: 1; visibility: visible; }
+        .modal-content { 
+            background: var(--bg-card); border-radius: var(--radius-lg); 
+            padding: 1.5rem; width: 92%; max-width: 520px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            transform: scale(0.95); transition: all 0.25s ease;
+            max-height: 90vh; overflow-y: auto;
+        }
+        .modal-overlay.show-modal .modal-content { transform: scale(1); }
+
+        /* Mini-tags for tasks */
+        .minitag { 
+            font-size: 10px; padding: 2px 6px; border-radius: 4px; 
+            background: var(--bg-body); border: 1px solid var(--border); 
+            display: inline-block; margin-right: 4px; font-weight: 600;
+            color: var(--text-muted);
+        }
+        .minitag.tag-ev { background: var(--primary-light); color: var(--primary); border-color: transparent; }
+        .minitag.tag-auto { background: var(--info-light); color: var(--info); border-color: transparent; }
+        .minitag.tag-rep { background: var(--success-light); color: var(--success); border-color: transparent; }
+
+        /* Drag & Drop styling */
+        .draggable-task { cursor: grab; user-select: none; }
+        .draggable-task:active { cursor: grabbing; }
+        .matrix-box.drag-over { background: var(--primary-light); border-color: var(--primary); border-style: dashed; }
+        .matrix-box { transition: background 0.15s ease; }
+
+        /* Dispatcher button quadrant */
+        .quad-btn { padding: 0.3rem 0.5rem; font-size: 0.7rem; font-weight: 700; }
+        .quad-btn.q1 { color: var(--danger); }
+        .quad-btn.q2 { color: var(--success); }
+        .quad-btn.q3 { color: var(--accent); }
+        .quad-btn.q4 { color: var(--text-muted); }
+
+        /* Flow Mode glow */
+        .flow-active { 
+            border-color: var(--primary) !important; 
+            box-shadow: 0 0 0 3px var(--primary-light), 0 0 20px var(--primary-light) !important; 
+        }
+
+        /* WIP alert */
+        .wip-alert {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border-left: 4px solid var(--accent);
+            color: #92400e;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
         /* Responsive Mobile */
         @media (max-width: 1024px) { .grid-4 { grid-template-columns: 1fr 1fr; } .grid-2 { grid-template-columns: 1fr; } .grid-3 { grid-template-columns: 1fr; } }
         @media (max-width: 768px) {
             .app-layout { flex-direction: column; }
-            .sidebar { position: fixed; bottom: 0; left: 0; width: 100%; height: auto; flex-direction: row; border-top: 1px solid var(--border); z-index: 100;}
+            .sidebar { 
+                position: fixed; bottom: 0; left: 0; width: 100%; height: auto; 
+                flex-direction: row; border-top: 1px solid var(--border); z-index: 100;
+                padding-bottom: env(safe-area-inset-bottom);
+            }
             .sidebar-header, .nav-section-title { display: none; }
-            .sidebar-nav { flex-direction: row; padding: 0.5rem; overflow-x: auto; align-items: center; gap: 0.25rem;}
-            .nav-item { flex-direction: column; gap: 0.25rem; min-width: 70px; padding: 0.5rem 0.25rem; font-size: 0.65rem; justify-content: center; border-radius: var(--radius-sm); }
-            .nav-item.active { box-shadow: none; background: rgba(124, 58, 237, 0.1); color: var(--primary);}
-            .nav-badge { top: 4px; right: 16px; padding: 0; width: 8px; height: 8px; color: transparent; }
-            .main-wrapper { padding-bottom: 75px; }
-            .top-header { padding: 1.5rem 1rem 1rem 1rem; flex-direction: column; gap: 1rem; }
-            .header-tools { width: 100%; justify-content: flex-end; }
+            .sidebar-nav { 
+                flex-direction: row; padding: 0.5rem 0.25rem; 
+                overflow-x: auto; overflow-y: hidden; align-items: stretch; gap: 4px;
+                -webkit-overflow-scrolling: touch; 
+                scroll-snap-type: x proximity;
+            }
+            .sidebar-nav::-webkit-scrollbar { display: none; }
+            .nav-item { 
+                flex-direction: column; gap: 4px; 
+                min-width: 78px; padding: 8px 6px; 
+                font-size: 0.7rem; font-weight: 600;
+                justify-content: center; align-items: center;
+                border-radius: 10px; 
+                scroll-snap-align: start;
+                text-align: center; line-height: 1.15;
+                white-space: nowrap;
+            }
+            .nav-item .nav-icon { font-size: 1.35rem; line-height: 1; }
+            .nav-item.active { 
+                box-shadow: none; 
+                background: rgba(124, 58, 237, 0.15); 
+                color: var(--primary);
+                font-weight: 700;
+            }
+            .nav-badge { top: 4px; right: 12px; padding: 0; width: 8px; height: 8px; color: transparent; min-width: 8px; }
+            .main-wrapper { padding-bottom: calc(90px + env(safe-area-inset-bottom)); }
+            .top-header { padding: 1.25rem 1rem 0.75rem 1rem; flex-direction: column; gap: 0.75rem; align-items: stretch; }
+            .header-tools { width: 100%; justify-content: space-between; }
+            .header-tools .btn { flex: 1; }
             .main-content { padding: 0 1rem 1rem 1rem; }
-            .card-section, .stat-card { padding: 1.25rem; }
+            .card-section, .stat-card { padding: 1rem; }
+            
+            /* Mobile-friendly forms: stack inputs vertical when needed */
+            .grid-2 { grid-template-columns: 1fr; gap: 1rem; }
+            .grid-3 { grid-template-columns: 1fr; gap: 0.75rem; }
+            .grid-4 { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+            
+            /* Stack flex rows with inputs on mobile */
+            .card-section .flex.gap-2:not(.justify-between):not(.align-center) { flex-wrap: wrap; }
+            .card-section .flex.gap-2 > input,
+            .card-section .flex.gap-2 > select,
+            .card-section .flex.gap-2 > textarea { 
+                min-width: 100%; flex: 1 1 100%; 
+            }
+            .card-section .flex.gap-2 > button { 
+                flex: 1 1 100%; 
+            }
+            /* But keep sub-tabs horizontal */
+            .sub-nav { flex-wrap: nowrap; }
+            
+            /* Inputs bigger on mobile */
+            input, textarea, select { 
+                font-size: 16px !important; /* prevent iOS auto-zoom */
+                padding: 0.85rem 1rem;
+            }
+            input[type="range"] { padding: 0.5rem 0; }
+            input[type="checkbox"] { width: 22px; height: 22px; }
+            
+            /* Buttons bigger touch targets */
+            .btn { padding: 0.85rem 1rem; min-height: 44px; }
+            .btn-small { padding: 0.5rem 0.75rem; min-height: 36px; font-size: 0.8rem; }
+            .quad-btn { min-height: 40px; font-size: 0.85rem; padding: 0.5rem; }
+            
+            /* Page title */
+            .page-title { font-size: 1.4rem; }
+            
+            /* Matrix on mobile - single column with bigger drop zones */
+            .matrix-grid { grid-template-columns: 1fr; gap: 0.75rem; }
+            .matrix-box { min-height: 80px; padding: 0.85rem; }
+            
+            /* Mini-tags wrap cleanly */
+            .minitag { margin-bottom: 2px; }
+            
+            /* Stat cards more compact */
+            .stat-value { font-size: 1.75rem; }
+            .stat-value input { font-size: 1.75rem; width: 50px; }
+            
+            /* Lists with better tap targets */
+            .list-row { padding: 0.85rem 0; gap: 0.75rem; }
+            
+            /* Modal mobile fix */
+            .modal-content { width: 95%; padding: 1.25rem; max-height: 85vh; }
+            
+            /* Water grid tighter */
+            .water-grid { grid-template-columns: repeat(4, 1fr); gap: 10px; }
+            
+            /* Pomodoro widget */
+            .pomodoro-widget { flex-direction: column; gap: 1rem; text-align: center; }
+            .pomo-time { font-size: 3rem; }
         }
     </style>
 </head>
@@ -278,30 +420,33 @@
 <div class="app-layout">
     <!-- SIDEBAR -->
     <aside class="sidebar">
-        <div class="sidebar-header"><div class="icon">T</div><h2>PPT OS</h2></div>
+        <div class="sidebar-header"><div class="icon">E</div><h2>Empire OS</h2></div>
         <nav class="sidebar-nav">
             <div class="nav-section-title">Core Center</div>
-            <div class="nav-item active" onclick="nav(0)"><span class="nav-icon">📊</span> Dashboard</div>
-            <div class="nav-item" onclick="nav(1)"><span class="nav-icon">⭐</span> XP/Habits</div>
-            <div class="nav-item" onclick="nav(2)"><span class="nav-icon">⚔️</span> War Gym</div>
-            <div class="nav-item" onclick="nav(3)"><span class="nav-icon">⚖️</span> Ma Trận Quyết</div>
+            <div class="nav-item active" onclick="nav(0)"><span class="nav-icon">📊</span> <span>Dashboard</span></div>
+            <div class="nav-item" onclick="nav(1)"><span class="nav-icon">⭐</span> <span>Habits</span></div>
+            <div class="nav-item" onclick="nav(2)"><span class="nav-icon">⚔️</span> <span>Gym</span></div>
+            <div class="nav-item" onclick="nav(3)"><span class="nav-icon">⚖️</span> <span>Quyết</span></div>
             
             <div class="nav-section-title">Operations</div>
             <div class="nav-item" onclick="nav(4)">
-                <span class="nav-icon">🔔</span> Nhắc Nhở
+                <span class="nav-icon">🔔</span> <span>Nhắc</span>
                 <span class="nav-badge hidden" id="nav-remind-badge"></span>
             </div>
-            <div class="nav-item" onclick="nav(5)"><span class="nav-icon">📝</span> Review Log</div>
-            <div class="nav-item" onclick="nav(6)"><span class="nav-icon">🗺️</span> Planning</div>
+            <div class="nav-item" onclick="nav(5)"><span class="nav-icon">📝</span> <span>Review</span></div>
+            <div class="nav-item" onclick="nav(6)"><span class="nav-icon">🗺️</span> <span>Plan</span></div>
             
             <div class="nav-section-title">Intelligence</div>
-            <div class="nav-item" onclick="nav(7)"><span class="nav-icon">📚</span> Học / Insight</div>
-            <div class="nav-item" onclick="nav(8)"><span class="nav-icon">🎯</span> Goal & Hierarchy</div>
-            <div class="nav-item" onclick="nav(9)"><span class="nav-icon">📈</span> Data Track</div>
+            <div class="nav-item" onclick="nav(7)"><span class="nav-icon">📚</span> <span>Học</span></div>
+            <div class="nav-item" onclick="nav(8)"><span class="nav-icon">🎯</span> <span>Goal</span></div>
+            <div class="nav-item" onclick="nav(9)"><span class="nav-icon">📈</span> <span>Track</span></div>
             
             <div class="nav-section-title">System</div>
-            <div class="nav-item" onclick="nav(11)"><span class="nav-icon">📜</span> Đế Đạo (Codex)</div>
-            <div class="nav-item" onclick="nav(10)"><span class="nav-icon">⚙️</span> Cấu Hình</div>
+            <div class="nav-item" onclick="nav(15)"><span class="nav-icon">⚠️</span> <span>Antidote</span> <span class="nav-badge hidden" id="nav-antidote-badge"></span></div>
+            <div class="nav-item" onclick="nav(14)"><span class="nav-icon">📓</span> <span>Notes</span></div>
+            <div class="nav-item" onclick="nav(13)"><span class="nav-icon">🔮</span> <span>Mệnh</span></div>
+            <div class="nav-item" onclick="nav(11)"><span class="nav-icon">📜</span> <span>Codex</span></div>
+            <div class="nav-item" onclick="nav(10)"><span class="nav-icon">⚙️</span> <span>Setup</span></div>
         </nav>
     </aside>
 
@@ -313,6 +458,7 @@
                 <p class="page-subtitle" id="page-subtitle">Execute your daily commands.</p>
             </div>
             <div class="header-tools">
+                <button class="btn btn-primary" onclick="openGTDModal()" title="Quick Capture (G)">⚡ Capture</button>
                 <button class="tool-btn" onclick="forceSync()" title="Sync với Cloud" style="position:relative"><span>☁️</span><span class="sync-dot" id="sync-dot"></span></button>
                 <button class="tool-btn" onclick="toggleTheme()" title="Đổi giao diện Sáng/Tối">🌓</button>
             </div>
@@ -322,6 +468,33 @@
             
             <!-- P0: TODAY DASHBOARD -->
             <div id="p0" class="panel">
+                <!-- Antidote Alert Banner (auto-detect) -->
+                <div id="antidote-banner" class="hidden" style="background:linear-gradient(135deg, var(--danger-light), var(--accent-light)); border:2px solid var(--danger); padding:1.25rem; border-radius:var(--radius-lg)">
+                    <div class="flex justify-between align-center mb-2">
+                        <div class="flex align-center gap-2">
+                            <span style="font-size:1.5rem">⚠️</span>
+                            <div>
+                                <div class="text-xs font-bold text-danger" style="text-transform:uppercase; letter-spacing:1px">PATTERN PHÁT HIỆN</div>
+                                <div class="font-bold" id="antidote-banner-name" style="font-size:1.05rem">--</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-small" onclick="dismissAntidoteBanner()" style="padding:2px 8px">✕</button>
+                    </div>
+                    <div class="text-sm mb-3" id="antidote-banner-diagnosis"></div>
+                    <div class="flex gap-2">
+                        <button class="btn btn-danger btn-small w-100" onclick="runAntidotePractice()">💊 Practice ngay (2 phút)</button>
+                        <button class="btn btn-small" onclick="nav(15)">📋 Xem chi tiết</button>
+                    </div>
+                </div>
+                
+                <!-- Daily Affirmation (chart-aligned, grounded) -->
+                <div class="card-section" id="affirmation-card" style="background:linear-gradient(135deg, var(--primary-light), var(--accent-light)); border:none; padding:1.25rem">
+                    <div class="flex justify-between align-center mb-2">
+                        <div class="text-xs font-bold text-muted" style="text-transform:uppercase; letter-spacing:1px">☀️ Morning Affirmation</div>
+                        <button class="btn btn-small btn-outline" onclick="let d=new Date().getDate()+Math.floor(Math.random()*100); let a=AFFIRMATIONS_GROUNDED[d%AFFIRMATIONS_GROUNDED.length]; document.getElementById('affirmation-text').innerText=a;" style="padding:2px 8px; font-size:0.7rem">🔄</button>
+                    </div>
+                    <div id="affirmation-text" class="font-bold" style="font-size:1.05rem; line-height:1.4; color:var(--text-main)">Đang load...</div>
+                </div>
                 <!-- Pomodoro Deep Work -->
                 <div class="pomodoro-widget">
                     <div>
@@ -372,24 +545,48 @@
                 <div class="grid-4">
                     <div class="stat-card">
                         <div class="stat-header"><span class="stat-title purple">Đơn Hôm Nay</span><div class="icon-box purple">📦</div></div>
-                        <div class="stat-value">
-                            <input type="number" id="t-orders" value="0" onchange="updateOrders()">
-                            <span class="text-muted" style="font-size:1rem; margin: 0 4px">/</span>
-                            <input type="number" id="t-target" value="5" onchange="updateOrders()" style="width:40px; color:var(--text-muted)">
+                        <div class="flex align-center gap-2 mt-2">
+                            <input type="number" id="t-orders" value="0" onchange="updateOrders()" style="font-size:2rem; font-weight:800; width:60px; background:transparent; border:none; border-bottom:2px solid var(--primary); color:var(--text-main); padding:0;">
+                            <span class="text-muted" style="font-size:1.1rem;">/</span>
+                            <input type="number" id="t-target" value="5" onchange="updateOrders()" style="font-size:1.5rem; font-weight:600; width:40px; background:transparent; border:none; border-bottom:1px dashed var(--border); color:var(--text-muted); padding:0;">
                         </div>
+                        <div class="progress-track mt-2" style="height:6px"><div class="progress-fill" id="orders-bar" style="background:var(--primary)"></div></div>
+                        <div class="text-xs text-muted mt-1" id="orders-pct">0% target</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-header"><span class="stat-title gold">Total XP</span><div class="icon-box gold">⭐</div></div>
-                        <div class="stat-value text-accent" id="t-xp-val">0</div>
+                        <div class="stat-value text-accent" id="t-xp-val" style="font-size:2rem">0</div>
+                        <div class="text-xs text-muted mt-1" id="t-rank-display">Recruit</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-header"><span class="stat-title">Power Score</span><div class="icon-box gray">⚡</div></div>
-                        <div class="stat-value" id="t-power-val">--<span class="text-sm text-muted">/50</span></div>
+                        <div class="stat-value" id="t-power-val" style="font-size:2rem">--<span class="text-sm text-muted">/50</span></div>
+                        <div class="progress-track mt-2" style="height:6px"><div class="progress-fill" id="power-bar" style="background:var(--success)"></div></div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-header"><span class="stat-title">Current Streak</span><div class="icon-box green">🔥</div></div>
-                        <div class="stat-value text-success"><span id="t-streak-val">0</span><span class="text-sm text-muted" style="margin-left:4px;">ngày</span></div>
+                        <div class="stat-header"><span class="stat-title">Streak</span><div class="icon-box green">🔥</div></div>
+                        <div class="flex align-center gap-1 mt-2">
+                            <span class="text-success font-bold" id="t-streak-val" style="font-size:2rem">0</span>
+                            <span class="text-sm text-muted">ngày</span>
+                        </div>
+                        <div class="text-xs text-muted mt-1">Best: <span id="t-streak-best">0</span></div>
                     </div>
+                </div>
+
+                <div id="wip-alert" class="wip-alert hidden">
+                    🚨 <b>BOTTLENECK:</b> &gt;5 task Q1+Q2 chưa làm. Đừng nạp thêm — clear hết đã!
+                </div>
+
+                <!-- Weekly → Daily Bridge -->
+                <div class="card-section" id="weekly-today-card" style="border-left:4px solid var(--info); padding:1rem">
+                    <div class="flex justify-between align-center mb-2">
+                        <div>
+                            <div class="text-xs font-bold text-muted" style="text-transform:uppercase; letter-spacing:1px">📅 Plan Hôm Nay (từ Weekly)</div>
+                            <div class="font-bold mt-1" id="weekly-today-day">--</div>
+                        </div>
+                        <button class="btn btn-small btn-primary" onclick="importWeeklyToMatrix()" title="Đẩy plan tuần của hôm nay vào Eisenhower Q2">📥 Push vào Matrix Q2</button>
+                    </div>
+                    <div id="weekly-today-content" style="background:var(--bg-body); padding:0.75rem; border-radius:var(--radius-sm); min-height:50px; font-size:0.85rem; line-height:1.5; white-space:pre-wrap">Chưa set plan tuần. Vào tab Planning → Weekly Plan.</div>
                 </div>
 
                 <!-- OBT & Matrix -->
@@ -409,21 +606,26 @@
                             <button class="btn" onclick="saveOBTReason()">Lưu</button>
                         </div>
                         
+                        <!-- GTD Inbox Dispatcher -->
+                        <div class="section-header mt-6 pt-6" style="border-top: 1px dashed var(--border)"><h4>📥 GTD Inbox Dispatcher</h4><span class="text-xs text-muted" id="gtd-cnt">0 items</span></div>
+                        <p class="text-xs text-muted mb-2">Quick Capture → push vào Eisenhower bằng button Q1/Q2/Q3/Q4</p>
+                        <div id="dispatcher-list" class="flex-col gap-2" style="max-height: 200px; overflow-y:auto"></div>
+                        
                         <div class="section-header mt-6 pt-6" style="border-top: 1px dashed var(--border)"><h4>🔥 Streak Map (30 Days)</h4><span class="text-xs" id="freeze-display"></span></div>
                         <div id="streak-wall" class="streak-wall mb-2"></div>
                         <div class="text-xs text-muted text-center mt-2">Xanh: ≥80% habits · Đỏ: Zero day · Xanh dương: Freeze · Viền: Hôm nay</div>
                     </div>
 
                     <div class="card-section">
-                        <div class="section-header"><h3 style="margin:0">⏰ Eisenhower Matrix</h3></div>
+                        <div class="section-header"><h3 style="margin:0">⏰ Eisenhower Matrix</h3><span class="text-xs text-muted">Kéo thả giữa ô</span></div>
                         <div id="mx-warn" class="hidden alert-box danger mb-4" style="padding:0.75rem">
-                            <div class="text-xs font-bold">⚠️ AI CẢNH BÁO: Gấp/Chữa cháy đang chiếm >40%. Hãy lùi lại focus vào chiến lược (Q2)!</div>
+                            <div class="text-xs font-bold">⚠️ Gấp/Chữa cháy đang chiếm >40%. Lùi lại focus Q2!</div>
                         </div>
                         <div class="matrix-grid">
-                            <div class="matrix-box" style="border-top: 3px solid var(--danger)"><h4 class="text-danger text-sm" id="q1-cnt">Q1 (Khủng hoảng)</h4><div id="q1-list" class="flex-col gap-2 mb-2"></div><input type="text" id="q1-add" placeholder="+ Thêm việc..." class="text-xs" style="margin:0; border:none; background:transparent" onkeypress="if(event.key==='Enter') addMx('q1', 50)"></div>
-                            <div class="matrix-box" style="border-top: 3px solid var(--success)"><h4 class="text-success text-sm" id="q2-cnt">Q2 (Chiến lược)</h4><div id="q2-list" class="flex-col gap-2 mb-2"></div><input type="text" id="q2-add" placeholder="+ Thêm việc..." class="text-xs" style="margin:0; border:none; background:transparent" onkeypress="if(event.key==='Enter') addMx('q2', 30)"></div>
-                            <div class="matrix-box" style="border-top: 3px solid var(--accent)"><h4 class="text-accent text-sm" id="q3-cnt">Q3 (Ủy quyền)</h4><div id="q3-list" class="flex-col gap-2 mb-2"></div><input type="text" id="q3-add" placeholder="+ Thêm việc..." class="text-xs" style="margin:0; border:none; background:transparent" onkeypress="if(event.key==='Enter') addMx('q3', 10)"></div>
-                            <div class="matrix-box" style="border-top: 3px solid var(--text-muted)"><h4 class="text-muted text-sm" id="q4-cnt">Q4 (Loại bỏ)</h4><div id="q4-list" class="flex-col gap-2 mb-2"></div><input type="text" id="q4-add" placeholder="+ Thêm việc..." class="text-xs" style="margin:0; border:none; background:transparent" onkeypress="if(event.key==='Enter') addMx('q4', 5)"></div>
+                            <div class="matrix-box" id="drop-q1" ondragover="allowDrop(event)" ondragleave="leaveDrop(event)" ondrop="drop(event, 'q1')" style="border-top: 3px solid var(--danger)"><h4 class="text-danger text-sm" id="q1-cnt">Q1 (Khủng hoảng)</h4><div id="q1-list" class="flex-col gap-2 mb-2"></div><input type="text" id="q1-add" placeholder="+ Thêm việc..." class="text-xs" style="margin:0; border:none; background:transparent" onkeypress="if(event.key==='Enter') addMx('q1', 50)"></div>
+                            <div class="matrix-box" id="drop-q2" ondragover="allowDrop(event)" ondragleave="leaveDrop(event)" ondrop="drop(event, 'q2')" style="border-top: 3px solid var(--success)"><h4 class="text-success text-sm" id="q2-cnt">Q2 (Chiến lược)</h4><div id="q2-list" class="flex-col gap-2 mb-2"></div><input type="text" id="q2-add" placeholder="+ Thêm việc..." class="text-xs" style="margin:0; border:none; background:transparent" onkeypress="if(event.key==='Enter') addMx('q2', 30)"></div>
+                            <div class="matrix-box" id="drop-q3" ondragover="allowDrop(event)" ondragleave="leaveDrop(event)" ondrop="drop(event, 'q3')" style="border-top: 3px solid var(--accent)"><h4 class="text-accent text-sm" id="q3-cnt">Q3 (Ủy quyền)</h4><div id="q3-list" class="flex-col gap-2 mb-2"></div><input type="text" id="q3-add" placeholder="+ Thêm việc..." class="text-xs" style="margin:0; border:none; background:transparent" onkeypress="if(event.key==='Enter') addMx('q3', 10)"></div>
+                            <div class="matrix-box" id="drop-q4" ondragover="allowDrop(event)" ondragleave="leaveDrop(event)" ondrop="drop(event, 'q4')" style="border-top: 3px solid var(--text-muted)"><h4 class="text-muted text-sm" id="q4-cnt">Q4 (Loại bỏ)</h4><div id="q4-list" class="flex-col gap-2 mb-2"></div><input type="text" id="q4-add" placeholder="+ Thêm việc..." class="text-xs" style="margin:0; border:none; background:transparent" onkeypress="if(event.key==='Enter') addMx('q4', 5)"></div>
                         </div>
                     </div>
                 </div>
@@ -491,42 +693,93 @@
 
             <!-- P2: GYM -->
             <div id="p2" class="panel hidden">
-                <div class="alert-box mb-4" style="background:var(--primary-light); border-color:var(--primary-light)">
-                    <div class="alert-icon">⚔️</div>
-                    <div><h4 style="color:var(--primary)" id="gym-today-title">War Schedule Hôm Nay</h4><p class="font-bold" id="gym-today-text" style="color:var(--text-main); margin:0; font-size:1.1rem">...</p></div>
+                <div class="sub-nav">
+                    <div class="sub-tab active" onclick="switchSubTab('p2', 0)">Today's Workout</div>
+                    <div class="sub-tab" onclick="switchSubTab('p2', 1)">Weekly Schedule</div>
+                    <div class="sub-tab" onclick="switchSubTab('p2', 2)">Bài Tập Pool</div>
+                    <div class="sub-tab" onclick="switchSubTab('p2', 3)">Power Score</div>
                 </div>
-                <div class="grid-2">
-                    <div class="card-section">
-                        <div class="section-header"><h3>⚡ Power Score</h3></div>
-                        <div id="power-score-grid" class="flex-col text-sm"></div>
-                        <div class="mt-4 flex justify-between align-center font-bold pt-4" style="border-top:2px solid var(--border)">
-                            <span class="text-danger" id="ps-sos"></span><span class="font-bold">Tổng: <span class="text-primary" style="font-size:2rem;" id="power-total">0/50</span></span>
-                        </div>
-                        <button class="btn w-100 mt-4" onclick="calcPowerScore()">Lưu Điểm Tuần Này</button>
+                
+                <!-- Today's Workout -->
+                <div id="p2-sub0">
+                    <div class="alert-box mb-4" style="background:var(--primary-light); border-color:var(--primary-light)">
+                        <div class="alert-icon">⚔️</div>
+                        <div><h4 style="color:var(--primary)" id="gym-today-title">Hôm nay (<span id="gym-day-name">--</span>)</h4><p class="font-bold" id="gym-today-text" style="color:var(--text-main); margin:0; font-size:1.1rem">--</p></div>
                     </div>
+                    
                     <div class="card-section">
-                        <div class="section-header"><h3>🏋️ Gym Log</h3></div>
-                        <select id="gym-ex-sel" class="mb-2"><option>Bench Press</option><option>Squat</option><option>Deadlift</option><option>Pull Up</option><option value="other">Khác...</option></select>
-                        <input type="text" id="gym-ex-cust" placeholder="Nhập bài tập..." class="hidden mb-2">
-                        <div class="flex gap-2"><input type="number" id="gym-rep" placeholder="Reps"><input type="number" id="gym-kg" placeholder="Kg"><button class="btn" onclick="addGymSet()">Thêm</button></div>
-                        <div id="gym-curr-sets" class="flex-col mt-4 mb-4"></div>
-                        <button class="btn btn-primary w-100" onclick="endGymSession()">Kết Thúc Buổi Tập (+50XP)</button>
-                        <div class="section-header mt-6"><h4>Recent Results</h4></div>
+                        <div class="section-header"><h3>🏋️ Log Bài Tập</h3></div>
+                        <div class="flex gap-2 mb-2">
+                            <select id="gym-ex-sel" style="margin:0">
+                                <option value="">-- Chọn bài tập --</option>
+                            </select>
+                        </div>
+                        <div class="flex gap-2 mb-2">
+                            <input type="text" id="gym-set1" placeholder="Set 1 (vd: 10x60kg, 30 phút, 5km...)" style="margin:0">
+                            <button class="btn btn-primary" onclick="addGymSet()">+ Add Set</button>
+                        </div>
+                        <div id="gym-curr-sets" class="flex-col mt-2 mb-4"></div>
+                        <textarea id="gym-note" rows="2" placeholder="Ghi chú buổi tập (cảm giác, đau ở đâu, RPE...)" class="mb-2"></textarea>
+                        <button class="btn btn-primary w-100" onclick="endGymSession()">✓ Kết Thúc Buổi (+50XP)</button>
+                    </div>
+                    
+                    <div class="card-section">
+                        <div class="section-header"><h3>📊 Lịch Sử 30 Ngày</h3></div>
                         <div id="gym-history" class="flex-col"></div>
                     </div>
+                </div>
+                
+                <!-- Weekly Schedule -->
+                <div id="p2-sub1" class="hidden card-section">
+                    <div class="section-header"><h3>📅 Lịch Tập Theo Tuần</h3></div>
+                    <p class="text-xs text-muted mb-4">Set chế độ tập cho từng ngày. VD: T2 = Push, T3 = Pull, T4 = Yoga, T5 = Tennis, T6 = Legs, T7 = Cardio, CN = Rest.</p>
+                    <div id="gym-schedule-grid" class="flex-col gap-3"></div>
+                </div>
+                
+                <!-- Exercise Pool -->
+                <div id="p2-sub2" class="hidden card-section">
+                    <div class="section-header"><h3>💪 Pool Bài Tập (Custom)</h3></div>
+                    <p class="text-xs text-muted mb-4">Thêm bài tập bất kỳ vào pool. Mỗi bài có category để filter khi log buổi tập.</p>
+                    <div class="flex gap-2 mb-2">
+                        <input type="text" id="pool-ex-name" placeholder="Tên bài tập (vd: Bench Press, Yoga, Tennis Match...)" style="margin:0">
+                    </div>
+                    <div class="flex gap-2 mb-2">
+                        <select id="pool-ex-cat" style="margin:0">
+                            <option value="push">💪 Push</option>
+                            <option value="pull">🪢 Pull</option>
+                            <option value="legs">🦵 Legs</option>
+                            <option value="core">🧘 Core/Abs</option>
+                            <option value="cardio">🏃 Cardio</option>
+                            <option value="sport">🎾 Sport</option>
+                            <option value="mobility">🤸 Mobility/Yoga</option>
+                            <option value="other">Khác</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="addGymPool()">+ Thêm</button>
+                    </div>
+                    <div id="gym-pool-list" class="flex-col mt-4"></div>
+                </div>
+                
+                <!-- Power Score -->
+                <div id="p2-sub3" class="hidden card-section">
+                    <div class="section-header"><h3>⚡ Power Score (Weekly)</h3></div>
+                    <div id="power-score-grid" class="flex-col text-sm"></div>
+                    <div class="mt-4 flex justify-between align-center font-bold pt-4" style="border-top:2px solid var(--border)">
+                        <span class="text-danger" id="ps-sos"></span><span class="font-bold">Tổng: <span class="text-primary" style="font-size:2rem;" id="power-total">0/50</span></span>
+                    </div>
+                    <button class="btn w-100 mt-4" onclick="calcPowerScore()">Lưu Điểm Tuần Này</button>
                 </div>
             </div>
 
             <!-- P3: QUYẾT -->
             <div id="p3" class="panel hidden">
+                <div class="sub-nav">
+                    <div class="sub-tab active" onclick="switchSubTab('p3', 0)">Decision Matrix</div>
+                    <div class="sub-tab" onclick="switchSubTab('p3', 1)">Issue Log (5-Step)</div>
+                    <div class="sub-tab" onclick="switchSubTab('p3', 2)">Đào Hoa Firewall</div>
+                </div>
+                
+                <div id="p3-sub0">
                 <div class="grid-2">
-                    <div class="card-section" style="border-top: 4px solid var(--danger)">
-                        <div class="section-header"><h3 class="text-danger">🔒 Đào Hoa Firewall</h3></div>
-                        <p class="text-sm text-muted mb-4">Sức hút mãnh liệt 2 chiều. Lock 72h là phanh hãm duy nhất. Trả lời 5 câu hỏi trước khi tiến tới.</p>
-                        <div id="daohoa-qs" class="text-sm flex-col gap-3 mb-6"></div>
-                        <button class="btn btn-danger w-100" onclick="triggerDaoHoaLock()" id="btn-dh-lock">KÍCH HOẠT LOCK 72H</button>
-                        <div id="dh-timer" class="text-center font-bold text-danger mt-2" style="font-size:1.1rem"></div>
-                    </div>
                     <div class="card-section">
                         <div class="section-header"><h3>⚖️ 70% Decision Enforcer</h3></div>
                         <input type="text" id="dec-title" placeholder="Tên quyết định...">
@@ -534,6 +787,15 @@
                         <div id="dec-checks" class="text-sm flex-col my-4"></div>
                         <div class="progress-track mb-2"><div id="dec-bar" class="progress-fill" style="background:var(--danger); width:0%;"></div></div>
                         <div id="dec-banner" class="text-xs font-bold mb-4 text-muted">0% - Chưa đủ data</div>
+                        
+                        <details class="mb-4">
+                            <summary class="text-xs cursor-pointer text-primary font-bold">💀 Pre-mortem (Dalio: học trước, quyết sau)</summary>
+                            <div class="mt-2 p-2" style="background:var(--bg-body); padding:1rem; border-radius:var(--radius-sm)">
+                                <div class="text-xs text-muted mb-2">Nếu quyết định này SAI hoàn toàn, lý do PROBABLE nhất là gì?</div>
+                                <textarea id="dec-premortem" rows="2" placeholder="VD: 'Đối tác sẽ bể kèo vì không có hợp đồng', 'Thị trường không sẵn sàng', 'Tôi đang FOMO'..." style="margin:0"></textarea>
+                                <div class="text-xs text-muted mt-2">→ Nếu lý do này CÓ THẬT, bạn vẫn quyết? Nếu không → STOP.</div>
+                            </div>
+                        </details>
                         
                         <div class="mb-4 pt-4" style="border-top:1px dashed var(--border)">
                             <div class="flex justify-between text-xs font-bold mb-1"><span>🎯 Độ tự tin quyết định này đúng (Superforecasting)</span><span id="dec-conf-val" class="text-primary">70%</span></div>
@@ -543,20 +805,76 @@
                         
                         <button class="btn btn-primary w-100" onclick="saveDecision()">GHI NHẬN QUYẾT ĐỊNH</button>
                     </div>
-                </div>
-                <div class="grid-2">
+                    
                     <div class="card-section">
-                        <div class="section-header"><h3>📜 Decision Log</h3><span class="text-xs font-bold" id="brier-display"></span></div>
-                        <div id="dec-log-list" class="flex-col"></div>
-                    </div>
-                    <div class="card-section">
-                        <div class="section-header"><h3>💀 Post-Mortem</h3></div>
-                        <input type="text" id="pm-dec" placeholder="Quyết định sai nào?">
-                        <textarea id="pm-q1" rows="2" placeholder="Điều gì đã xảy ra / Tại sao sai?"></textarea>
-                        <textarea id="pm-q2" rows="2" placeholder="Bài học & Sẽ làm khác thế nào?"></textarea>
-                        <button class="btn w-100" onclick="savePostMortem()">LƯU PHÂN TÍCH</button>
+                        <div class="section-header"><h3>💀 Post-Mortem (5-Whys)</h3></div>
+                        <p class="text-xs text-muted mb-2">Ray Dalio: Pain + Reflection = Progress. Phân tích root cause kỹ.</p>
+                        <input type="text" id="pm-dec" placeholder="Quyết định/dự án/KPI nào thất bại?" class="mb-2">
+                        <div style="background:var(--bg-body); padding:0.75rem; border-radius:var(--radius-sm); margin-bottom:0.5rem">
+                            <div class="text-xs font-bold mb-2">🔍 5-WHYS (đi xuống tới gốc rễ)</div>
+                            <input type="text" id="pm-w1" placeholder="1. Tại sao? (Triệu chứng bề mặt)" class="mb-1" style="font-size:0.85rem">
+                            <input type="text" id="pm-w2" placeholder="2. Tại sao vậy?" class="mb-1" style="font-size:0.85rem">
+                            <input type="text" id="pm-w3" placeholder="3. Tại sao tiếp?" class="mb-1" style="font-size:0.85rem">
+                            <input type="text" id="pm-w4" placeholder="4. Tại sao?" class="mb-1" style="font-size:0.85rem">
+                            <input type="text" id="pm-w5" placeholder="5. NGUYÊN NHÂN GỐC RỄ" style="font-size:0.85rem; border-color:var(--danger); font-weight:600">
+                        </div>
+                        <input type="text" id="pm-cost" placeholder="Tổn thất ước tính (tiền/thời gian/cơ hội)" class="mb-2">
+                        <input type="text" id="pm-ifthen" placeholder="IF [tình huống] THEN [hành động mới] - để không lặp lại" class="mb-2">
+                        <button class="btn w-100" onclick="savePostMortem()">LƯU VÀO FAILURE LEDGER</button>
                         <div id="pm-list" class="mt-4 flex-col text-xs"></div>
                     </div>
+                </div>
+                <div class="card-section">
+                    <div class="section-header"><h3>📜 Decision Log</h3><span class="text-xs font-bold" id="brier-display"></span></div>
+                    <div id="dec-log-list" class="flex-col"></div>
+                </div>
+                </div>
+                
+                <!-- Issue Log (Dalio 5-Step) -->
+                <div id="p3-sub1" class="hidden">
+                    <div class="alert-box info mb-4">
+                        <div class="alert-icon">🔍</div>
+                        <div><h4 class="text-info">Issue Log (Ray Dalio - 5 Step Process)</h4><p class="text-sm">Step 1: Goals → Step 2: <b>Identify Problems (đừng dung túng!)</b> → Step 3: Diagnose root cause → Step 4: Plan → Step 5: Execute. Pain + Reflection = Progress.</p></div>
+                    </div>
+                    
+                    <div class="grid-2">
+                        <div class="card-section">
+                            <div class="section-header"><h3>🚨 Log Vấn Đề Mới</h3></div>
+                            <input type="text" id="iss-title" placeholder="Vấn đề cụ thể là gì? (đừng chung chung)" class="mb-2">
+                            <select id="iss-area" class="mb-2">
+                                <option value="biz">💰 Business</option>
+                                <option value="health">💪 Health</option>
+                                <option value="learn">📚 Learning</option>
+                                <option value="relation">🤝 Relationships</option>
+                                <option value="money">💵 Finance</option>
+                                <option value="mind">🧠 Mind/Emotion</option>
+                            </select>
+                            <div class="flex justify-between text-xs font-bold mb-1"><span>🌡️ Mức độ đau</span><span id="iss-pain-val" class="text-danger">5/10</span></div>
+                            <input type="range" id="iss-pain" min="1" max="10" value="5" oninput="document.getElementById('iss-pain-val').innerText=this.value+'/10'" class="mb-4" style="padding:0">
+                            
+                            <textarea id="iss-root" rows="2" placeholder="Nguyên nhân GỐC RỄ (đừng nhầm với triệu chứng)" class="mb-2"></textarea>
+                            <textarea id="iss-plan" rows="2" placeholder="Plan cụ thể để xử lý" class="mb-2"></textarea>
+                            <button class="btn btn-primary w-100" onclick="addIssue()">LƯU ISSUE (+30 XP)</button>
+                        </div>
+                        
+                        <div class="card-section">
+                            <div class="section-header"><h3>📊 Active Issues</h3><span class="text-xs text-muted" id="iss-stats"></span></div>
+                            <select id="iss-filter" onchange="rIss()" class="mb-2">
+                                <option value="open">🔥 Đang xử lý</option>
+                                <option value="resolved">✓ Đã giải quyết</option>
+                                <option value="all">Tất cả</option>
+                            </select>
+                            <div id="iss-list" class="flex-col" style="max-height:500px; overflow-y:auto"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="p3-sub2" class="hidden card-section" style="border-top: 4px solid var(--danger)">
+                    <div class="section-header"><h3 class="text-danger">🔒 Đào Hoa Firewall</h3></div>
+                    <p class="text-sm text-muted mb-4">Sức hút mãnh liệt 2 chiều. Lock 72h là phanh hãm duy nhất. Trả lời 5 câu hỏi trước khi tiến tới.</p>
+                    <div id="daohoa-qs" class="text-sm flex-col gap-3 mb-6"></div>
+                    <button class="btn btn-danger w-100" onclick="triggerDaoHoaLock()" id="btn-dh-lock">KÍCH HOẠT LOCK 72H</button>
+                    <div id="dh-timer" class="text-center font-bold text-danger mt-2" style="font-size:1.1rem"></div>
                 </div>
             </div>
 
@@ -626,10 +944,13 @@
                 
                 <div id="p6-sub0">
                     <div class="card-section">
-                        <div class="section-header"><h3>🧠 Brain Dump</h3></div>
-                        <p class="text-sm text-muted mb-4">Đổ mọi ý tưởng lộn xộn vào đây trước khi phân loại.</p>
+                        <div class="section-header">
+                            <h3>🧠 Brain Dump</h3>
+                            <label class="flex align-center gap-2 text-xs font-bold cursor-pointer" title="Chặn Backspace - viết tự do không edit"><input type="checkbox" id="flow-mode-toggle" onchange="toggleFlowMode()"> 🌊 Flow Mode</label>
+                        </div>
+                        <p class="text-sm text-muted mb-4">Đổ mọi ý tưởng lộn xộn vào đây. Flow Mode = chặn Backspace để ép tiếp tục viết, không edit.</p>
                         <textarea id="brain-dump-text" rows="12" placeholder="Viết nháp..." onblur="saveNotes()"></textarea>
-                        <button class="btn btn-primary w-100 mt-2" onclick="saveNotes(); toast('Đã lưu Note!')">Lưu Ghi Chú</button>
+                        <button class="btn btn-primary w-100 mt-2" onclick="saveNotes(); toast('Đã lưu Note!','success')">Lưu Ghi Chú</button>
                     </div>
                 </div>
 
@@ -667,8 +988,7 @@
             <div id="p7" class="panel hidden">
                 <div class="sub-nav">
                     <div class="sub-tab active" onclick="switchSubTab('p7', 0)">Library</div>
-                    <div class="sub-tab" onclick="switchSubTab('p7', 1)">English Vocab</div>
-                    <div class="sub-tab" onclick="switchSubTab('p7', 2)">Mastery</div>
+                    <div class="sub-tab" onclick="switchSubTab('p7', 1)">Mastery</div>
                 </div>
                 
                 <div id="p7-sub0">
@@ -705,9 +1025,19 @@
                         
                         <div class="card-section">
                             <div class="section-header"><h3>💡 INSIGHT LOG</h3></div>
-                            <div class="flex gap-2 mb-4">
+                            <div class="flex gap-2 mb-2">
                                 <select id="learn-tag" style="width:110px;margin:0"><option>Business</option><option>Tech</option><option>Life</option></select>
                                 <input type="text" id="learn-log-text" placeholder="Ghi nhanh insight..." style="margin:0">
+                            </div>
+                            <div class="flex gap-2 align-center mb-2">
+                                <input type="text" id="learn-source" placeholder="Nguồn (Ai/Sách nào?)" style="margin:0; flex:1">
+                                <select id="learn-believe" style="width:110px;margin:0" title="Believability (Dalio): nguồn đã làm được 3+ lần?">
+                                    <option value="9">⭐9-10: Bậc thầy</option>
+                                    <option value="7" selected>⭐7-8: Đáng tin</option>
+                                    <option value="5">⭐5-6: Chưa rõ</option>
+                                    <option value="3">⭐3-4: Lý thuyết</option>
+                                    <option value="1">⭐1-2: Random</option>
+                                </select>
                             </div>
                             <button class="btn btn-primary w-100" onclick="saveLearnLog()">LƯU INSIGHT (+50XP)</button>
                             <div class="section-header mt-6"><h4>RECENT LOGS</h4></div>
@@ -717,77 +1047,26 @@
                 </div>
                 
                 <!-- NEW: English Vocab Tracker -->
-                <div id="p7-sub1" class="hidden">
-                    <div class="alert-box info mb-4">
-                        <div class="alert-icon">🇬🇧</div>
-                        <div><h4 class="text-info">IELTS 8.0 Target - 12/2027</h4><p class="text-sm">Để đạt 8.0, cần khoảng 8,000-10,000 từ vựng active. Track hằng ngày để compound.</p></div>
+                <div id="p7-sub1" class="hidden card-section">
+                    <div class="section-header"><h3>⏳ SKILL MASTERY TRACKER</h3></div>
+                    <p class="text-xs text-muted mb-4">Compound theo skill bạn đang luyện. Set target giờ riêng cho từng skill, không bị bó vào 10k cứng (skill nhỏ có khi 1000h đã master).</p>
+                    
+                    <div class="flex gap-2 mb-2">
+                        <input type="text" id="skill-name" placeholder="Tên skill (vd: Coding Python, Sales, Tennis...)" style="margin:0">
+                    </div>
+                    <div class="flex gap-2 mb-4">
+                        <input type="number" id="skill-target" placeholder="Target giờ (vd: 1000)" style="margin:0">
+                        <button class="btn btn-primary" onclick="addSkill()">+ Thêm Skill</button>
                     </div>
                     
-                    <div class="grid-2">
-                        <div class="card-section">
-                            <div class="section-header"><h3>📝 Thêm từ mới</h3></div>
-                            <input type="text" id="vocab-word" placeholder="Từ (English)" style="margin-bottom:0.5rem">
-                            <input type="text" id="vocab-meaning" placeholder="Nghĩa (VN)" style="margin-bottom:0.5rem">
-                            <input type="text" id="vocab-example" placeholder="Ví dụ câu (tùy chọn)" style="margin-bottom:0.5rem">
-                            <select id="vocab-tag" style="margin-bottom:0.5rem">
-                                <option value="general">General</option><option value="business">Business</option>
-                                <option value="academic">Academic</option><option value="idiom">Idiom/Phrasal</option>
-                            </select>
-                            <button class="btn btn-primary w-100" onclick="addVocab()">+ Add Word (+5XP)</button>
-                            
-                            <div class="section-header mt-6"><h4>📊 Progress</h4></div>
-                            <div class="flex justify-between text-sm font-bold mb-1"><span>Total Vocab</span><span id="vocab-total">0</span></div>
-                            <div class="progress-track mb-4"><div class="progress-fill" id="vocab-bar"></div></div>
-                            <div class="grid-3 text-center">
-                                <div><div class="font-bold" id="vocab-today">0</div><div class="text-xs text-muted">Hôm nay</div></div>
-                                <div><div class="font-bold" id="vocab-week">0</div><div class="text-xs text-muted">7 ngày</div></div>
-                                <div><div class="font-bold" id="vocab-streak">0</div><div class="text-xs text-muted">Streak</div></div>
-                            </div>
-                        </div>
-                        
-                        <div class="card-section">
-                            <div class="section-header"><h3>📖 Vocab Library</h3>
-                                <div class="flex gap-2">
-                                    <button class="btn btn-small btn-outline" onclick="startVocabReview()">🎓 Review</button>
-                                    <select id="vocab-filter-tag" onchange="rVocab()" style="width:120px;margin:0; font-size:0.75rem; padding:4px 8px">
-                                        <option value="all">All</option><option value="general">General</option>
-                                        <option value="business">Business</option><option value="academic">Academic</option>
-                                        <option value="idiom">Idiom</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <input type="text" id="vocab-search" placeholder="Tìm từ..." oninput="rVocab()" class="mb-4">
-                            
-                            <!-- Review mode display -->
-                            <div id="vocab-review-card" class="hidden" style="background:var(--primary-light); padding:1.5rem; border-radius:var(--radius); margin-bottom:1rem; text-align:center; border:2px solid var(--primary)">
-                                <div class="text-xs text-muted mb-2" id="vocab-review-progress"></div>
-                                <div style="font-size:1.8rem; font-weight:800" class="text-primary mb-2" id="vocab-review-word"></div>
-                                <div id="vocab-review-meaning" class="hidden">
-                                    <div class="text-sm font-bold mb-2" id="vocab-review-meaning-text"></div>
-                                    <div class="text-xs text-muted" id="vocab-review-example"></div>
-                                </div>
-                                <div class="flex gap-2 mt-4 justify-center">
-                                    <button class="btn btn-small" id="vocab-show-btn" onclick="vocabShowMeaning()">Show meaning</button>
-                                    <button class="btn btn-small btn-danger hidden" id="vocab-bad-btn" onclick="vocabReviewAnswer(false)">Forgot</button>
-                                    <button class="btn btn-small btn-success hidden" id="vocab-good-btn" onclick="vocabReviewAnswer(true)">Knew it</button>
-                                    <button class="btn btn-small btn-outline" onclick="endVocabReview()">Exit</button>
-                                </div>
-                            </div>
-                            
-                            <div id="vocab-list" class="flex-col" style="max-height:450px; overflow-y:auto"></div>
-                        </div>
+                    <div class="section-header mt-4"><h4>📈 Log Giờ</h4></div>
+                    <div class="flex gap-2 mb-4">
+                        <select id="skill-log-id" style="margin:0"></select>
+                        <input type="number" id="skill-log-h" placeholder="Thêm giờ..." style="width:120px;margin:0" step="0.5">
+                        <button class="btn btn-primary" onclick="logSkill()">+ Log</button>
                     </div>
-                </div>
-                
-                <div id="p7-sub2" class="hidden card-section">
-                    <div class="section-header"><h3>⏳ 10,000 HOURS MASTERY</h3></div>
-                    <p class="text-xs text-muted mb-4">Compound Effect: Tracking absolute hours spent on each domain.</p>
-                    <div class="flex gap-2 mb-6">
-                        <select id="h10k-cat" style="width:110px;margin:0"><option value="biz">Business</option><option value="tech">Tech</option><option value="eng">English</option></select>
-                        <input type="number" id="h10k-val" placeholder="Thêm giờ..." style="width:100px;margin:0">
-                        <button class="btn btn-primary" onclick="add10kHours()">Cộng</button>
-                    </div>
-                    <div id="10k-list" class="flex-col gap-3"></div>
+                    
+                    <div id="skill-list" class="flex-col gap-3"></div>
                 </div>
             </div>
 
@@ -796,8 +1075,8 @@
                 <div class="sub-nav">
                     <div class="sub-tab active" onclick="switchSubTab('p8', 0)">Alignment (Why Chain)</div>
                     <div class="sub-tab" onclick="switchSubTab('p8', 1)">OKRs (Year/Quarter)</div>
-                    <div class="sub-tab" onclick="switchSubTab('p8', 2)">20-Year Milestones</div>
-                    <div class="sub-tab" onclick="switchSubTab('p8', 3)">Scorecard & Rules</div>
+                    <div class="sub-tab" onclick="switchSubTab('p8', 2)">Life Roadmap</div>
+                    <div class="sub-tab" onclick="switchSubTab('p8', 3)">EV Filter (Dự Án)</div>
                 </div>
 
                 <div id="p8-sub0" class="card-section">
@@ -855,22 +1134,47 @@
                     </div>
                 </div>
 
+                <!-- Life Roadmap - Unified -->
                 <div id="p8-sub2" class="card-section hidden">
-                    <div class="section-header"><h3>🏆 20-YEAR MILESTONES</h3></div>
-                    <div class="flex gap-2 mb-4"><input type="text" id="ms-d" placeholder="Date (VD: 2030)" style="width:30%;margin:0"><input type="text" id="ms-t" placeholder="Target" style="margin:0"><button class="btn" onclick="addMS()">Add</button></div>
-                    <div id="milestone-list" class="flex-col"></div>
+                    <div class="section-header"><h3>🗺️ LIFE ROADMAP</h3></div>
+                    <p class="text-xs text-muted mb-4">Theme + 3 outcomes cho mỗi năm trọng tâm. Không nhồi: chỉ 5-7 năm bước ngoặt thôi. Cái nào year hiện tại sẽ được highlight + drilldown.</p>
+                    
+                    <div class="card-section mb-4" style="background:var(--bg-body); padding:1rem">
+                        <div class="font-bold text-sm mb-2">➕ Thêm Năm Trọng Tâm</div>
+                        <div class="flex gap-2 mb-2">
+                            <input type="number" id="lr-year" placeholder="Year (VD: 2027)" min="2024" max="2070" style="width:130px; margin:0">
+                            <input type="text" id="lr-theme" placeholder="Theme chính (VD: IELTS 8.0 + CC chuyên môn)" style="margin:0">
+                        </div>
+                        <input type="text" id="lr-out1" placeholder="Outcome 1 (đo được)" class="mb-1" style="font-size:0.85rem">
+                        <input type="text" id="lr-out2" placeholder="Outcome 2 (đo được)" class="mb-1" style="font-size:0.85rem">
+                        <input type="text" id="lr-out3" placeholder="Outcome 3 (đo được)" class="mb-2" style="font-size:0.85rem">
+                        <button class="btn btn-primary w-100" onclick="addRoadmap()">+ Lưu Năm</button>
+                    </div>
+                    
+                    <div id="roadmap-list" class="flex-col gap-3"></div>
                 </div>
                 
-                <div id="p8-sub3" class="hidden grid-2">
-                    <div class="card-section">
-                        <div class="section-header"><h3>🗓️ Annual Scorecard</h3></div>
-                        <div class="flex gap-2 mb-4"><input type="text" id="sc-y" placeholder="Year" style="width:30%;margin:0"><input type="text" id="sc-m" placeholder="Objective" style="margin:0"><button class="btn" onclick="addSC()">Add</button></div>
-                        <div id="scorecard-list" class="flex-col"></div>
-                    </div>
-                    <div class="card-section">
-                        <div class="section-header"><h3>🧠 12 Nghịch Lý</h3></div>
-                        <div class="flex gap-2 mb-4"><input type="text" id="pd-t" placeholder="Core principle..." style="margin:0"><button class="btn" onclick="addPD()">Add</button></div>
-                        <div id="nghichly-list" class="flex-col"></div>
+                <!-- EV Filter sub-tab -->
+                <div id="p8-sub3" class="hidden card-section">
+                    <div class="section-header"><h3>⚖️ EV Filter - Bộ Lọc Dự Án Mới</h3></div>
+                    <p class="text-xs text-muted mb-4">Trước khi bắt đầu dự án mới, tính EV = (Impact × Probability) / Cost. Score &lt;1 = bỏ, &gt;3 = ưu tiên cao.</p>
+                    <div class="grid-2">
+                        <div>
+                            <input type="text" id="ev-name" placeholder="Tên dự án/cơ hội..." class="mb-2">
+                            <div class="text-xs font-bold mb-1">Impact dự kiến (đơn vị: triệu/giờ/XP - tùy bạn)</div>
+                            <input type="number" id="ev-impact" placeholder="VD: 100 (triệu doanh thu)" class="mb-2">
+                            <div class="text-xs font-bold mb-1">Cost cần đầu tư (cùng đơn vị)</div>
+                            <input type="number" id="ev-cost" placeholder="VD: 30 (triệu vốn + 200h)" class="mb-2">
+                            <div class="text-xs font-bold mb-1">Xác suất thành công (1-100%)</div>
+                            <input type="range" id="ev-prob" min="5" max="95" value="50" oninput="document.getElementById('ev-prob-val').innerText=this.value+'%'; calcEVPreview()" class="mb-2" style="padding:0">
+                            <div class="text-center font-bold text-primary mb-2" id="ev-prob-val">50%</div>
+                            <div id="ev-preview" class="text-center font-bold mb-4" style="padding:1rem; background:var(--bg-body); border-radius:var(--radius-sm)">Nhập số để tính EV</div>
+                            <button class="btn btn-primary w-100" onclick="saveEV()">LƯU EV</button>
+                        </div>
+                        <div>
+                            <div class="section-header"><h4>📊 EV Ranking</h4></div>
+                            <div id="ev-list" class="flex-col"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -886,6 +1190,7 @@
                 <div id="p9-sub0" class="grid-2">
                     <div class="card-section">
                         <div class="section-header"><h3>📈 BIOMETRIC DATA</h3></div>
+                        <div id="chrono-suggest" class="text-xs mb-4" style="padding:0.75rem; background:var(--bg-body); border-radius:var(--radius-sm); border-left:3px solid var(--info)">Log ít nhất 7 ngày để phân tích chronotype...</div>
                         <div class="grid-2"><input type="number" id="bio-w" placeholder="Kg"><input type="number" id="bio-s" placeholder="Sleep (h)"><input type="number" id="bio-e" placeholder="Energy 1-10"><input type="number" id="bio-m" placeholder="Mood 1-10"></div>
                         <button class="btn btn-primary w-100 mt-4" onclick="saveBio()">LOG TELEMETRY</button>
                     </div>
@@ -1027,9 +1332,178 @@ CREATE POLICY "Allow all" ON ppt_os FOR ALL USING (true) WITH CHECK (true);</cod
                 </div>
             </div>
             
+            <!-- P13: BẢN MỆNH -->
+            <div id="p13" class="panel hidden">
+                <div class="alert-box info mb-4">
+                    <div class="alert-icon">🔮</div>
+                    <div>
+                        <h4 class="text-info">Phan Phúc Thịnh · 12/07/2004 · 10:30 AM · HCMC</h4>
+                        <p class="text-sm">Bản đồ vận mệnh + khung điều hành cá nhân</p>
+                    </div>
+                </div>
+                
+                <div class="grid-2 mb-4">
+                    <div class="card-section" style="border-left:4px solid var(--info)">
+                        <div class="section-header"><h3>🌊 BÁT TỰ (Tứ Trụ)</h3></div>
+                        <div class="text-sm mb-2"><b>Năm:</b> Giáp Thân (甲申) — Mộc+ / Khỉ</div>
+                        <div class="text-sm mb-2"><b>Tháng:</b> Tân Mùi (辛未) — Kim- / Dê</div>
+                        <div style="background:var(--info-light); padding:8px 12px; border-radius:6px; margin:8px 0">
+                            <b class="text-info">Ngày: Nhâm Thìn (壬辰)</b> ← NHẬT CHỦ Thủy Dương
+                        </div>
+                        <div class="text-sm mb-3"><b>Giờ:</b> Ất Tỵ (乙巳) — Mộc- / Rắn</div>
+                        <div class="text-xs text-muted pt-2" style="border-top:1px dashed var(--border)">
+                            Nhật chủ <b>Thủy Dương</b> sinh tháng Mùi (mùa hè khô, Hỏa-Thổ vượng) → <b class="text-danger">Thủy thân nhược</b>, cần Kim sinh.
+                        </div>
+                    </div>
+                    
+                    <div class="card-section" style="border-left:4px solid var(--accent)">
+                        <div class="section-header"><h3>⭐ TỬ VI (paste từ tuvi.vn)</h3></div>
+                        <div class="text-sm mb-1">Mệnh: <input type="text" id="tv-menh" placeholder="VD: Tử Phá tại Mão" style="margin:0; padding:6px; font-size:0.85rem" onblur="saveBanMenh()"></div>
+                        <div class="text-sm mb-1">Cách cục: <input type="text" id="tv-cc" placeholder="VD: Tử Phá Hóa Quyền" style="margin:0; padding:6px; font-size:0.85rem" onblur="saveBanMenh()"></div>
+                        <div class="text-sm mb-1">Đại vận hiện tại: <input type="text" id="tv-dv" placeholder="VD: 22-31 Vận xây nền" style="margin:0; padding:6px; font-size:0.85rem" onblur="saveBanMenh()"></div>
+                    </div>
+                </div>
+                
+                <div class="grid-2 mb-4">
+                    <div style="background:var(--success-light); padding:1rem; border-radius:var(--radius-sm)">
+                        <div class="font-bold text-success mb-2">✅ HỶ THẦN (Cần)</div>
+                        <div class="text-sm mb-1">• <b>Kim</b>: trắng, tây bắc, kim loại, đồng hồ</div>
+                        <div class="text-sm mb-1">• <b>Thủy</b>: đen/xanh đậm, bắc, gần nước</div>
+                        <div class="text-xs text-muted mt-2">→ Mặc trắng/đen, hướng B/TB, đeo trang sức Kim</div>
+                    </div>
+                    <div style="background:var(--danger-light); padding:1rem; border-radius:var(--radius-sm)">
+                        <div class="font-bold text-danger mb-2">⛔ KỴ THẦN (Tránh)</div>
+                        <div class="text-sm mb-1">• <b>Thổ</b> nặng: vàng/nâu, gốm khô</div>
+                        <div class="text-sm mb-1">• <b>Hỏa</b> khô: đỏ chói, lửa mạnh</div>
+                        <div class="text-xs text-muted mt-2">→ Tránh đỏ rực, thận trọng tháng 4-6 ÂL</div>
+                    </div>
+                </div>
+                
+                <div class="card-section">
+                    <div class="section-header"><h3>🧬 HUMAN DESIGN (paste từ mybodygraph.com)</h3></div>
+                    <div class="grid-2">
+                        <div>
+                            <div class="text-xs font-bold mb-1">TYPE</div>
+                            <select id="hd-type" onblur="saveBanMenh()" class="mb-2">
+                                <option value="">-- Chọn --</option>
+                                <option>Generator</option><option>Manifesting Generator</option>
+                                <option>Projector</option><option>Manifestor</option><option>Reflector</option>
+                            </select>
+                            <div class="text-xs font-bold mb-1">STRATEGY</div>
+                            <input type="text" id="hd-strategy" placeholder="VD: Wait to Respond..." onblur="saveBanMenh()" class="mb-2">
+                            <div class="text-xs font-bold mb-1">AUTHORITY</div>
+                            <input type="text" id="hd-auth" placeholder="VD: Sacral / Emotional..." onblur="saveBanMenh()" class="mb-2">
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold mb-1">PROFILE</div>
+                            <input type="text" id="hd-profile" placeholder="VD: 5/1, 3/5..." onblur="saveBanMenh()" class="mb-2">
+                            <div class="text-xs font-bold mb-1">NOT-SELF</div>
+                            <input type="text" id="hd-notself" placeholder="VD: Frustration / Bitterness..." onblur="saveBanMenh()" class="mb-2">
+                            <div class="text-xs font-bold mb-1">CHART URL (lưu link)</div>
+                            <input type="text" id="hd-url" placeholder="https://mybodygraph.com/..." onblur="saveBanMenh()" class="mb-2">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-section mt-4">
+                    <div class="section-header"><h3>📝 Notes Vận Mệnh</h3></div>
+                    <textarea id="banmenh-notes" rows="6" placeholder="Notes về bát tự, đại vận, cách cục, transit, ý nghĩa cá nhân..." onblur="saveBanMenh()"></textarea>
+                </div>
+            </div>
+            
+            <!-- P14: NOTES HUB -->
+            <div id="p14" class="panel hidden">
+                <div class="alert-box info mb-4">
+                    <div class="alert-icon">📓</div>
+                    <div><h4 class="text-info">Notes Hub - Tất cả ghi chú ở 1 chỗ</h4>
+                    <p class="text-sm">Search được. Filter theo nguồn (Brain Dump, Insights, Wins, Gratitude, Issues, Decisions, Post-Mortems...)</p></div>
+                </div>
+                
+                <div class="card-section mb-4">
+                    <div class="flex gap-2 mb-2">
+                        <input type="text" id="notes-search" placeholder="🔍 Tìm trong tất cả notes..." oninput="rNotesHub()" style="margin:0">
+                    </div>
+                    <div class="flex gap-2 flex-wrap">
+                        <button class="btn btn-small" id="nh-filter-all" onclick="setNotesFilter('all')">Tất cả</button>
+                        <button class="btn btn-small" id="nh-filter-insight" onclick="setNotesFilter('insight')">💡 Insights</button>
+                        <button class="btn btn-small" id="nh-filter-win" onclick="setNotesFilter('win')">🏆 Wins</button>
+                        <button class="btn btn-small" id="nh-filter-grat" onclick="setNotesFilter('grat')">🙏 Gratitude</button>
+                        <button class="btn btn-small" id="nh-filter-issue" onclick="setNotesFilter('issue')">🔥 Issues</button>
+                        <button class="btn btn-small" id="nh-filter-pm" onclick="setNotesFilter('pm')">💀 Post-Mortems</button>
+                        <button class="btn btn-small" id="nh-filter-dec" onclick="setNotesFilter('dec')">⚖️ Decisions</button>
+                        <button class="btn btn-small" id="nh-filter-dump" onclick="setNotesFilter('dump')">🧠 Brain Dump</button>
+                        <button class="btn btn-small" id="nh-filter-net" onclick="setNotesFilter('net')">🤝 Network</button>
+                        <button class="btn btn-small" id="nh-filter-obt" onclick="setNotesFilter('obt')">🎯 OBT</button>
+                    </div>
+                </div>
+                
+                <div class="card-section">
+                    <div class="section-header"><h3 id="notes-count">Loading...</h3></div>
+                    <div id="notes-hub-list" class="flex-col"></div>
+                </div>
+            </div>
+            
+            <!-- P15: ANTIDOTE (Pattern Detection + Practice) -->
+            <div id="p15" class="panel hidden">
+                <div class="alert-box info mb-4">
+                    <div class="alert-icon">💊</div>
+                    <div>
+                        <h4 class="text-info">Antidote Lab</h4>
+                        <p class="text-sm">11 pattern hủy diệt được tự động phát hiện từ data của bạn. Mỗi pattern có chẩn đoán + practice 2-15 phút để giải trừ.</p>
+                    </div>
+                </div>
+                
+                <!-- Active alerts (currently triggered) -->
+                <div class="card-section" id="antidote-active-card">
+                    <div class="section-header"><h3>🚨 Đang Kích Hoạt</h3> <span class="text-xs" id="antidote-active-count">0 patterns</span></div>
+                    <div id="antidote-active-list" class="flex-col gap-3"></div>
+                </div>
+                
+                <!-- Practice modal (inline within panel) -->
+                <div id="antidote-practice-card" class="card-section hidden" style="background:linear-gradient(135deg, var(--info-light), var(--primary-light)); border:2px solid var(--info)">
+                    <div class="flex justify-between align-center mb-3">
+                        <h3 class="text-info" id="practice-title">Practice</h3>
+                        <button class="btn btn-small" onclick="closePractice()">✕</button>
+                    </div>
+                    <div id="practice-content"></div>
+                </div>
+                
+                <!-- All 11 patterns reference -->
+                <div class="card-section">
+                    <div class="section-header"><h3>📚 11 Pattern Reference</h3></div>
+                    <p class="text-xs text-muted mb-4">Click vào pattern bất kỳ để xem chẩn đoán + thử practice (không cần đợi trigger).</p>
+                    <div id="antidote-all-list" class="flex-col gap-2"></div>
+                </div>
+                
+                <!-- History -->
+                <div class="card-section">
+                    <div class="section-header"><h3>📜 History Antidote</h3></div>
+                    <p class="text-xs text-muted mb-2">Lần dùng practice gần đây - track xem pattern nào lặp lại nhiều</p>
+                    <div id="antidote-history" class="flex-col"></div>
+                </div>
+            </div>
+            
             <!-- P11: DOCTRINE / PLAYBOOK -->
             <div id="p11" class="panel hidden">
                 <div class="grid-2">
+                    <div class="card-section">
+                        <div class="section-header"><span>🧠 12 NGHỊCH LÝ CỐT LÕI</span></div>
+                        <div class="doc-section text-sm">
+                            <div class="doc-item"><b class="text-primary">1.</b> Muốn phá thì phải có kỷ luật nhất.</div>
+                            <div class="doc-item"><b class="text-primary">2.</b> Muốn lãnh đạo thì phải biết làm tôi tớ.</div>
+                            <div class="doc-item"><b class="text-primary">3.</b> Muốn giàu nhanh thì phải chấp nhận giàu chậm nhất.</div>
+                            <div class="doc-item"><b class="text-primary">4.</b> Muốn làm lớn thì phải bắt đầu từ rất nhỏ.</div>
+                            <div class="doc-item"><b class="text-primary">5.</b> Thành công thì phải sẵn sàng thất bại công khai.</div>
+                            <div class="doc-item"><b class="text-primary">6.</b> Muốn nói thì phải biết im lặng đúng lúc.</div>
+                            <div class="doc-item"><b class="text-primary">7.</b> Muốn nhiều thì phải biết bỏ bớt.</div>
+                            <div class="doc-item"><b class="text-primary">8.</b> Tự do nhất khi tuân thủ kỷ luật chặt nhất.</div>
+                            <div class="doc-item"><b class="text-primary">9.</b> Sức mạnh đến từ sự dễ tổn thương được công nhận.</div>
+                            <div class="doc-item"><b class="text-primary">10.</b> Càng giỏi thì càng phải khiêm tốn để học tiếp.</div>
+                            <div class="doc-item"><b class="text-primary">11.</b> Tốc độ thật sự = từ tốn nhưng không dừng.</div>
+                            <div class="doc-item"><b class="text-primary">12.</b> Muốn được nhớ tới thì phải sẵn sàng bị quên đi hôm nay.</div>
+                        </div>
+                    </div>
+                    
                     <div class="card-section">
                         <div class="section-header"><span>📖 TRIẾT LÝ INAMORI KAZUO</span></div>
                         <div class="doc-section text-sm text-muted">
@@ -1120,9 +1594,41 @@ CREATE POLICY "Allow all" ON ppt_os FOR ALL USING (true) WITH CHECK (true);</cod
     </main>
 </div>
 
+<!-- Quick Capture Modal -->
+<div id="gtd-modal" class="modal-overlay" onclick="if(event.target===this) closeGTDModal()">
+    <div class="modal-content">
+        <div class="flex justify-between align-center mb-4">
+            <h3 style="margin:0">⚡ Quick Capture</h3>
+            <span class="text-xs text-muted">ESC để đóng</span>
+        </div>
+        <textarea id="gtd-input" rows="3" placeholder="Đổ ý tưởng/task vào đây..." style="font-weight:600; margin-bottom:0.75rem"></textarea>
+        
+        <div class="grid-2 mb-2">
+            <div>
+                <div class="text-xs font-bold mb-1">💎 EV (Expected Value 1-100)</div>
+                <input type="number" id="gtd-ev" placeholder="Impact tiềm năng" min="1" max="100" style="margin:0">
+            </div>
+            <div>
+                <div class="text-xs font-bold mb-1">🚀 Leverage (1-100)</div>
+                <input type="number" id="gtd-lev" placeholder="Đòn bẩy" min="1" max="100" style="margin:0">
+            </div>
+        </div>
+        
+        <div class="flex gap-4 mb-4 mt-2">
+            <label class="flex align-center gap-2 text-sm cursor-pointer"><input type="checkbox" id="gtd-rep"> 🔄 Repeatable</label>
+            <label class="flex align-center gap-2 text-sm cursor-pointer"><input type="checkbox" id="gtd-auto"> 🤖 Automation Potential</label>
+        </div>
+
+        <div class="flex gap-2">
+            <button class="btn w-100" onclick="closeGTDModal()">Hủy</button>
+            <button class="btn btn-primary w-100" onclick="saveGTD()">Dump vào Inbox</button>
+        </div>
+    </div>
+</div>
+
 <script>
 /* ================= DATA ================= */
-const PAGE_TITLES = {0:{t:"Today Dashboard",s:"Execute your daily commands."},1:{t:"XP & Habits",s:"Discipline is the foundation."},2:{t:"Combat Log",s:"Physical augmentation tracking."},3:{t:"Decision Matrix",s:"70% data rule enforcement."},4:{t:"Cycle Management",s:"Automated routine tracking."},5:{t:"Introspection",s:"Log analysis & correction."},6:{t:"Planning Base",s:"Weekly & Monthly battlefield overview."},7:{t:"Knowledge Base",s:"Intel assimilation."},8:{t:"Goals & Alignment",s:"Vertical integration of purpose."},9:{t:"Telemetry",s:"Raw data tracking."},10:{t:"System Config",s:"Core parameters."},11:{t:"Codex & Doctrine",s:"Core philosophies and playbooks."}};
+const PAGE_TITLES = {0:{t:"Today Dashboard",s:"Execute your daily commands."},1:{t:"XP & Habits",s:"Discipline is the foundation."},2:{t:"Combat Log",s:"Physical augmentation tracking."},3:{t:"Decision Matrix",s:"70% data rule enforcement."},4:{t:"Cycle Management",s:"Automated routine tracking."},5:{t:"Introspection",s:"Log analysis & correction."},6:{t:"Planning Base",s:"Weekly & Monthly battlefield overview."},7:{t:"Knowledge Base",s:"Intel assimilation."},8:{t:"Goals & Alignment",s:"Vertical integration of purpose."},9:{t:"Telemetry",s:"Raw data tracking."},10:{t:"System Config",s:"Core parameters."},11:{t:"Codex & Doctrine",s:"Core philosophies and playbooks."},13:{t:"Bản Mệnh",s:"Bát Tự · Tử Vi · Human Design"},14:{t:"Notes Hub",s:"Tất cả ghi chú ở một chỗ."},15:{t:"Antidote Lab",s:"Pattern detection & giải trừ."}};
 const DEF_HABITS = [{id:"s",n:"Dậy 5:30 + Thiền",x:30},{id:"w",n:"Nước 3L",x:20},{id:"r",n:"Đọc 30 trang",x:25},{id:"e",n:"Vận động",x:30},{id:"en",n:"English 60'",x:25},{id:"d",n:"Deep Work 3h",x:30},{id:"sv",n:"Tiết kiệm",x:15},{id:"so",n:"1 cuộc gặp",x:20}];
 const DEF_SCORES = ["Dậy 5:30 + Thiền 15'","Nước 3L + Ngủ 7h+","Vận động 4 buổi/tuần","Deep Work ≥3h/ngày","English ≥60'/ngày","Đọc ≥30 trang/ngày","0 ngày zero habits","Tiết kiệm ≥40% thu","2 cuộc gặp/tuần","Không tự lừa mình"];
 const LEVELS = [{n:"Recruit",x:0},{n:"Soldier",x:500},{n:"Knight",x:2000},{n:"Captain",x:5000},{n:"Commander",x:10000},{n:"General",x:25000},{n:"Legend",x:50000},{n:"Emperor",x:100000}];
@@ -1134,16 +1640,10 @@ const WK_QS = ["OBT rate?","Habit fail?","Power score?","3 thứ học được?
 const REM_TEMPLATES = [{n:"Sổ giun mèo",c:3,u:"m"},{n:"Đổi dầu xe",c:3,u:"m"},{n:"Khám SK",c:1,u:"y"},{n:"Review port",c:1,u:"m"}];
 const DAYS = ["Thứ 2","Thứ 3","Thứ 4","Thứ 5","Thứ 6","Thứ 7","Chủ Nhật"];
 
-const PRESET_MILESTONES = [{d:"12/2027", t:"IELTS 8.0 & CC chuyên môn", done:false},{d:"12/2031", t:"Kết hôn / Thiết lập MQH ổn định", done:false},{d:"12/2035", t:"BĐS đầu tiên + 1 tỷ tài sản ròng", done:false},{d:"2045", t:"Lên đỉnh, CEO tổ chức. Tài sản 3 thế hệ", done:false}];
-const PRESET_SCORECARD = [{y:"2026", m:"Xây habits + English + Đọc (Nền móng)"},{y:"2027", m:"IELTS 8.0, Tích lũy skill chuyên môn"},{y:"2028", m:"Năm hạn - PHÒNG THỦ. Không nợ, giữ habits"},{y:"2035", m:"Tài sản 1 tỷ, Chuyển đại vận"},{y:"2045", m:"Đại Vận Quan Lộc - Lên Đỉnh"}];
-const PRESET_PARADOXES = ["Muốn phá thì phải có kỷ luật nhất","Muốn lãnh đạo thì phải biết làm tôi tớ","Muốn giàu nhanh thì phải chấp nhận giàu chậm nhất","Muốn làm lớn thì phải bắt đầu từ rất nhỏ","Thành công thì phải sẵn sàng thất bại công khai"];
-
 const INITIAL_BOOKS = [
     {t:"Atomic Habits", a:"James Clear", r:"S+++"}, {t:"Deep Work", a:"Cal Newport", r:"S+++"},
     {t:"Principles", a:"Ray Dalio", r:"S++"}, {t:"Zero to One", a:"Peter Thiel", r:"S++"}, {t:"Psychology of Money", a:"Morgan Housel", r:"S+"}
 ];
-
-const VOCAB_TARGET = 8000; // For IELTS 8.0
 
 /* ================= UTILS ================= */
 const todayStr = new Date().toISOString().split('T')[0];
@@ -1161,7 +1661,13 @@ function nav(idx){
     let cl=document.querySelector(`.nav-item[onclick="nav(${idx})"]`);if(cl)cl.classList.add('active');
     let i=PAGE_TITLES[idx]||PAGE_TITLES[0];
     document.getElementById('page-title').innerText=i.t; document.getElementById('page-subtitle').innerText=i.s;
+    
+    // Refresh data when entering specific panels
     if(idx===8 && typeof renderHier==='function') renderHier();
+    if(idx===14 && typeof rNotesHub==='function') rNotesHub(); // Notes Hub - refresh
+    if(idx===15 && typeof renderAntidotePanel==='function') renderAntidotePanel(); // Antidote
+    if(idx===13 && typeof loadBanMenh==='function') loadBanMenh(); // Bản Mệnh
+    
     document.querySelector('.main-content').scrollTo(0,0);
 }
 function switchSubTab(pid,idx){
@@ -1207,7 +1713,7 @@ let autoSyncTimer = null;
 let isSyncing = false;
 
 // Keys to sync (all app data, excluding meta)
-const SYNC_KEYS_PREFIXES = ['txp','dark_mode','perf_mode','zoom_level','cust_habits','my_books','books_read','media_log','l_log','hr10k','rems','rv_hist','obt_hist','dec_log','dec_curr','pm_log','vision','yokr_data','qokr_data','ms_data','sc_data','pd_data','bio_log','brain_dump','wplan','mplan','dh_lock','gym_hist','gym_curr','freeze_cards','win_log','grat_log','net_log','vocab_list','fin_log','mq_done','ord_tgt','identity_list','sprint_data'];
+const SYNC_KEYS_PREFIXES = ['txp','dark_mode','perf_mode','zoom_level','cust_habits','my_books','books_read','media_log','l_log','rems','rv_hist','obt_hist','dec_log','dec_curr','pm_log','vision','yokr_data','qokr_data','bio_log','brain_dump','wplan','mplan','dh_lock','gym_hist','gym_curr','freeze_cards','win_log','grat_log','net_log','fin_log','mq_done','ord_tgt','identity_list','sprint_data','issue_log','gtd_inbox','ev_log','gym_schedule','gym_pool','life_roadmap','ban_menh','skills_list','streak_best','antidote_hist'];;
 // Prefixed daily/monthly keys
 const SYNC_KEY_PATTERNS = ['habits_','obt_','mx_','ord_','water_','mq_','ps_','power_','rv_daily_','rv_weekly_','rv_monthly_','pl_','w_xp_'];
 
@@ -1481,7 +1987,20 @@ function renderFreezeCards(){
 /* ================= INIT TODAY ================= */
 function i0(){
     document.getElementById('t-orders').value=gs(`ord_${todayStr}`,0); document.getElementById('t-target').value=gs('ord_tgt',5);
-    window.updateOrders=()=>{let v=parseInt(document.getElementById('t-orders').value||0),t=parseInt(document.getElementById('t-target').value||5);ss(`ord_${todayStr}`,v);ss('ord_tgt',t);}; updateOrders();
+    window.updateOrders=()=>{
+        let v=parseInt(document.getElementById('t-orders').value||0),t=parseInt(document.getElementById('t-target').value||5);
+        ss(`ord_${todayStr}`,v); ss('ord_tgt',t);
+        let pct = t>0 ? Math.min(100, (v/t)*100) : 0;
+        let bar = document.getElementById('orders-bar'); if(bar) bar.style.width = pct + '%';
+        let pctEl = document.getElementById('orders-pct'); 
+        if(pctEl){
+            pctEl.innerText = `${Math.round(pct)}% target`;
+            if(pct >= 100) pctEl.className = 'text-xs text-success font-bold mt-1';
+            else if(pct >= 60) pctEl.className = 'text-xs text-accent mt-1';
+            else pctEl.className = 'text-xs text-muted mt-1';
+        }
+    }; 
+    updateOrders();
     
     let obt=gs(`obt_${todayStr}`,{t:'',c:'Asset',d:false,r:''}); 
     document.getElementById('obt-input').value=obt.t;document.getElementById('obt-cat').value=obt.c;document.getElementById('obt-reason').value=obt.r;
@@ -1498,25 +2017,37 @@ function i0(){
 
     let mx=gs(`mx_${todayStr}`,{q1:[],q2:[],q3:[],q4:[]}); 
     const baseTitles={q1:'Q1 (Khủng hoảng)',q2:'Q2 (Chiến lược)',q3:'Q3 (Ủy quyền)',q4:'Q4 (Loại bỏ)'};
-    const rMx=(q)=>{
-        document.getElementById(`${q}-cnt`).innerText=`${baseTitles[q]} (${mx[q].filter(x=>x.d).length}/${mx[q].length})`;
-        render(`${q}-list`,mx[q],(t,i)=>`
-            <div class="list-row" style="padding:0.4rem 0; ${t.d?'opacity:0.4':''}">
-                <div class="row-info flex align-center gap-2">
-                    <input type="checkbox" ${t.d?'checked':''} onchange="tMx('${q}',${i},this.checked)">
-                    <span style="${t.d?'text-decoration:line-through':''}">${esc(t.x)}</span>
-                </div>
-                <div class="badge badge-gray cursor-pointer" onclick="dMx('${q}',${i})">Xóa</div>
-            </div>`);
+    window.renderAllMx = (mxData)=>{
+        if(mxData) mx = mxData;
+        ['q1','q2','q3','q4'].forEach(q=>{
+            document.getElementById(`${q}-cnt`).innerText=`${baseTitles[q]} (${mx[q].filter(x=>x.d).length}/${mx[q].length})`;
+            let html = mx[q].map((t,i)=>`
+                <div class="list-row draggable-task" draggable="true" ondragstart="dragMx(event, '${q}', ${i})" style="padding:0.4rem; ${t.d?'opacity:0.4':''}">
+                    <div class="row-info flex align-center gap-2" style="min-width:0">
+                        <input type="checkbox" ${t.d?'checked':''} onchange="tMx('${q}',${i},this.checked)" style="flex-shrink:0">
+                        <div style="min-width:0; flex:1">
+                            <div class="text-sm" style="${t.d?'text-decoration:line-through':''}; line-height:1.3">${esc(t.x)}</div>
+                            ${(t.ev||t.lev||t.auto||t.rep) ? `<div style="margin-top:3px">${getMiniTagsHTML(t)}</div>` : ''}
+                        </div>
+                    </div>
+                    <span class="badge badge-gray cursor-pointer text-xs" onclick="dMx('${q}',${i})" style="flex-shrink:0; padding:2px 6px">x</span>
+                </div>`).join('');
+            document.getElementById(`${q}-list`).innerHTML = html;
+        });
+        // Q1+Q3 percentage warning
         let q13 = mx.q1.length + mx.q3.length;
         let tot = mx.q1.length + mx.q2.length + mx.q3.length + mx.q4.length;
         if(tot > 0 && (q13/tot) > 0.4) document.getElementById('mx-warn').classList.remove('hidden');
         else document.getElementById('mx-warn').classList.add('hidden');
-    }; 
-    ['q1','q2','q3','q4'].forEach(rMx);
-    window.addMx=(q,xp)=>{let e=document.getElementById(`${q}-add`);if(!e.value)return;mx[q].push({x:e.value,d:false,xp});ss(`mx_${todayStr}`,mx);e.value='';['q1','q2','q3','q4'].forEach(rMx);}; 
-    window.tMx=(q,i,v)=>{mx[q][i].d=v;ss(`mx_${todayStr}`,mx);if(v) addXP(mx[q][i].xp||10);rMx(q);}; 
-    window.dMx=(q,i)=>{mx[q].splice(i,1);ss(`mx_${todayStr}`,mx);['q1','q2','q3','q4'].forEach(rMx);};
+        // WIP alert: Q1+Q2 undone > 5
+        let undone = mx.q1.filter(x=>!x.d).length + mx.q2.filter(x=>!x.d).length;
+        let wip = document.getElementById('wip-alert');
+        if(wip){ if(undone > 5) wip.classList.remove('hidden'); else wip.classList.add('hidden'); }
+    };
+    renderAllMx(mx);
+    window.addMx=(q,xp)=>{let e=document.getElementById(`${q}-add`);if(!e.value)return;mx[q].push({x:e.value,d:false,xp});ss(`mx_${todayStr}`,mx);e.value='';renderAllMx(mx);}; 
+    window.tMx=(q,i,v)=>{mx[q][i].d=v;ss(`mx_${todayStr}`,mx);if(v) addXP(mx[q][i].xp||10);renderAllMx(mx);}; 
+    window.dMx=(q,i)=>{mx[q].splice(i,1);ss(`mx_${todayStr}`,mx);renderAllMx(mx);};
 
     let mqA=gs(`mq_${todayStr}`,Array(MORNING_QS.length).fill('')); 
     render('morning-qs-list',MORNING_QS,(q,i)=>`
@@ -1547,10 +2078,53 @@ function i0(){
     let psT = gs(`power_${todayStr}`, 0);
     let pwEl = document.getElementById('t-power-val');
     if(pwEl) pwEl.innerHTML = `${psT}<span class="text-sm text-muted">/50</span>`;
+    let pwBar = document.getElementById('power-bar');
+    if(pwBar) {
+        pwBar.style.width = `${(psT/50)*100}%`;
+        pwBar.style.background = psT >= 35 ? 'var(--success)' : (psT >= 25 ? 'var(--accent)' : 'var(--danger)');
+    }
     let sos = document.getElementById('sos-banner');
     if(sos) { if(psT > 0 && psT < 25) sos.classList.remove('hidden'); else sos.classList.add('hidden'); }
     
+    // Best streak (compute)
+    let bestS = gs('streak_best', 0);
+    if(sc > bestS) { ss('streak_best', sc); bestS = sc; }
+    let bestEl = document.getElementById('t-streak-best');
+    if(bestEl) bestEl.innerText = bestS;
+    
+    // XP rank display
+    let txp = gs('txp',0);
+    let cl=LEVELS[0]; for(let i=0;i<LEVELS.length;i++){if(txp>=LEVELS[i].x)cl=LEVELS[i];}
+    let rkEl = document.getElementById('t-rank-display');
+    if(rkEl) rkEl.innerText = cl.n;
+    
     renderFreezeCards();
+    
+    // GTD Dispatcher
+    window.rGTD = () => {
+        let inbox = gs('gtd_inbox', []);
+        let cnt = document.getElementById('gtd-cnt');
+        if(cnt) cnt.innerText = `${inbox.length} items`;
+        let el = document.getElementById('dispatcher-list');
+        if(!el) return;
+        if(inbox.length === 0){
+            el.innerHTML = `<div class="text-xs text-muted text-center" style="padding:1rem">Trống. Bấm <b>⚡ Capture</b> ở header (hoặc phím <b>G</b>) để dump.</div>`;
+            return;
+        }
+        el.innerHTML = inbox.slice().reverse().map(item=>`
+            <div style="padding:0.6rem; background:var(--bg-body); border-radius:var(--radius-sm); border:1px solid var(--border)">
+                <div class="font-bold text-sm mb-1">${esc(item.t)}</div>
+                ${(item.ev||item.lev||item.auto||item.rep) ? `<div class="mb-2">${getMiniTagsHTML(item)}</div>` : ''}
+                <div class="flex gap-1">
+                    <button class="btn quad-btn q1" onclick="dispatchTask('${item.id}','q1')">Q1</button>
+                    <button class="btn quad-btn q2" onclick="dispatchTask('${item.id}','q2')">Q2</button>
+                    <button class="btn quad-btn q3" onclick="dispatchTask('${item.id}','q3')">Q3</button>
+                    <button class="btn quad-btn q4" onclick="dispatchTask('${item.id}','q4')">Q4</button>
+                    <button class="btn quad-btn" onclick="dismissInbox('${item.id}')" style="color:var(--text-muted)">✕</button>
+                </div>
+            </div>`).join('');
+    };
+    rGTD();
 }
 
 /* ================= INIT XP / HABITS ================= */
@@ -1626,29 +2200,178 @@ function i1(){
 
 /* ================= INIT GYM ================= */
 function i2(){
-    let dy=new Date().getDay(); document.getElementById('gym-today-text').innerText=dy===0||dy===3||dy===5?"REST & RECOVERY":({1:"PUSH",2:"PULL",4:"LEGS",6:"CARDIO"})[dy];
-    let pS=gs(`ps_${todayStr}`,Array(10).fill(0)); 
-    render('power-score-grid',DEF_SCORES,(s,i)=>`
-        <div class="list-row" style="padding:0.5rem 0">
-            <div class="row-info"><div class="row-title" style="font-size:0.85rem">${s}</div></div>
-            <div class="row-action" style="flex-direction:row; align-items:center; gap:0.5rem">
-                <input type="range" id="ps-${i}" min="0" max="5" value="${pS[i]}" oninput="document.getElementById('psv-${i}').innerText=this.value; cPS()" style="width:100px;margin:0">
-                <span id="psv-${i}" class="font-bold text-primary" style="width:20px;text-align:right">${pS[i]}</span>
+    const DAYS_FULL = ["Chủ Nhật","Thứ 2","Thứ 3","Thứ 4","Thứ 5","Thứ 6","Thứ 7"];
+    const DEFAULT_POOL = [
+        {n:"Bench Press", cat:"push"},
+        {n:"Overhead Press", cat:"push"},
+        {n:"Push Up", cat:"push"},
+        {n:"Pull Up", cat:"pull"},
+        {n:"Row", cat:"pull"},
+        {n:"Deadlift", cat:"pull"},
+        {n:"Squat", cat:"legs"},
+        {n:"Lunge", cat:"legs"},
+        {n:"Plank", cat:"core"},
+        {n:"Cardio Run", cat:"cardio"},
+        {n:"Yoga Flow", cat:"mobility"}
+    ];
+    const CAT_ICONS = {push:'💪',pull:'🪢',legs:'🦵',core:'🧘',cardio:'🏃',sport:'🎾',mobility:'🤸',other:'⚙️'};
+    const CAT_NAMES = {push:'Push',pull:'Pull',legs:'Legs',core:'Core/Abs',cardio:'Cardio',sport:'Sport',mobility:'Mobility',other:'Khác'};
+    
+    let pool = gs('gym_pool', DEFAULT_POOL);
+    let schedule = gs('gym_schedule', {0:'Rest', 1:'Push', 2:'Pull', 3:'Yoga/Mobility', 4:'Legs', 5:'Cardio', 6:'Rest'}); // by JS day (0=Sun)
+    
+    // === TODAY'S WORKOUT ===
+    let todayJsDay = new Date().getDay();
+    let dayNameEl = document.getElementById('gym-day-name');
+    if(dayNameEl) dayNameEl.innerText = DAYS_FULL[todayJsDay];
+    let todayPlan = schedule[todayJsDay] || 'Chưa set';
+    let textEl = document.getElementById('gym-today-text');
+    if(textEl) textEl.innerText = todayPlan;
+    
+    // Populate exercise selector based on today's category (smart suggest)
+    let exSel = document.getElementById('gym-ex-sel');
+    if(exSel){
+        let html = '<option value="">-- Chọn bài tập --</option>';
+        // Try to match today's plan to a category
+        let planLower = todayPlan.toLowerCase();
+        let prioritized = pool.filter(ex => planLower.includes(ex.cat) || planLower.includes(CAT_NAMES[ex.cat].toLowerCase()) || planLower.includes(ex.n.toLowerCase()));
+        let rest = pool.filter(ex => !prioritized.includes(ex));
+        if(prioritized.length > 0){
+            html += '<optgroup label="🎯 Hợp với lịch hôm nay">';
+            prioritized.forEach(ex => { html += `<option value="${esc(ex.n)}">${CAT_ICONS[ex.cat]} ${esc(ex.n)}</option>`; });
+            html += '</optgroup><optgroup label="📋 Khác">';
+            rest.forEach(ex => { html += `<option value="${esc(ex.n)}">${CAT_ICONS[ex.cat]} ${esc(ex.n)}</option>`; });
+            html += '</optgroup>';
+        } else {
+            pool.forEach(ex => { html += `<option value="${esc(ex.n)}">${CAT_ICONS[ex.cat]} ${esc(ex.n)}</option>`; });
+        }
+        exSel.innerHTML = html;
+    }
+    
+    // === SET LOGGING ===
+    let gS = gs('gym_curr', []);
+    window.rGS = () => {
+        let el = document.getElementById('gym-curr-sets');
+        if(!el) return;
+        if(gS.length===0){ el.innerHTML = '<div class="text-xs text-muted text-center" style="padding:0.5rem">Chưa có set nào</div>'; return;}
+        el.innerHTML = gS.map((s,i)=>`<div class="list-row" style="padding:0.5rem; background:var(--bg-body); border-radius:var(--radius-sm); margin-bottom:4px">
+            <div class="row-info"><b class="text-sm">${esc(s.ex)}</b> <span class="text-muted text-xs">— ${esc(s.detail)}</span></div>
+            <span class="text-danger cursor-pointer text-xs" onclick="dGS(${i})">x</span>
+        </div>`).join('');
+    };
+    rGS();
+    window.addGymSet = () => {
+        let ex = document.getElementById('gym-ex-sel').value;
+        let detail = document.getElementById('gym-set1').value.trim();
+        if(!ex) return toast('Chọn bài tập trước','error');
+        if(!detail) return toast('Cần thông tin set (vd: 10x60kg)','error');
+        gS.push({ex, detail});
+        ss('gym_curr', gS);
+        document.getElementById('gym-set1').value='';
+        rGS();
+    };
+    window.dGS = (i) => { gS.splice(i,1); ss('gym_curr',gS); rGS(); };
+    
+    let gH = gs('gym_hist', []);
+    window.rGH = () => {
+        let el = document.getElementById('gym-history');
+        if(!el) return;
+        let recent = gH.slice().reverse().slice(0,15);
+        if(recent.length===0){ el.innerHTML='<div class="text-xs text-muted text-center" style="padding:1rem">Chưa có buổi tập</div>'; return;}
+        el.innerHTML = recent.map(g=>`<div class="list-row" style="padding:0.85rem 0">
+            <div class="date-block"><span class="dt">${g.day||'DATE'}</span><span class="tm">${g.d.substring(5)}</span></div>
+            <div class="row-info">
+                <div class="row-title">${esc(g.plan||'Workout')} · ${g.sets} sets</div>
+                <div class="row-sub">${(g.exercises||[]).slice(0,3).join(', ')}${(g.exercises||[]).length>3?'...':''}</div>
+                ${g.note?`<div class="text-xs text-muted mt-1">📝 ${esc(g.note)}</div>`:''}
             </div>
-        </div>`);
+        </div>`).join('');
+    };
+    rGH();
+    window.endGymSession = () => {
+        if(gS.length===0) return toast('Chưa có set nào','error');
+        let exercises = [...new Set(gS.map(s=>s.ex))];
+        gH.push({
+            d: todayStr,
+            day: ['CN','T2','T3','T4','T5','T6','T7'][todayJsDay],
+            plan: todayPlan,
+            sets: gS.length,
+            exercises,
+            details: gS,
+            note: document.getElementById('gym-note').value
+        });
+        ss('gym_hist', gH);
+        gS = []; ss('gym_curr', gS); rGS();
+        document.getElementById('gym-note').value='';
+        rGH(); addXP(50);
+        toast('✓ Đã lưu buổi tập','success');
+    };
+    
+    // === WEEKLY SCHEDULE ===
+    window.rSchedule = () => {
+        let el = document.getElementById('gym-schedule-grid');
+        if(!el) return;
+        // Show Mon-Sun (1,2,3,4,5,6,0)
+        const order = [1,2,3,4,5,6,0];
+        const shortNames = {0:'Chủ Nhật',1:'Thứ 2',2:'Thứ 3',3:'Thứ 4',4:'Thứ 5',5:'Thứ 6',6:'Thứ 7'};
+        el.innerHTML = order.map(d=>{
+            let isToday = d===todayJsDay;
+            return `<div style="background:${isToday?'var(--primary-light)':'var(--bg-body)'}; padding:0.75rem; border-radius:var(--radius-sm); border:${isToday?'2px solid var(--primary)':'1px solid var(--border)'}">
+                <div class="flex justify-between align-center mb-2">
+                    <div class="font-bold text-sm ${isToday?'text-primary':''}">${shortNames[d]}${isToday?' · HÔM NAY':''}</div>
+                </div>
+                <input type="text" placeholder="VD: Push / Pull / Tennis / Rest..." value="${esc(schedule[d]||'')}" onchange="schedule[${d}]=this.value; ss('gym_schedule',schedule); i2();" style="background:var(--bg-card); margin:0">
+            </div>`;
+        }).join('');
+    };
+    rSchedule();
+    
+    // === EXERCISE POOL ===
+    window.rPool = () => {
+        let el = document.getElementById('gym-pool-list');
+        if(!el) return;
+        // Group by category
+        let byCat = {};
+        pool.forEach((ex,i)=>{ if(!byCat[ex.cat]) byCat[ex.cat]=[]; byCat[ex.cat].push({...ex, origIdx:i}); });
+        let html = '';
+        Object.keys(byCat).forEach(cat=>{
+            html += `<div class="mb-4"><div class="font-bold text-sm mb-2">${CAT_ICONS[cat]} ${CAT_NAMES[cat]||cat}</div>`;
+            html += byCat[cat].map(ex=>`<div class="list-row" style="padding:0.5rem; background:var(--bg-body); border-radius:var(--radius-sm); margin-bottom:4px">
+                <div class="row-info text-sm">${esc(ex.n)}</div>
+                <span class="text-danger cursor-pointer text-xs" onclick="pool.splice(${ex.origIdx},1); ss('gym_pool',pool); i2();">x</span>
+            </div>`).join('');
+            html += '</div>';
+        });
+        el.innerHTML = html || '<div class="text-xs text-muted">Pool trống</div>';
+    };
+    rPool();
+    window.addGymPool = () => {
+        let n = document.getElementById('pool-ex-name').value.trim();
+        let cat = document.getElementById('pool-ex-cat').value;
+        if(!n) return toast('Cần tên bài tập','error');
+        if(pool.some(p=>p.n.toLowerCase()===n.toLowerCase())) return toast('Bài này đã có','error');
+        pool.push({n, cat});
+        ss('gym_pool', pool);
+        document.getElementById('pool-ex-name').value='';
+        i2(); // re-init to refresh selector
+        toast('✓ Đã thêm','success');
+    };
+    
+    // === POWER SCORE ===
+    let pS = gs(`ps_${todayStr}`, Array(10).fill(0));
+    let psGrid = document.getElementById('power-score-grid');
+    if(psGrid){
+        psGrid.innerHTML = DEF_SCORES.map((s,i)=>`
+            <div class="list-row" style="padding:0.5rem 0">
+                <div class="row-info"><div class="row-title" style="font-size:0.85rem">${s}</div></div>
+                <div class="row-action" style="flex-direction:row; align-items:center; gap:0.5rem">
+                    <input type="range" id="ps-${i}" min="0" max="5" value="${pS[i]}" oninput="document.getElementById('psv-${i}').innerText=this.value; cPS()" style="width:100px;margin:0">
+                    <span id="psv-${i}" class="font-bold text-primary" style="width:20px;text-align:right">${pS[i]}</span>
+                </div>
+            </div>`).join('');
+    }
     window.cPS=()=>{let t=0;for(let i=0;i<10;i++){let v=parseInt(document.getElementById(`ps-${i}`).value||0);t+=v;pS[i]=v;}document.getElementById('power-total').innerText=t+'/50';ss(`ps_${todayStr}`,pS);ss(`power_${todayStr}`,t);document.getElementById('ps-sos').innerText=t<25?'⚠ SOS THRESHOLD':'';}; cPS();
     window.calcPowerScore=()=>{cPS(); toast('Đã lưu Power Score','success');};
-    
-    let gS=gs('gym_curr',[]); window.rGS=()=>render('gym-curr-sets',gS,(s,i)=>`<div class="list-row" style="padding:0.4rem 0"><div class="row-info font-bold">${s.r} = ${s.k} kg</div><div class="badge badge-gray cursor-pointer" onclick="dGS(${i})">Xóa</div></div>`); rGS();
-    window.addGymSet=()=>{let r=document.getElementById('gym-rep').value, k=document.getElementById('gym-kg').value;if(r&&k){gS.push({r,k});ss('gym_curr',gS);document.getElementById('gym-rep').value='';document.getElementById('gym-kg').value='';rGS();}}; window.dGS=(i)=>{gS.splice(i,1);ss('gym_curr',gS);rGS();};
-    document.getElementById('gym-ex-sel').onchange=e=>{if(e.target.value==='other')document.getElementById('gym-ex-cust').classList.remove('hidden');else document.getElementById('gym-ex-cust').classList.add('hidden');};
-    
-    let gH=gs('gym_hist',[]); window.rGH=()=>render('gym-history',gH.slice().reverse().slice(0,10),g=>`
-        <div class="list-row">
-            <div class="date-block"><span class="dt">DATE</span><span class="tm">${g.d.substring(5)}</span></div>
-            <div class="row-info"><div class="row-title">${esc(g.e)}</div><div class="row-sub">${g.t} sets</div></div>
-        </div>`); rGH();
-    window.endGymSession=()=>{let e=document.getElementById('gym-ex-sel').value==='other'?document.getElementById('gym-ex-cust').value:document.getElementById('gym-ex-sel').value; if(gS.length===0)return toast('No data','error'); gH.push({d:todayStr, e, t:gS.length, s:gS}); ss('gym_hist',gH); gS=[]; ss('gym_curr',gS); rGS(); rGH(); addXP(50);};
 }
 
 /* ================= INIT QUYẾT & REMIND ================= */
@@ -1696,10 +2419,28 @@ function i34(){
         el.className='text-xs font-bold';
     };
     rDL();
-    window.saveDecision=()=>{let t=document.getElementById('dec-title').value;if(!t)return toast('Cần tên quyết định','error'); let p=dC.length?Math.round((dC.filter(x=>x.d).length/dC.length)*100):0; if(p<70 && !confirm(`Chỉ có ${p}% data (<70%). Vẫn quyết?`)) return; let c=parseInt(document.getElementById('dec-conf').value||70); dL.push({d:todayStr, t, p, c, o:'Pending'}); ss('dec_log',dL); dC=[]; ss('dec_curr',dC); document.getElementById('dec-title').value=''; document.getElementById('dec-conf').value=70; document.getElementById('dec-conf-val').innerText='70%'; rDC(); rDL(); addXP(50); toast('Đã ghi nhận quyết định','success');};
+    window.saveDecision=()=>{let t=document.getElementById('dec-title').value;if(!t)return toast('Cần tên quyết định','error'); let p=dC.length?Math.round((dC.filter(x=>x.d).length/dC.length)*100):0; if(p<70 && !confirm(`Chỉ có ${p}% data (<70%). Vẫn quyết?`)) return; let c=parseInt(document.getElementById('dec-conf').value||70); let pre=document.getElementById('dec-premortem').value; dL.push({d:todayStr, t, p, c, pre, o:'Pending'}); ss('dec_log',dL); dC=[]; ss('dec_curr',dC); document.getElementById('dec-title').value=''; document.getElementById('dec-conf').value=70; document.getElementById('dec-conf-val').innerText='70%'; document.getElementById('dec-premortem').value=''; rDC(); rDL(); addXP(50); toast('Đã ghi nhận quyết định','success');};
     
-    let pmL=gs('pm_log',[]); window.rPM=()=>render('pm-list',pmL.slice().reverse(),p=>`<div class="list-row align-start" style="background:var(--bg-body);padding:1rem;border-radius:var(--radius-sm); border-left:2px solid var(--danger); flex-direction:column"><b class="text-danger">${esc(p.d)}</b><i class="mt-1">"${esc(p.q2)}"</i></div>`); rPM();
-    window.savePostMortem=()=>{let d=document.getElementById('pm-dec').value,q1=document.getElementById('pm-q1').value,q2=document.getElementById('pm-q2').value; if(d&&q2){pmL.push({dt:todayStr,d,q1,q2});ss('pm_log',pmL);rPM();document.getElementById('pm-dec').value='';document.getElementById('pm-q1').value='';document.getElementById('pm-q2').value='';toast('Lưu Post-Mortem!','success');}};
+    let pmL=gs('pm_log',[]); 
+    window.rPM=()=>render('pm-list',pmL.slice().reverse(),p=>`
+        <div class="list-row align-start" style="background:var(--bg-body);padding:1rem;border-radius:var(--radius-sm); border-left:3px solid var(--danger); flex-direction:column; gap:4px; margin-bottom:8px">
+            <div class="flex justify-between w-100"><b class="text-danger">${esc(p.d)}</b><span class="text-xs text-muted">${p.dt||''}</span></div>
+            ${p.w1?`<div class="text-xs"><b>1.</b> ${esc(p.w1)}</div>`:''}
+            ${p.w5?`<div class="text-xs"><b class="text-danger">5. GỐC:</b> ${esc(p.w5)}</div>`:(p.q2?`<i class="text-xs">"${esc(p.q2)}"</i>`:'')}
+            ${p.cost?`<div class="text-xs text-muted">Tổn thất: ${esc(p.cost)}</div>`:''}
+            ${p.ift?`<div class="text-xs text-primary">⚙ ${esc(p.ift)}</div>`:''}
+        </div>`); 
+    rPM();
+    window.savePostMortem=()=>{
+        let d=document.getElementById('pm-dec').value, w1=document.getElementById('pm-w1').value, w2=document.getElementById('pm-w2').value, w3=document.getElementById('pm-w3').value, w4=document.getElementById('pm-w4').value, w5=document.getElementById('pm-w5').value, cost=document.getElementById('pm-cost').value, ift=document.getElementById('pm-ifthen').value;
+        if(!d) return toast('Cần tên dự án/quyết định','error');
+        if(!w5) return toast('Cần Why #5 - nguyên nhân gốc rễ','error');
+        pmL.push({dt:todayStr, d, w1, w2, w3, w4, w5, cost, ift});
+        ss('pm_log',pmL); rPM();
+        ['pm-dec','pm-w1','pm-w2','pm-w3','pm-w4','pm-w5','pm-cost','pm-ifthen'].forEach(id=>document.getElementById(id).value='');
+        addXP(50);
+        toast('Lưu Post-Mortem 5-Whys!','success');
+    };
 
     window.fillRem=(n,nu,u)=>{document.getElementById('rem-name').value=n;document.getElementById('rem-num').value=nu;document.getElementById('rem-unit').value=u;};
     render('rem-templates',REM_TEMPLATES,t=>`<button class="btn btn-outline btn-small" onclick="fillRem('${t.n}',${t.c},'${t.u}')">${t.n}</button>`);
@@ -1718,6 +2459,71 @@ function i34(){
     }; rRem();
     window.saveNewReminder=()=>{let name = document.getElementById('rem-name').value; if(!name) return toast('Cần tên','error'); rL.push({id:'r'+Date.now(), n:name, l:document.getElementById('rem-lastdone').value||todayStr, c:parseInt(document.getElementById('rem-num').value||1), u:document.getElementById('rem-unit').value}); ss('rems', rL); document.getElementById('rem-name').value=''; rRem(); toast('Cycle configured.','success'); };
     window.dnR=id=>{let i=rL.find(x=>x.id===id);if(i){i.l=todayStr;ss('rems',rL);addXP(20);rRem();}}; window.dlR=id=>{if(confirm('Delete cycle?')){rL=rL.filter(x=>x.id!==id);ss('rems',rL);rRem();}};
+    
+    // Issue Log (Dalio 5-Step)
+    let issL = gs('issue_log', []);
+    const AREA_LABELS = {biz:'💰 Business', health:'💪 Health', learn:'📚 Learning', relation:'🤝 Relationships', money:'💵 Finance', mind:'🧠 Mind'};
+    window.rIss=()=>{
+        let filter = document.getElementById('iss-filter')?.value || 'open';
+        let filtered = issL.filter(i=>{
+            if(filter==='all') return true;
+            if(filter==='open') return !i.resolved;
+            return i.resolved;
+        });
+        // Stats
+        let open=issL.filter(i=>!i.resolved).length, total=issL.length;
+        let statsEl=document.getElementById('iss-stats');
+        if(statsEl) statsEl.innerText = `${open} open / ${total} total`;
+        
+        let html = filtered.slice().reverse().map((iss)=>{
+            let origIdx = issL.indexOf(iss);
+            let painColor = iss.pain>=8?'var(--danger)':(iss.pain>=5?'var(--accent)':'var(--info)');
+            return `<div class="list-row align-start" style="${iss.resolved?'opacity:0.5':''}; background:var(--bg-body); padding:1rem; border-radius:var(--radius-sm); border:none; margin-bottom:8px; flex-direction:column; gap:6px">
+                <div class="flex justify-between w-100">
+                    <div class="font-bold text-sm" style="${iss.resolved?'text-decoration:line-through':''}">${esc(iss.title)}</div>
+                    <div class="flex gap-2 align-center">
+                        <span class="badge badge-gray">${AREA_LABELS[iss.area]||iss.area}</span>
+                        <span class="badge" style="background:${painColor}; color:white">🌡️${iss.pain}</span>
+                    </div>
+                </div>
+                ${iss.root?`<div class="text-xs"><b class="text-danger">Gốc rễ:</b> ${esc(iss.root)}</div>`:''}
+                ${iss.plan?`<div class="text-xs"><b class="text-primary">Plan:</b> ${esc(iss.plan)}</div>`:''}
+                <div class="flex justify-between w-100 mt-2">
+                    <div class="text-xs text-muted">${iss.d}</div>
+                    <div class="flex gap-2">
+                        ${!iss.resolved?`<button class="btn btn-small btn-success" onclick="resolveIssue(${origIdx})">✓ Resolved</button>`:`<button class="btn btn-small btn-outline" onclick="reopenIssue(${origIdx})">↺ Reopen</button>`}
+                        <button class="btn btn-small btn-outline text-danger" onclick="delIssue(${origIdx})" style="border:none">✕</button>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+        let el = document.getElementById('iss-list');
+        if(el) el.innerHTML = html || '<div class="text-muted text-center" style="padding:2rem">Không có issue. Tốt!</div>';
+    };
+    window.addIssue=()=>{
+        let title=document.getElementById('iss-title').value.trim();
+        if(!title) return toast('Cần mô tả vấn đề','error');
+        let root=document.getElementById('iss-root').value.trim();
+        if(!root && !confirm('Chưa có root cause. Dalio: "Diagnose trước khi plan". Vẫn lưu?')) return;
+        issL.push({
+            d:todayStr,
+            title,
+            area: document.getElementById('iss-area').value,
+            pain: parseInt(document.getElementById('iss-pain').value||5),
+            root,
+            plan: document.getElementById('iss-plan').value,
+            resolved: false
+        });
+        ss('issue_log',issL);
+        ['iss-title','iss-root','iss-plan'].forEach(id=>document.getElementById(id).value='');
+        document.getElementById('iss-pain').value=5;
+        document.getElementById('iss-pain-val').innerText='5/10';
+        addXP(30); rIss();
+    };
+    window.resolveIssue=(i)=>{ issL[i].resolved=true; issL[i].resolvedDate=todayStr; ss('issue_log',issL); addXP(50); toast('Issue resolved! +50 XP','success'); rIss();};
+    window.reopenIssue=(i)=>{ issL[i].resolved=false; ss('issue_log',issL); rIss();};
+    window.delIssue=(i)=>{ if(confirm('Xóa issue?')){issL.splice(i,1); ss('issue_log',issL); rIss();}};
+    rIss();
 }
 
 /* ================= INIT REVIEWS, PLAN, HỌC ================= */
@@ -1760,9 +2566,22 @@ function i567(){
     window.saveNotes = () => { ss('brain_dump', document.getElementById('brain-dump-text').value); };
     
     let wp=gs('wplan',Array(7).fill('')); 
-    const todayDayName = DAYS[(new Date().getDay()+6)%7]; // Convert Sun=0 to Mon=0
-    render('weekly-plan-grid',DAYS,(d,i)=>`<div><div class="font-bold text-sm mb-1 ${d===todayDayName?'text-primary':''}">${d}${d===todayDayName?' (hôm nay)':''}</div><textarea id="wp-${i}" rows="3" onblur="saveWeeklyPlan()">${esc(wp[i])}</textarea></div>`);
-    window.saveWeeklyPlan=()=>{wp=DAYS.map((_,i)=>document.getElementById(`wp-${i}`).value);ss('wplan',wp);toast('Plan updated.','success');};
+    const todayDayIdx = (new Date().getDay()+6)%7;
+    const todayDayName = DAYS[todayDayIdx];
+    let wpEl = document.getElementById('weekly-plan-grid');
+    if(wpEl){
+        wpEl.innerHTML = DAYS.map((d,i)=>{
+            let isToday = i===todayDayIdx;
+            return `<div style="background:${isToday?'var(--primary-light)':'var(--bg-body)'}; padding:0.75rem; border-radius:var(--radius-sm); border:${isToday?'2px solid var(--primary)':'1px solid var(--border)'}; margin-bottom:0.5rem">
+                <div class="flex justify-between align-center mb-2">
+                    <div class="font-bold text-sm ${isToday?'text-primary':''}">${d}${isToday?' · HÔM NAY':''}</div>
+                    ${isToday?'<span class="badge badge-purple text-xs">⚡</span>':''}
+                </div>
+                <textarea id="wp-${i}" rows="3" placeholder="Việc cần làm... (xuống dòng để tách thành nhiều task)" onblur="saveWeeklyPlan()" style="background:var(--bg-card); margin:0">${esc(wp[i]||'')}</textarea>
+            </div>`;
+        }).join('');
+    }
+    window.saveWeeklyPlan=()=>{wp=DAYS.map((_,i)=>document.getElementById(`wp-${i}`).value);ss('wplan',wp);toast('Plan updated.','success'); renderWeeklyToday();};
     window.copyLastWeek=()=>{let last=gs('wplan_last',null); if(!last) return toast('Không có data tuần trước','error'); wp=last; ss('wplan',wp); DAYS.forEach((_,i)=>document.getElementById(`wp-${i}`).value=wp[i]); toast('Đã copy plan tuần trước','success');};
     
     let mp=gs('mplan',{f:'',w1:'',w2:'',w3:'',w4:''}); document.getElementById('mp-focus').value=mp.f; document.getElementById('mp-w1').value=mp.w1; document.getElementById('mp-w2').value=mp.w2; document.getElementById('mp-w3').value=mp.w3; document.getElementById('mp-w4').value=mp.w4;
@@ -1821,120 +2640,89 @@ function i567(){
     window.addMedia=()=>{let t=document.getElementById('media-input').value;if(t){mdL.push({t});ss('media_log',mdL);document.getElementById('media-input').value='';rMd();}};
 
     let lL=gs('l_log',[]); 
-    window.rLL=()=>render('learn-history',lL.slice(-20).reverse(),(l,i)=>`
+    window.rLL=()=>render('learn-history',lL.slice(-20).reverse(),(l,i)=>{
+        let bScore = l.b||0;
+        let bColor = bScore>=8?'success':(bScore>=6?'primary':(bScore>=4?'accent':'danger'));
+        let bBadge = bScore ? `<span class="badge badge-${bColor=='success'?'green':(bColor=='primary'?'purple':(bColor=='accent'?'gold':'red'))}" style="margin-left:8px">⭐${bScore}</span>` : '';
+        return `
         <div class="list-row" style="background:var(--bg-body); padding:1rem; border-radius:var(--radius-sm); border:none; margin-bottom:8px">
             <div class="row-info">
                 <div class="row-title text-sm" style="margin-bottom:8px; line-height:1.5">${esc(l.t)}</div>
-                <div class="row-sub"><span>${l.d}</span><span class="badge badge-purple" style="margin-left:8px">${l.tg}</span></div>
+                <div class="row-sub">
+                    <span>${l.d}</span>
+                    <span class="badge badge-purple" style="margin-left:8px">${l.tg}</span>
+                    ${l.src?`<span class="text-xs" style="margin-left:8px">📖 ${esc(l.src)}</span>`:''}
+                    ${bBadge}
+                </div>
             </div>
             <span class="text-danger cursor-pointer font-bold" onclick="lL.splice(${lL.length-1-i},1);ss('l_log',lL);rLL()" style="font-size:12px; padding:4px">X</span>
-        </div>`); rLL();
-    window.saveLearnLog=()=>{let t=document.getElementById('learn-log-text').value;if(t){lL.push({d:todayStr,tg:document.getElementById('learn-tag').value,t});ss('l_log',lL);document.getElementById('learn-log-text').value='';addXP(50);rLL();}};
-
-    // English Vocab
-    let vocabL=gs('vocab_list',[]);
-    window.rVocab=()=>{
-        let search=(document.getElementById('vocab-search')?.value||'').toLowerCase();
-        let filter=document.getElementById('vocab-filter-tag')?.value||'all';
-        let filtered=vocabL.filter(v=>{
-            let m1 = !search || v.w.toLowerCase().includes(search) || (v.m||'').toLowerCase().includes(search);
-            let m2 = filter==='all' || v.tag===filter;
-            return m1 && m2;
-        });
-        render('vocab-list',filtered.slice().reverse(),(v,idx)=>{
-            let origIdx = vocabL.indexOf(v);
-            return `
-            <div class="list-row" style="padding:0.75rem 0">
-                <div class="row-info">
-                    <div class="row-title">${esc(v.w)} <span class="badge badge-gray text-xs">${v.tag}</span></div>
-                    <div class="row-sub" style="margin-top:4px"><b>${esc(v.m||'')}</b></div>
-                    ${v.ex?`<div class="text-xs text-muted" style="margin-top:4px; font-style:italic">"${esc(v.ex)}"</div>`:''}
-                </div>
-                <div class="row-action" style="flex-direction:column; gap:4px">
-                    <span class="badge ${(v.score||0)>=3?'badge-green':((v.score||0)>=1?'badge-gold':'badge-gray')}" title="Mastery: ${v.score||0}">★${v.score||0}</span>
-                    <span class="text-danger cursor-pointer text-xs" onclick="vocabL.splice(${origIdx},1);ss('vocab_list',vocabL);rVocab()">x</span>
-                </div>
-            </div>`;
-        });
-        // Stats
-        let totalEl=document.getElementById('vocab-total'); if(totalEl) totalEl.innerText=vocabL.length;
-        let bar=document.getElementById('vocab-bar'); if(bar) bar.style.width=`${Math.min(100,(vocabL.length/VOCAB_TARGET)*100)}%`;
-        let today=vocabL.filter(v=>v.d===todayStr).length;
-        let weekAgo=new Date(); weekAgo.setDate(weekAgo.getDate()-7); let weekAgoStr=weekAgo.toISOString().split('T')[0];
-        let weekN=vocabL.filter(v=>v.d>=weekAgoStr).length;
-        let tEl=document.getElementById('vocab-today'); if(tEl) tEl.innerText=today;
-        let wEl=document.getElementById('vocab-week'); if(wEl) wEl.innerText=weekN;
-        // Streak
-        let st=0; for(let i=0;i<30;i++){let d=new Date(); d.setDate(d.getDate()-i); let ds=d.toISOString().split('T')[0]; if(vocabL.some(v=>v.d===ds)) st++; else if(i>0) break;}
-        let sEl=document.getElementById('vocab-streak'); if(sEl) sEl.innerText=st;
-    }; rVocab();
-    window.addVocab=()=>{
-        let w=document.getElementById('vocab-word').value.trim(), m=document.getElementById('vocab-meaning').value.trim(), ex=document.getElementById('vocab-example').value.trim(), tag=document.getElementById('vocab-tag').value;
-        if(!w || !m) return toast('Cần từ và nghĩa','error');
-        if(vocabL.some(v=>v.w.toLowerCase()===w.toLowerCase())) return toast('Từ này đã tồn tại','error');
-        vocabL.push({w,m,ex,tag,d:todayStr,score:0});
-        ss('vocab_list',vocabL);
-        ['vocab-word','vocab-meaning','vocab-example'].forEach(id=>document.getElementById(id).value='');
-        addXP(5); rVocab();
-    };
-    
-    // Vocab Review (SRS-lite)
-    let reviewQueue=[], reviewIdx=0;
-    window.startVocabReview=()=>{
-        if(vocabL.length===0) return toast('Chưa có từ để review','error');
-        // Prioritize lowest score & not reviewed today
-        reviewQueue = vocabL.slice().sort((a,b)=>(a.score||0)-(b.score||0)).slice(0,10);
-        reviewIdx=0;
-        document.getElementById('vocab-review-card').classList.remove('hidden');
-        showVocabReviewCard();
-    };
-    window.showVocabReviewCard=()=>{
-        if(reviewIdx>=reviewQueue.length){ endVocabReview(); addXP(20); toast('Review xong! +20XP','success'); return;}
-        let v=reviewQueue[reviewIdx];
-        document.getElementById('vocab-review-word').innerText=v.w;
-        document.getElementById('vocab-review-meaning-text').innerText=v.m;
-        document.getElementById('vocab-review-example').innerText=v.ex?`"${v.ex}"`:'';
-        document.getElementById('vocab-review-progress').innerText=`${reviewIdx+1}/${reviewQueue.length}`;
-        document.getElementById('vocab-review-meaning').classList.add('hidden');
-        document.getElementById('vocab-show-btn').classList.remove('hidden');
-        document.getElementById('vocab-good-btn').classList.add('hidden');
-        document.getElementById('vocab-bad-btn').classList.add('hidden');
-    };
-    window.vocabShowMeaning=()=>{
-        document.getElementById('vocab-review-meaning').classList.remove('hidden');
-        document.getElementById('vocab-show-btn').classList.add('hidden');
-        document.getElementById('vocab-good-btn').classList.remove('hidden');
-        document.getElementById('vocab-bad-btn').classList.remove('hidden');
-    };
-    window.vocabReviewAnswer=(good)=>{
-        let v=reviewQueue[reviewIdx];
-        let origIdx=vocabL.indexOf(v);
-        if(origIdx>=0){
-            vocabL[origIdx].score = good ? Math.min(5,(v.score||0)+1) : Math.max(0,(v.score||0)-1);
-            ss('vocab_list',vocabL);
-        }
-        reviewIdx++;
-        showVocabReviewCard();
-    };
-    window.endVocabReview=()=>{
-        document.getElementById('vocab-review-card').classList.add('hidden');
-        rVocab();
+        </div>`;
+    }); rLL();
+    window.saveLearnLog=()=>{
+        let t=document.getElementById('learn-log-text').value;
+        if(!t) return;
+        let src=document.getElementById('learn-source').value;
+        let b=parseInt(document.getElementById('learn-believe').value||7);
+        lL.push({d:todayStr,tg:document.getElementById('learn-tag').value,t,src,b});
+        ss('l_log',lL);
+        document.getElementById('learn-log-text').value='';
+        document.getElementById('learn-source').value='';
+        addXP(50); rLL();
     };
 
-    // 10k Hours
-    let hr10=gs('hr10k', {biz: 0, tech: 0, eng: 0});
-    window.r10k=()=>{
-        render('10k-list', ['biz', 'tech', 'eng'], cat => {
-            let name = cat==='biz'?'Business':(cat==='tech'?'Tech':'English');
-            let pct = (hr10[cat] / 10000) * 100;
-            return `
-            <div>
-                <div class="flex justify-between text-sm font-bold mb-1"><span>${name}</span><span>${hr10[cat]} / 10,000h (${pct.toFixed(2)}%)</span></div>
-                <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+
+    // Skill Mastery Tracker
+    let skills = gs('skills_list', [
+        {id:'sk_eng', name:'English (IELTS 8.0)', target:1500, hours:0},
+        {id:'sk_biz', name:'Business/Sales', target:2000, hours:0},
+        {id:'sk_code', name:'Coding/Tech', target:3000, hours:0}
+    ]);
+    window.r10k = () => {
+        // Update selector
+        let sel = document.getElementById('skill-log-id');
+        if(sel) sel.innerHTML = skills.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('') || '<option value="">-- Thêm skill trước --</option>';
+        // Render list
+        let el = document.getElementById('skill-list');
+        if(!el) return;
+        if(skills.length===0){ el.innerHTML='<div class="text-xs text-muted text-center" style="padding:1rem">Chưa có skill nào. Thêm skill phía trên.</div>'; return;}
+        el.innerHTML = skills.map((s,i)=>{
+            let pct = s.target > 0 ? Math.min(100, (s.hours/s.target)*100) : 0;
+            let color = pct >= 100 ? 'var(--success)' : (pct >= 50 ? 'var(--primary)' : (pct >= 20 ? 'var(--accent)' : 'var(--text-muted)'));
+            let verdict = pct >= 100 ? '🎯 MASTERED' : (pct >= 80 ? '🔥 Sắp đạt' : (pct >= 50 ? '⚡ Đang tiến' : (pct >= 20 ? '🌱 Bắt đầu' : '⏳ Mới')));
+            return `<div style="padding:1rem; background:var(--bg-body); border-radius:var(--radius-sm); border:1px solid var(--border)">
+                <div class="flex justify-between align-center mb-2">
+                    <div class="font-bold text-sm">${esc(s.name)}</div>
+                    <div class="flex gap-2 align-center">
+                        <span class="text-xs font-bold" style="color:${color}">${verdict}</span>
+                        <button class="btn btn-small btn-outline text-danger" style="border:none; padding:2px 8px" onclick="if(confirm('Xóa skill ${esc(s.name)}?')){skills.splice(${i},1); ss('skills_list',skills); r10k();}">x</button>
+                    </div>
+                </div>
+                <div class="flex justify-between text-xs font-bold mb-1">
+                    <span>${s.hours}h</span>
+                    <span class="text-muted">/ ${s.target}h (${pct.toFixed(1)}%)</span>
+                </div>
+                <div class="progress-track"><div class="progress-fill" style="width:${pct}%; background:${color}"></div></div>
             </div>`;
-        });
-    }; r10k();
-    window.add10kHours=()=>{let c=document.getElementById('h10k-cat').value; let v=parseFloat(document.getElementById('h10k-val').value||0); if(v){hr10[c]+=v; ss('hr10k', hr10); document.getElementById('h10k-val').value=''; r10k();}};
+        }).join('');
+    };
+    r10k();
+    window.addSkill = () => {
+        let name = document.getElementById('skill-name').value.trim();
+        let target = parseInt(document.getElementById('skill-target').value) || 1000;
+        if(!name) return toast('Cần tên skill','error');
+        skills.push({id:'sk'+Date.now(), name, target, hours:0});
+        ss('skills_list', skills);
+        document.getElementById('skill-name').value='';
+        document.getElementById('skill-target').value='';
+        r10k(); toast('✓ Đã thêm skill','success');
+    };
+    window.logSkill = () => {
+        let id = document.getElementById('skill-log-id').value;
+        let h = parseFloat(document.getElementById('skill-log-h').value) || 0;
+        if(!id || !h) return toast('Cần chọn skill và giờ','error');
+        let s = skills.find(x=>x.id===id);
+        if(s){ s.hours += h; ss('skills_list', skills); document.getElementById('skill-log-h').value=''; r10k(); addXP(Math.round(h*5)); }
+    };
 }
 
 /* ================= INIT GOAL & TRACK ================= */
@@ -1963,38 +2751,65 @@ function i89(){
         document.getElementById('hier-wk').innerText = mp.f || 'Chưa set mục tiêu Tháng/Tuần';
     }; window.renderHier = saveHier;
     
-    let ms=gs('ms_data', PRESET_MILESTONES); 
-    window.rMS=()=>render('milestone-list',ms,(m,i)=>`
-        <div class="list-row" style="${m.done?'opacity:0.5':''}">
-            <div class="date-block"><span class="dt">MARK</span><span class="tm">${esc(m.d)}</span></div>
-            <div class="row-info"><div class="row-title" style="${m.done?'text-decoration:line-through':''}">${esc(m.t)}</div></div>
-            <div class="row-action" style="flex-direction:row">
-                <input type="checkbox" ${m.done?'checked':''} onchange="ms[${i}].done=this.checked;ss('ms_data',ms);rMS()">
-                <button class="btn btn-small btn-danger" onclick="ms.splice(${i},1);ss('ms_data',ms);rMS()">DEL</button>
-            </div>
-        </div>`); rMS();
-    window.addMS=()=>{let d=document.getElementById('ms-d').value,t=document.getElementById('ms-t').value;if(d&&t){ms.push({d,t,done:false});ss('ms_data',ms);document.getElementById('ms-d').value='';document.getElementById('ms-t').value='';rMS();}};
+    // Life Roadmap (unified milestones + scorecard)
+    const PRESET_ROADMAP = [
+        {year:2026, theme:"Foundation - Habits + English + Đọc", outcomes:["Build 8/8 daily habits ≥80%","Đọc 24 sách S+","Save rate ≥40%"], done:false},
+        {year:2027, theme:"IELTS 8.0 + Chuyên môn", outcomes:["IELTS 8.0 (12/2027)","Tích lũy CC chuyên môn","Network có 10 quality contacts"], done:false},
+        {year:2028, theme:"PHÒNG THỦ - Năm hạn", outcomes:["Zero debt","Giữ habits compound","Không quyết định lớn"], done:false},
+        {year:2031, theme:"MQH ổn định + Kết hôn", outcomes:["Kết hôn / partner committed","Foundation tài chính cá nhân"], done:false},
+        {year:2035, theme:"1 tỷ Net Worth + BĐS đầu tiên", outcomes:["BĐS đầu tay","Net worth ≥1 tỷ","Chuyển đại vận"], done:false},
+        {year:2045, theme:"ĐẠI VẬN QUAN LỘC - Empire", outcomes:["Lên đỉnh sự nghiệp","CEO tổ chức","Tài sản 3 thế hệ"], done:false}
+    ];
+    let roadmap = gs('life_roadmap', PRESET_ROADMAP);
+    const currentYear = new Date().getFullYear();
     
-    let sc=gs('sc_data', PRESET_SCORECARD);
-    window.rSC=()=>render('scorecard-list',sc,(s,i)=>`
-        <div class="list-row" style="${s.y==new Date().getFullYear()?'border-left: 2px solid var(--primary); padding-left:16px':''}">
-            <div class="date-block"><span class="dt">YEAR</span><span class="tm">${esc(s.y)}</span></div>
-            <div class="row-info"><div class="row-title">${esc(s.m)}</div></div>
-            <div class="row-action"><button class="btn btn-small btn-danger" onclick="sc.splice(${i},1);ss('sc_data',sc);rSC()">DEL</button></div>
-        </div>`); rSC();
-    window.addSC=()=>{let y=document.getElementById('sc-y').value,m=document.getElementById('sc-m').value;if(y&&m){sc.push({y,m});ss('sc_data',sc);document.getElementById('sc-y').value='';document.getElementById('sc-m').value='';rSC();}};
-
-    let pd=gs('pd_data', PRESET_PARADOXES);
-    window.rPD=()=>render('nghichly-list',pd,(p,i)=>`
-        <div class="list-row" style="background:var(--bg-body); padding:16px; border-radius:var(--radius-sm)">
-            <div class="row-info"><div class="row-title text-primary">${i+1}. ${esc(p)}</div></div>
-            <div class="row-action"><button class="btn btn-small btn-danger" onclick="pd.splice(${i},1);ss('pd_data',pd);rPD()">DEL</button></div>
-        </div>`); rPD();
-    window.addPD=()=>{let t=document.getElementById('pd-t').value;if(t){pd.push(t);ss('pd_data',pd);document.getElementById('pd-t').value='';rPD();}};
+    window.rRoadmap = () => {
+        let el = document.getElementById('roadmap-list');
+        if(!el) return;
+        let sorted = roadmap.slice().sort((a,b)=>a.year-b.year);
+        el.innerHTML = sorted.map((r,idx)=>{
+            let origIdx = roadmap.indexOf(r);
+            let isPast = r.year < currentYear;
+            let isCurrent = r.year === currentYear;
+            let isFuture = r.year > currentYear;
+            let style = isCurrent ? 'background:var(--primary-light); border:2px solid var(--primary)' : (isPast ? 'opacity:0.6; background:var(--bg-body)' : 'background:var(--bg-body); border:1px solid var(--border)');
+            let badge = isCurrent ? '<span class="badge badge-purple">⚡ NĂM NAY</span>' : (isPast ? `<span class="badge badge-gray">${r.done?'✓':'past'}</span>` : `<span class="badge badge-gold">+${r.year-currentYear} năm</span>`);
+            return `<div style="${style}; padding:1rem; border-radius:var(--radius-sm)">
+                <div class="flex justify-between align-center mb-2">
+                    <div class="font-bold ${isCurrent?'text-primary':''}" style="font-size:1.1rem">${r.year} · ${esc(r.theme)}</div>
+                    <div class="flex gap-2 align-center">
+                        ${badge}
+                        <button class="btn btn-small btn-outline text-danger" style="border:none; padding:2px 8px" onclick="if(confirm('Xóa năm ${r.year}?')){roadmap.splice(${origIdx},1); ss('life_roadmap',roadmap); rRoadmap();}">x</button>
+                    </div>
+                </div>
+                ${(r.outcomes||[]).map((o,oi)=>`<div class="flex align-center gap-2 mb-1" style="font-size:0.9rem">
+                    <input type="checkbox" ${r.outcomeDone&&r.outcomeDone[oi]?'checked':''} onchange="if(!roadmap[${origIdx}].outcomeDone)roadmap[${origIdx}].outcomeDone={}; roadmap[${origIdx}].outcomeDone[${oi}]=this.checked; ss('life_roadmap',roadmap);">
+                    <span style="${r.outcomeDone&&r.outcomeDone[oi]?'text-decoration:line-through; color:var(--text-muted)':''}">${esc(o)}</span>
+                </div>`).join('')}
+            </div>`;
+        }).join('');
+    };
+    rRoadmap();
+    window.addRoadmap = () => {
+        let year = parseInt(document.getElementById('lr-year').value);
+        let theme = document.getElementById('lr-theme').value.trim();
+        let outs = ['lr-out1','lr-out2','lr-out3'].map(id=>document.getElementById(id).value.trim()).filter(x=>x);
+        if(!year || !theme) return toast('Cần năm và theme','error');
+        if(roadmap.some(r=>r.year===year)){
+            if(!confirm(`Năm ${year} đã có. Ghi đè?`)) return;
+            roadmap = roadmap.filter(r=>r.year!==year);
+        }
+        roadmap.push({year, theme, outcomes:outs, done:false});
+        ss('life_roadmap', roadmap);
+        ['lr-year','lr-theme','lr-out1','lr-out2','lr-out3'].forEach(id=>document.getElementById(id).value='');
+        rRoadmap();
+        toast('✓ Đã lưu','success');
+    };
 
     // P9 Biometric
-    let bioL=gs('bio_log',[]); window.saveBio=()=>{let w=document.getElementById('bio-w').value, s=document.getElementById('bio-s').value, e=document.getElementById('bio-e').value, m=document.getElementById('bio-m').value; if(w||s||e||m){bioL.push({d:todayStr,w,s,e,m});ss('bio_log',bioL);toast('Telemetry logged','success');addXP(20);['bio-w','bio-s','bio-e','bio-m'].forEach(id=>document.getElementById(id).value='');rBio();} };
+    let bioL=gs('bio_log',[]); window.saveBio=()=>{let w=document.getElementById('bio-w').value, s=document.getElementById('bio-s').value, e=document.getElementById('bio-e').value, m=document.getElementById('bio-m').value; if(w||s||e||m){bioL.push({d:todayStr,w,s,e,m});ss('bio_log',bioL);toast('Telemetry logged','success');addXP(20);['bio-w','bio-s','bio-e','bio-m'].forEach(id=>document.getElementById(id).value='');rBio();analyzeChronotype();} };
     window.rBio=()=>render('bio-hist',bioL.slice(-7).reverse(),b=>`<div class="list-row"><div class="date-block"><span class="dt">DATE</span><span class="tm">${b.d.substring(5)}</span></div><div class="row-info"><div class="row-title">${b.w?b.w+'kg':'-'} · ${b.s?b.s+'h':'-'}</div><div class="row-sub">Energy: ${b.e||'-'} · Mood: ${b.m||'-'}</div></div></div>`); rBio();
+    analyzeChronotype();
     window.calcPL=()=>{let r=parseFloat(document.getElementById('pl-rev').value||0),c=parseFloat(document.getElementById('pl-cogs').value||0),o=parseFloat(document.getElementById('pl-opex').value||0); document.getElementById('pl-g').innerText=(r-c).toLocaleString(); let n=r-c-o; document.getElementById('pl-n').innerText=n.toLocaleString(); };
     window.savePL=()=>{calcPL();ss(`pl_${getMonth()}`,{r:document.getElementById('pl-rev').value,c:document.getElementById('pl-cogs').value,o:document.getElementById('pl-opex').value});toast('Financials logged','success');};
 
@@ -2156,21 +2971,881 @@ function i89(){
     };
 }
 
-/* ================= BOOTSTRAP ================= */
+/* ================= WEEKLY → DAILY BRIDGE ================= */
+function renderWeeklyToday() {
+    const days = ["Thứ 2","Thứ 3","Thứ 4","Thứ 5","Thứ 6","Thứ 7","Chủ Nhật"];
+    // JS Sunday=0, Monday=1... map to our index (Mon=0)
+    let jsDay = new Date().getDay();
+    let dayIdx = (jsDay + 6) % 7; // Mon=0, Tue=1, ..., Sun=6
+    let wp = gs('wplan', Array(7).fill(''));
+    let todayPlan = wp[dayIdx] || '';
+    
+    let dEl = document.getElementById('weekly-today-day');
+    let cEl = document.getElementById('weekly-today-content');
+    if(dEl) dEl.innerText = days[dayIdx];
+    if(cEl){
+        if(todayPlan.trim()){
+            cEl.innerText = todayPlan;
+            cEl.style.color = 'var(--text-main)';
+        } else {
+            cEl.innerHTML = '<span class="text-muted">Chưa set plan cho ngày này. Vào tab <b>Plan → Weekly Plan</b> để fill.</span>';
+        }
+    }
+}
+
+function importWeeklyToMatrix() {
+    try {
+        let jsDay = new Date().getDay();
+        let dayIdx = (jsDay + 6) % 7;
+        let wp = gs('wplan', Array(7).fill(''));
+        let plan = (wp[dayIdx] || '').trim();
+        if(!plan) { toast('Chưa có plan cho hôm nay. Set ở Plan → Weekly Plan trước','error'); return; }
+        
+        // Parse plan: split by newline, comma, semicolon, or "- " (markdown lists)
+        let tasks = plan.split(/[\n,;]+|\s*-\s+/).map(t=>t.trim().replace(/^[•\-*]\s*/,'')).filter(t=>t.length>=1);
+        if(tasks.length===0) { toast('Plan trống','error'); return; }
+        
+        // Skip confirm if ≤8 tasks; only ask for confirmation when many
+        if(tasks.length > 8){
+            if(!confirm(`Đẩy ${tasks.length} task vào Q2 (Chiến lược)?\n\n${tasks.slice(0,5).join('\n')}\n...`)) return;
+        }
+        
+        // CRITICAL: Read fresh from localStorage to avoid stale closure issue in i0
+        let mx = gs(`mx_${todayStr}`, {q1:[],q2:[],q3:[],q4:[]});
+        // Ensure all 4 quadrants exist
+        if(!mx.q1) mx.q1=[]; if(!mx.q2) mx.q2=[]; if(!mx.q3) mx.q3=[]; if(!mx.q4) mx.q4=[];
+        
+        let existing = new Set([...mx.q1, ...mx.q2, ...mx.q3, ...mx.q4].map(t=>(t.x||'').toLowerCase()));
+        let added = 0;
+        tasks.forEach(t=>{
+            if(!existing.has(t.toLowerCase())){
+                mx.q2.push({x: t, d: false, xp: 30, fromWeekly: true});
+                added++;
+                existing.add(t.toLowerCase());
+            }
+        });
+        
+        if(added === 0){ toast('Tất cả task đã có trong matrix','error'); return; }
+        
+        // Save IMMEDIATELY
+        ss(`mx_${todayStr}`, mx);
+        
+        // Force re-render the matrix UI directly (don't rely on full i0 which can fail)
+        if(typeof window.renderAllMx === 'function'){
+            try { window.renderAllMx(mx); } catch(e){ console.error('renderAllMx error:', e); }
+        }
+        
+        // Also try full re-init as backup
+        try {
+            if(typeof i0 === 'function') i0();
+        } catch(e){ console.error('i0 re-init error:', e); }
+        
+        toast(`✓ Đã đẩy ${added}/${tasks.length} task vào Q2`, 'success');
+    } catch(err){
+        console.error('importWeeklyToMatrix FATAL:', err);
+        toast('Lỗi: '+err.message, 'error');
+    }
+}
+
+
+function openGTDModal() { 
+    document.getElementById('gtd-modal').classList.add('show-modal'); 
+    setTimeout(()=>{let i=document.getElementById('gtd-input'); if(i) i.focus();}, 100);
+}
+function closeGTDModal() { document.getElementById('gtd-modal').classList.remove('show-modal'); }
+function saveGTD() {
+    let inp = document.getElementById('gtd-input').value.trim();
+    if(!inp) return toast('Cần nội dung','error');
+    let b = gs('gtd_inbox', []);
+    b.push({
+        id: 'g'+Date.now(),
+        t: inp,
+        ev: parseInt(document.getElementById('gtd-ev').value)||0,
+        lev: parseInt(document.getElementById('gtd-lev').value)||0,
+        rep: document.getElementById('gtd-rep').checked,
+        auto: document.getElementById('gtd-auto').checked,
+        ts: Date.now()
+    });
+    ss('gtd_inbox', b);
+    ['gtd-input','gtd-ev','gtd-lev'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('gtd-rep').checked=false;
+    document.getElementById('gtd-auto').checked=false;
+    closeGTDModal();
+    if(typeof window.rGTD === 'function') window.rGTD();
+    toast('Đã lưu Inbox','success');
+}
+document.addEventListener('keydown', e=>{
+    if(e.key==='Escape') closeGTDModal();
+    // Press 'g' to open Quick Capture (when not in input)
+    if(e.key==='g' && !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)){
+        e.preventDefault(); openGTDModal();
+    }
+});
+
+/* ================= MINI-TAGS HELPER ================= */
+function getMiniTagsHTML(t) {
+    let html = '';
+    if(t.ev) html += `<span class="minitag tag-ev">EV:${t.ev}</span>`;
+    if(t.lev) html += `<span class="minitag tag-ev">LEV:${t.lev}</span>`;
+    if(t.auto) html += `<span class="minitag tag-auto">🤖</span>`;
+    if(t.rep) html += `<span class="minitag tag-rep">🔄</span>`;
+    return html;
+}
+
+/* ================= DRAG & DROP EISENHOWER ================= */
+let draggedFromQ = null, draggedTaskIdx = null;
+function dragMx(ev, q, idx) { 
+    draggedFromQ = q; draggedTaskIdx = idx; 
+    ev.dataTransfer.effectAllowed = 'move';
+    ev.dataTransfer.setData('text/plain', `${q}-${idx}`);
+}
+function allowDrop(ev) { ev.preventDefault(); ev.currentTarget.classList.add('drag-over'); }
+function leaveDrop(ev) { ev.currentTarget.classList.remove('drag-over'); }
+function drop(ev, targetQ) {
+    ev.preventDefault(); ev.currentTarget.classList.remove('drag-over');
+    if(!draggedFromQ || draggedFromQ === targetQ || draggedTaskIdx === null) return;
+    let mx = gs(`mx_${todayStr}`,{q1:[],q2:[],q3:[],q4:[]});
+    let task = mx[draggedFromQ].splice(draggedTaskIdx, 1)[0];
+    if(!task) return;
+    // Update XP value based on new quadrant
+    const xpMap = {q1:50, q2:30, q3:10, q4:5};
+    task.xp = xpMap[targetQ];
+    mx[targetQ].push(task);
+    ss(`mx_${todayStr}`, mx);
+    if(typeof window.renderAllMx === 'function') window.renderAllMx(mx);
+    draggedFromQ = null; draggedTaskIdx = null;
+}
+
+/* ================= DISPATCHER (GTD → Matrix) ================= */
+function dispatchTask(id, targetQ) {
+    let inbox = gs('gtd_inbox', []);
+    let idx = inbox.findIndex(x=>x.id === id);
+    if(idx < 0) return;
+    let item = inbox.splice(idx, 1)[0];
+    ss('gtd_inbox', inbox);
+    let mx = gs(`mx_${todayStr}`,{q1:[],q2:[],q3:[],q4:[]});
+    const xpMap = {q1:50, q2:30, q3:10, q4:5};
+    mx[targetQ].push({x: item.t, d:false, xp: xpMap[targetQ], ev: item.ev, lev: item.lev, auto: item.auto, rep: item.rep});
+    ss(`mx_${todayStr}`, mx);
+    if(typeof window.rGTD === 'function') window.rGTD();
+    if(typeof window.renderAllMx === 'function') window.renderAllMx(mx);
+    toast(`Pushed to ${targetQ.toUpperCase()}`, 'success');
+}
+function dismissInbox(id) {
+    let inbox = gs('gtd_inbox', []).filter(x=>x.id !== id);
+    ss('gtd_inbox', inbox);
+    if(typeof window.rGTD === 'function') window.rGTD();
+}
+
+/* ================= FLOW MODE (Brain Dump) ================= */
+let flowModeActive = false;
+function toggleFlowMode() {
+    flowModeActive = document.getElementById('flow-mode-toggle').checked;
+    let ta = document.getElementById('brain-dump-text');
+    if(flowModeActive){
+        ta.classList.add('flow-active');
+        toast('🌊 Flow Mode ON. Backspace bị chặn. Cứ viết!','success');
+    } else {
+        ta.classList.remove('flow-active');
+    }
+}
+document.addEventListener('keydown', e=>{
+    if(flowModeActive && document.activeElement.id === 'brain-dump-text'){
+        if(e.key === 'Backspace' || e.key === 'Delete'){
+            e.preventDefault();
+        }
+    }
+});
+
+/* ================= LRU GARBAGE COLLECTOR ================= */
+function runLRUGarbageCollector() {
+    let inbox = gs('gtd_inbox', []);
+    let now = Date.now();
+    let cutoff = 30 * 86400000; // 30 days
+    let kept = inbox.filter(item => (now - (item.ts||0)) < cutoff);
+    if(kept.length < inbox.length){
+        ss('gtd_inbox', kept);
+        console.log(`[LRU] Cleaned ${inbox.length - kept.length} stale inbox items >30d`);
+    }
+}
+
+/* ================= EV FILTER ================= */
+function calcEVPreview() {
+    let imp = parseFloat(document.getElementById('ev-impact').value)||0;
+    let cost = parseFloat(document.getElementById('ev-cost').value)||0;
+    let prob = parseFloat(document.getElementById('ev-prob').value)||0;
+    let pv = document.getElementById('ev-preview');
+    if(!imp || !cost) { pv.innerHTML = '<span class="text-muted">Nhập số để tính EV</span>'; return; }
+    let ev = (imp * (prob/100)) / cost;
+    let verdict, color;
+    if(ev >= 3) { verdict='🟢 ƯU TIÊN CAO - Làm ngay'; color='var(--success)'; }
+    else if(ev >= 1.5) { verdict='🟡 KHẢ THI - Cân nhắc'; color='var(--accent)'; }
+    else if(ev >= 0.8) { verdict='🟠 MARGINAL - Cẩn thận'; color='var(--accent)'; }
+    else { verdict='🔴 BỎ - EV quá thấp'; color='var(--danger)'; }
+    pv.innerHTML = `<div style="font-size:1.5rem; color:${color}; font-weight:800">EV = ${ev.toFixed(2)}</div><div class="text-xs mt-1" style="color:${color}">${verdict}</div>`;
+}
+function saveEV() {
+    let name = document.getElementById('ev-name').value.trim();
+    let imp = parseFloat(document.getElementById('ev-impact').value)||0;
+    let cost = parseFloat(document.getElementById('ev-cost').value)||0;
+    let prob = parseFloat(document.getElementById('ev-prob').value)||0;
+    if(!name || !imp || !cost) return toast('Cần đủ tên, impact, cost','error');
+    let ev = (imp * (prob/100)) / cost;
+    let evL = gs('ev_log', []);
+    evL.push({d:todayStr, name, imp, cost, prob, ev});
+    ss('ev_log', evL);
+    ['ev-name','ev-impact','ev-cost'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('ev-prob').value=50;
+    document.getElementById('ev-prob-val').innerText='50%';
+    rEV(); toast('Đã lưu EV','success');
+}
+function rEV() {
+    let evL = gs('ev_log', []).slice().sort((a,b)=>b.ev-a.ev);
+    let html = evL.map((e,idx)=>{
+        let origIdx = gs('ev_log',[]).indexOf(e);
+        let color = e.ev>=3?'success':(e.ev>=1.5?'accent':(e.ev>=0.8?'accent':'danger'));
+        return `<div class="list-row" style="padding:0.6rem; background:var(--bg-body); border-radius:var(--radius-sm); border:none; margin-bottom:6px">
+            <div class="row-info">
+                <div class="font-bold text-sm">${esc(e.name)}</div>
+                <div class="text-xs text-muted">Impact ${e.imp} · Cost ${e.cost} · P=${e.prob}%</div>
+            </div>
+            <div class="text-right">
+                <div class="font-bold text-${color}" style="font-size:1.1rem">EV ${e.ev.toFixed(2)}</div>
+                <button class="btn btn-small btn-outline text-danger" style="border:none" onclick="evL=gs('ev_log',[]); evL.splice(${origIdx},1); ss('ev_log',evL); rEV();">x</button>
+            </div>
+        </div>`;
+    }).join('');
+    let el = document.getElementById('ev-list');
+    if(el) el.innerHTML = html || '<div class="text-muted text-center" style="padding:1rem">Chưa có dự án nào</div>';
+}
+
+/* ================= CHRONOTYPE ANALYZER ================= */
+function analyzeChronotype() {
+    let bio = gs('bio_log', []).slice(-14);
+    if(bio.length < 5) return;
+    let avgSleep = bio.reduce((s,b)=>s+(parseFloat(b.s)||0), 0) / bio.length;
+    let avgEnergy = bio.reduce((s,b)=>s+(parseFloat(b.e)||0), 0) / bio.length;
+    let avgMood = bio.reduce((s,b)=>s+(parseFloat(b.m)||0), 0) / bio.length;
+    
+    let type, advice;
+    if(avgSleep >= 7.5 && avgEnergy >= 7) { type='🦁 SƯ TỬ (Lion)'; advice='Peak: 6-10h sáng. Deep Work sáng sớm. Đi ngủ trước 22h.'; }
+    else if(avgSleep < 6 || avgEnergy < 5) { type='⚠️ KIỆT SỨC'; advice='Sleep nợ + energy thấp. ƯU TIÊN ngủ 8h, giảm task.'; }
+    else if(avgSleep >= 6.5 && avgEnergy >= 6) { type='🐻 GẤU (Bear)'; advice='Peak: 10h-14h. Deep Work giữa buổi sáng. Đi ngủ 22-23h.'; }
+    else { type='🐺 SÓI (Wolf)'; advice='Peak: chiều tối 17-21h. Sáng nhẹ nhàng, deep work cuối ngày.'; }
+    
+    let el = document.getElementById('chrono-suggest');
+    if(el) el.innerHTML = `<div class="font-bold text-primary mb-1">${type}</div><div class="text-muted">${advice}</div><div class="text-xs mt-2">Avg: ${avgSleep.toFixed(1)}h sleep · E${avgEnergy.toFixed(1)} · M${avgMood.toFixed(1)} (n=${bio.length})</div>`;
+}
+
+
+/* ================= ANTIDOTE: 11 PATTERNS DETECTION + PRACTICE ================= */
+const ANTIDOTES = [
+    {
+        id: 'perfectionism',
+        name: '🔍 Perfectionism Spiral',
+        diagnosis: 'Bạn đang edit/lặp 1 task quá nhiều lần. Xử Nữ Rising + Chiron Ma Kết đang chạy. Hoàn hảo là kẻ thù của giao đi.',
+        detect: () => {
+            // Check if today has >5 OBT changes or matrix items with very long names (proxy for over-editing)
+            let mx = gs(`mx_${todayStr}`, {q1:[],q2:[],q3:[],q4:[]});
+            let allTasks = [...(mx.q1||[]), ...(mx.q2||[]), ...(mx.q3||[]), ...(mx.q4||[])];
+            // Check if any task has been undone and redone (proxy: counts of un-done tasks today)
+            let undone = allTasks.filter(t=>!t.d).length;
+            // Or check pomodoro >90min uninterrupted (proxy from sets data)
+            return undone > 8; // >8 unfinished tasks → over-listing without execution
+        },
+        practiceTitle: '7/10 Practice',
+        practiceContent: () => `
+            <div class="text-sm mb-3"><b>Bài thuốc:</b> Lấy 1 task đang edit lâu. Submit/publish/đóng ngay ở mức 7/10. KHÔNG sửa thêm.</div>
+            <div class="text-xs text-muted mb-4">Lý do: Cung Mọc Xử Nữ + Chiron cần evidence "không hoàn hảo vẫn ổn". 12 tuần lặp lại = rewire não.</div>
+            <input type="text" id="practice-perfectionism-task" placeholder="Task tôi sẽ submit ở 7/10 ngay:" class="mb-2">
+            <textarea id="practice-perfectionism-fear" rows="2" placeholder="Tôi sợ điều gì sẽ xảy ra? (viết ra để nhìn rõ)" class="mb-2"></textarea>
+            <button class="btn btn-success w-100" onclick="completePractice('perfectionism', document.getElementById('practice-perfectionism-task').value)">✓ Đã submit ở 7/10 (+30XP)</button>
+        `,
+        linkTo: 6, // Brain Dump
+        linkLabel: 'Drill down: Brain Dump'
+    },
+    {
+        id: 'self_crit',
+        name: '🗣️ Self-Criticism Loop',
+        diagnosis: 'Mộc Tinh Tù đang xuống dốc. Nhật ký/notes có nhiều từ tiêu cực về bản thân. Cần evidence base để chống.',
+        detect: () => {
+            // Scan brain dump, recent reviews, post-mortems for negative keywords
+            let bd = gs('brain_dump', '');
+            let pm = gs('pm_log', []).slice(-10);
+            let combined = bd + ' ' + pm.map(p=>p.w1+' '+p.w2+' '+p.w3+' '+p.w4+' '+p.w5).join(' ');
+            const negKeys = ['chưa đủ','phải lại','lo là','sai sót','kém','dốt','tệ','vô dụng','thất bại','ngu','không xứng'];
+            let count = 0;
+            negKeys.forEach(k=>{ count += (combined.match(new RegExp(k,'gi'))||[]).length; });
+            return count >= 5;
+        },
+        practiceTitle: 'Faith Vault - Đọc Evidence',
+        practiceContent: () => {
+            let wins = gs('win_log', []).slice(-20).reverse();
+            let html = `<div class="text-sm mb-3"><b>Bài thuốc:</b> Đọc 10 evidence gần nhất bạn đã làm tốt. Mộc Tù không thể chống được evidence cụ thể.</div>`;
+            if(wins.length===0) html += `<div class="text-xs text-danger">Chưa có win nào. <a href="#" onclick="nav(5);switchSubTab('p5',3);return false">→ Vào Win Journal log 1 win ngay</a></div>`;
+            else {
+                html += `<div style="max-height:300px; overflow-y:auto; background:var(--bg-body); padding:0.75rem; border-radius:var(--radius-sm)">`;
+                wins.slice(0,10).forEach((w,i)=>{
+                    html += `<div class="text-sm mb-2"><b class="text-success">${i+1}.</b> ${esc(w.t)} <span class="text-xs text-muted">(${w.d})</span></div>`;
+                });
+                html += `</div>`;
+            }
+            html += `<button class="btn btn-success w-100 mt-3" onclick="completePractice('self_crit', 'Đã đọc Faith Vault')">✓ Đã đọc - tôi có giá trị (+20XP)</button>`;
+            return html;
+        },
+        linkTo: 5,
+        linkLabel: 'Drill down: Win Journal'
+    },
+    {
+        id: 'workaholic',
+        name: '🔥 Workaholic Spiral',
+        diagnosis: 'Chiron Ma Kết đang nói "càng làm càng xứng đáng". SAI. Cơ thể không phải máy. Nghỉ là chiến lược, không phải yếu đuối.',
+        detect: () => {
+            // Check: many pomodoro sessions in last 5 days + low sleep
+            let bio = gs('bio_log', []).slice(-5);
+            if(bio.length < 3) return false;
+            let avgSleep = bio.reduce((s,b)=>s+(parseFloat(b.s)||7), 0) / bio.length;
+            // Check OBT all done 5 days streak (proxy for over-output)
+            let obtH = gs('obt_hist', []).slice(-7).filter(o=>o.done);
+            return avgSleep < 6.5 && obtH.length >= 5;
+        },
+        practiceTitle: 'Force Rest 2 Hours',
+        practiceContent: () => `
+            <div class="text-sm mb-3"><b>Bài thuốc:</b> Đặt timer 2h. Không màn hình. Không productive. Chỉ nghỉ.</div>
+            <div class="text-xs text-muted mb-4">Cự Giải nhà 10 + Chiron Ma Kết = "phải làm mới xứng". Phá vòng lặp này = nghỉ KHÔNG kèm guilt.</div>
+            <input type="text" id="practice-rest-activity" placeholder="Tôi sẽ làm gì NON-productive 2h tới? (ngủ trưa / nằm / nhìn cây / nghe nhạc)" class="mb-2">
+            <button class="btn btn-success w-100" onclick="completePractice('workaholic', document.getElementById('practice-rest-activity').value)">✓ Cam kết nghỉ 2h (+30XP)</button>
+        `,
+        linkTo: 9,
+        linkLabel: 'Drill down: Biometric'
+    },
+    {
+        id: 'isolation',
+        name: '🚪 Isolation Mode',
+        diagnosis: 'Cự Giải có xu hướng thu mình khi tổn thương. 7 ngày không network = warning sign. Gọi 1 người tin được hôm nay.',
+        detect: () => {
+            let netL = gs('net_log', []);
+            if(netL.length === 0) return true;
+            let last = new Date(netL[netL.length-1].d);
+            let daysSince = (new Date() - last) / 86400000;
+            return daysSince >= 7;
+        },
+        practiceTitle: 'Reach Out',
+        practiceContent: () => `
+            <div class="text-sm mb-3"><b>Bài thuốc:</b> Chọn 1 người. Nhắn 1 tin. Không cần long. "Dạo này sao? Lâu rồi không nói chuyện" đủ rồi.</div>
+            <div class="text-xs text-muted mb-4">Lilith Song Tử + Cự Giải dễ "ổn cả" trong khi bên trong sóng cuộn. Phá mask = sức mạnh.</div>
+            <input type="text" id="practice-iso-who" placeholder="Ai tôi sẽ nhắn? (1 người thôi)" class="mb-2">
+            <input type="text" id="practice-iso-msg" placeholder="Tin nhắn ngắn (8-20 từ)" class="mb-2">
+            <button class="btn btn-success w-100" onclick="completePractice('isolation', document.getElementById('practice-iso-who').value); nav(1)">✓ Đã nhắn - Log vào Network (+30XP)</button>
+        `,
+        linkTo: 1,
+        linkLabel: 'Drill down: Network Log'
+    },
+    {
+        id: 'body_neglect',
+        name: '🫥 Body Neglect',
+        diagnosis: 'Cự Giải + Mặt Trăng Kim Ngưu = dạ dày + tuyến giáp critical. Bỏ ăn, skip habit thể chất = báo động đỏ.',
+        detect: () => {
+            // Check water + habit completion last 3 days
+            let bad = 0;
+            for(let i=0;i<3;i++){
+                let d = new Date(); d.setDate(d.getDate()-i);
+                let ds = d.toISOString().split('T')[0];
+                let water = gs(`water_${ds}`, 0);
+                let habits = gs(`habits_${ds}`, {});
+                if(water < 4 && Object.keys(habits).length < 3) bad++;
+            }
+            return bad >= 2;
+        },
+        practiceTitle: 'Body Grounding 60s',
+        practiceContent: () => `
+            <div class="text-sm mb-3"><b>Bài thuốc:</b> Đứng dậy ngay. 60 giây.</div>
+            <div style="background:var(--bg-body); padding:1rem; border-radius:var(--radius-sm); margin-bottom:1rem">
+                <div class="font-bold text-sm mb-2">Làm theo (60s):</div>
+                <ol style="padding-left:1.5rem; font-size:0.85rem; line-height:1.7">
+                    <li>Đặt 2 chân xuống sàn. Cảm nhận sàn.</li>
+                    <li>Hít vào 4 giây - giữ 4 giây - thở ra 6 giây. Lặp 3 lần.</li>
+                    <li>Sờ 5 vật khác nhau gần bạn. Cảm chất liệu.</li>
+                    <li>Uống 1 cốc nước thật chậm.</li>
+                    <li>Hỏi: "Cơ thể tôi đang cần gì?" Lắng nghe câu trả lời đầu tiên.</li>
+                </ol>
+            </div>
+            <button class="btn btn-success w-100" onclick="completePractice('body_neglect', 'Đã grounding 60s')">✓ Đã làm (+15XP)</button>
+        `,
+        linkTo: 1,
+        linkLabel: 'Drill down: Habits + Water'
+    },
+    {
+        id: 'avoidance',
+        name: '⏳ Avoidance Pattern',
+        diagnosis: 'Bạn có issue mở >30 ngày chưa giải quyết. Tránh né không làm nó biến mất - nó tích tụ.',
+        detect: () => {
+            let issues = gs('issue_log', []).filter(i=>!i.resolved);
+            return issues.some(i=>{
+                let issDate = new Date(i.d);
+                let days = (new Date() - issDate) / 86400000;
+                return days >= 30;
+            });
+        },
+        practiceTitle: 'Schedule Fix',
+        practiceContent: () => {
+            let stale = gs('issue_log', []).filter(i=>!i.resolved).filter(i=>{
+                let days = (new Date() - new Date(i.d)) / 86400000;
+                return days >= 30;
+            }).sort((a,b)=>b.pain-a.pain);
+            let html = `<div class="text-sm mb-3"><b>Bài thuốc:</b> Pick 1 issue cũ nhất / pain cao nhất. Set deadline tuần này.</div>`;
+            html += `<div style="background:var(--bg-body); padding:0.75rem; border-radius:var(--radius-sm); margin-bottom:1rem">`;
+            stale.slice(0,3).forEach((i,idx)=>{
+                html += `<div class="text-sm mb-2"><b class="text-danger">${idx+1}.</b> ${esc(i.title)} <span class="badge badge-red">🌡${i.pain}</span></div>`;
+            });
+            html += `</div>`;
+            html += `<input type="date" id="practice-avoid-deadline" class="mb-2">`;
+            html += `<button class="btn btn-success w-100" onclick="completePractice('avoidance', 'Set deadline ' + document.getElementById('practice-avoid-deadline').value); nav(3); switchSubTab('p3', 1)">✓ Cam kết deadline (+25XP)</button>`;
+            return html;
+        },
+        linkTo: 3,
+        linkLabel: 'Drill down: Issue Log'
+    },
+    {
+        id: 'overconfident',
+        name: '🎯 Overconfident Bias',
+        diagnosis: 'Brier Score quá cao (>0.3). Bạn đang predict sai mà tự tin cao. Premortem bắt buộc cho quyết định kế.',
+        detect: () => {
+            let dL = gs('dec_log', []);
+            let scored = dL.filter(x=>x.c && (x.o==='Good' || x.o==='Bài học'));
+            if(scored.length < 3) return false;
+            let brier = scored.reduce((s,d)=>{
+                let pred = d.c/100;
+                let actual = d.o==='Good'?1:0;
+                return s + Math.pow(pred-actual, 2);
+            }, 0) / scored.length;
+            return brier > 0.3;
+        },
+        practiceTitle: 'Forced Premortem',
+        practiceContent: () => `
+            <div class="text-sm mb-3"><b>Bài thuốc:</b> Chọn 1 quyết định bạn đang đắn đo. Viết 3 lý do nó sẽ FAIL trước khi quyết.</div>
+            <input type="text" id="practice-pm-dec" placeholder="Quyết định đang cân nhắc:" class="mb-2">
+            <textarea id="practice-pm-r1" rows="1" placeholder="Lý do 1 sẽ fail:" class="mb-2"></textarea>
+            <textarea id="practice-pm-r2" rows="1" placeholder="Lý do 2 sẽ fail:" class="mb-2"></textarea>
+            <textarea id="practice-pm-r3" rows="1" placeholder="Lý do 3 sẽ fail:" class="mb-2"></textarea>
+            <button class="btn btn-success w-100" onclick="completePractice('overconfident', document.getElementById('practice-pm-dec').value)">✓ Premortem xong (+30XP)</button>
+        `,
+        linkTo: 3,
+        linkLabel: 'Drill down: Decision Matrix'
+    },
+    {
+        id: 'lifestyle_inflation',
+        name: '💸 Lifestyle Inflation',
+        diagnosis: 'Save rate <20% 2 tháng liên tục. Power Score #8 fail. Chiron muốn "đền bù" bằng pleasure tiêu xài.',
+        detect: () => {
+            let finL = gs('fin_log', []);
+            if(finL.length < 6) return false;
+            // Check last 2 months
+            let now = new Date();
+            for(let m=0;m<2;m++){
+                let chkDate = new Date(now.getFullYear(), now.getMonth()-m, 1);
+                let ms = chkDate.toISOString().substring(0,7);
+                let data = finL.filter(f=>f.d.startsWith(ms));
+                let inT = data.filter(f=>f.type==='in').reduce((s,f)=>s+f.amount,0);
+                let saveT = data.filter(f=>f.type==='save').reduce((s,f)=>s+f.amount,0);
+                if(inT > 0 && (saveT/inT) >= 0.2) return false;
+            }
+            return true;
+        },
+        practiceTitle: 'Emotion Audit Chi Tiêu',
+        practiceContent: () => {
+            let finL = gs('fin_log', []).filter(f=>f.type==='out').slice(-20);
+            let emotional = finL.filter(f=>['stress','impulse','fomo'].includes(f.mood));
+            let total = emotional.reduce((s,f)=>s+f.amount,0);
+            let html = `<div class="text-sm mb-3"><b>Bài thuốc:</b> Xem lại chi tiêu cảm xúc gần đây.</div>`;
+            html += `<div style="background:var(--bg-body); padding:0.75rem; border-radius:var(--radius-sm); margin-bottom:1rem">
+                <div class="font-bold mb-2">Chi tiêu emotional (20 giao dịch gần): <span class="text-danger">${(total).toLocaleString('vi-VN')}₫</span></div>
+                <div class="text-xs text-muted">${emotional.length} giao dịch stress/impulse/fomo</div>
+            </div>`;
+            html += `<textarea rows="2" id="practice-fin-trigger" placeholder="3 trigger emotional spending thường xảy ra với tôi:" class="mb-2"></textarea>`;
+            html += `<button class="btn btn-success w-100" onclick="completePractice('lifestyle_inflation', 'Audit ' + total.toLocaleString() + 'đ'); nav(9); switchSubTab('p9', 2)">✓ Đã audit (+30XP)</button>`;
+            return html;
+        },
+        linkTo: 9,
+        linkLabel: 'Drill down: Personal Finance'
+    },
+    {
+        id: 'approval_seeking',
+        name: '🎭 Approval Seeking',
+        diagnosis: 'Brain dump nhắc "họ nghĩ / họ thấy" >5 lần. Lilith Song Tử đang đeo mặt nạ. Làm 1 việc CHỈ vì bản thân muốn.',
+        detect: () => {
+            let bd = gs('brain_dump', '');
+            let pm = gs('pm_log', []).slice(-10).map(p=>(p.w1||'')+(p.w2||'')+(p.w3||'')).join(' ');
+            let combined = (bd + ' ' + pm).toLowerCase();
+            const keys = ['họ nghĩ','họ thấy','người ta','sợ bị','sợ người','mọi người','what they','social','phải đẹp','phải tốt'];
+            let count = 0;
+            keys.forEach(k=>{ count += (combined.match(new RegExp(k,'gi'))||[]).length; });
+            return count >= 5;
+        },
+        practiceTitle: 'No-Mask Action',
+        practiceContent: () => `
+            <div class="text-sm mb-3"><b>Bài thuốc:</b> Hôm nay làm 1 việc CHỈ vì bản thân muốn. Không cần ai biết, không post, không khoe.</div>
+            <div class="text-xs text-muted mb-3">Lilith Song Tử nhà 9 = mask wearer. No-mask zone = phục hồi self.</div>
+            <input type="text" id="practice-approval-act" placeholder="Việc tôi muốn làm cho RIÊNG MÌNH:" class="mb-2">
+            <textarea id="practice-approval-truth" rows="2" placeholder="Sự thật tôi đang giấu vì sợ ai đó nghĩ gì:" class="mb-2"></textarea>
+            <button class="btn btn-success w-100" onclick="completePractice('approval_seeking', document.getElementById('practice-approval-act').value)">✓ Cam kết - chỉ cho tôi (+25XP)</button>
+        `,
+        linkTo: 5,
+        linkLabel: 'Drill down: Review (Mask-Off journal)'
+    },
+    {
+        id: 'drama_pull',
+        name: '🌀 Drama Pull (Kế Đô)',
+        diagnosis: 'Notes có nhiều keyword phản bội / kiểm soát / ám ảnh. La Hầu Kim Ngưu nói: ngày mai làm 1 việc đơn giản, hữu hình.',
+        detect: () => {
+            let combined = gs('brain_dump','') + ' ' + 
+                gs('pm_log',[]).slice(-5).map(p=>(p.w1||'')+(p.q1||'')+(p.w2||'')).join(' ') +
+                gs('rv_hist',[]).slice(-5).map(r=>JSON.stringify(r.data||{})).join(' ');
+            combined = combined.toLowerCase();
+            const keys = ['phản bội','lừa','kiểm soát','ám ảnh','thù','không tha thứ','nói xấu','drama','toxic','gossip'];
+            let count = 0;
+            keys.forEach(k=>{ count += (combined.match(new RegExp(k,'gi'))||[]).length; });
+            return count >= 3;
+        },
+        practiceTitle: 'Tangible Reset',
+        practiceContent: () => `
+            <div class="text-sm mb-3"><b>Bài thuốc:</b> 1 việc đơn giản, hữu hình, không liên quan đến ai khác. Detox 24h drama.</div>
+            <div style="background:var(--bg-body); padding:0.75rem; border-radius:var(--radius-sm); margin-bottom:1rem">
+                <div class="text-xs font-bold mb-2">Chọn 1:</div>
+                <div class="text-sm mb-1">🍴 Nấu 1 món ăn từ đầu đến cuối</div>
+                <div class="text-sm mb-1">🧹 Dọn 1 ngăn tủ / 1 góc nhà</div>
+                <div class="text-sm mb-1">🌱 Trồng / tưới cây</div>
+                <div class="text-sm mb-1">🚶 Đi bộ 30 phút không phone</div>
+                <div class="text-sm mb-1">📚 Đọc 1 chương sách (không news/social)</div>
+            </div>
+            <input type="text" id="practice-drama-task" placeholder="Tôi sẽ làm:" class="mb-2">
+            <button class="btn btn-success w-100" onclick="completePractice('drama_pull', document.getElementById('practice-drama-task').value)">✓ Cam kết - 24h drama detox (+20XP)</button>
+        `,
+        linkTo: 6,
+        linkLabel: 'Drill down: Brain Dump'
+    },
+    {
+        id: 'yod_suppression',
+        name: '🌟 Yod Suppression',
+        diagnosis: 'Bạn skip Sprint mission hoặc Identity Anchors quá lâu. Linh hồn đang gọi. Không trả lời = burnout.',
+        detect: () => {
+            let sprint = gs('sprint_data', {start:''});
+            if(!sprint.start) return false;
+            // Sprint đang chạy nhưng OBT không match goal trong 14 ngày qua
+            let obtH = gs('obt_hist', []).slice(-14);
+            let goalKeywords = sprint.goal.toLowerCase().split(/\s+/).filter(w=>w.length>3);
+            if(goalKeywords.length===0) return false;
+            let matched = obtH.filter(o=>{
+                let t = (o.t||'').toLowerCase();
+                return goalKeywords.some(k=>t.includes(k));
+            }).length;
+            // Less than 30% of OBTs match sprint goal
+            let identL = gs('identity_list', []);
+            return matched < obtH.length * 0.3 && identL.length === 0;
+        },
+        practiceTitle: 'Re-align with Mission',
+        practiceContent: () => {
+            let sprint = gs('sprint_data', {start:'', goal:''});
+            let html = `<div class="text-sm mb-3"><b>Bài thuốc:</b> Re-connect với sprint mission.</div>`;
+            if(sprint.goal) html += `<div style="background:var(--accent-light); padding:0.75rem; border-radius:var(--radius-sm); margin-bottom:1rem"><div class="font-bold">Sprint hiện tại:</div><div>${esc(sprint.goal)}</div></div>`;
+            html += `<input type="text" id="practice-yod-obt" placeholder="OBT ngày mai PHẢI move sprint forward:" class="mb-2">`;
+            html += `<textarea id="practice-yod-identity" rows="2" placeholder="3-5 câu 'Tôi là người...' để alignment:" class="mb-2"></textarea>`;
+            html += `<button class="btn btn-success w-100" onclick="completePractice('yod_suppression', document.getElementById('practice-yod-obt').value); nav(8)">✓ Đã align (+40XP)</button>`;
+            return html;
+        },
+        linkTo: 8,
+        linkLabel: 'Drill down: Goals & Alignment'
+    }
+];
+
+let currentPractice = null;
+
+function runAntidoteDetection() {
+    let active = [];
+    ANTIDOTES.forEach(a => {
+        try { if(a.detect()) active.push(a); } catch(e){ console.error(`Detection error for ${a.id}:`, e); }
+    });
+    return active;
+}
+
+function renderAntidoteBanner() {
+    let active = runAntidoteDetection();
+    let banner = document.getElementById('antidote-banner');
+    let badge = document.getElementById('nav-antidote-badge');
+    
+    if(active.length === 0){
+        if(banner) banner.classList.add('hidden');
+        if(badge) badge.classList.add('hidden');
+        return;
+    }
+    
+    // Check dismissed today
+    let dismissed = gs('antidote_dismissed_'+todayStr, []);
+    let toShow = active.filter(a => !dismissed.includes(a.id));
+    
+    if(badge){ badge.classList.remove('hidden'); badge.innerText = active.length; }
+    
+    if(toShow.length === 0){
+        if(banner) banner.classList.add('hidden');
+        return;
+    }
+    
+    // Show first non-dismissed
+    let first = toShow[0];
+    if(banner){
+        banner.classList.remove('hidden');
+        banner.dataset.antidoteId = first.id;
+        document.getElementById('antidote-banner-name').innerText = first.name;
+        document.getElementById('antidote-banner-diagnosis').innerText = first.diagnosis;
+    }
+}
+
+function dismissAntidoteBanner() {
+    let banner = document.getElementById('antidote-banner');
+    if(!banner) return;
+    let id = banner.dataset.antidoteId;
+    if(id){
+        let dismissed = gs('antidote_dismissed_'+todayStr, []);
+        if(!dismissed.includes(id)) dismissed.push(id);
+        ss('antidote_dismissed_'+todayStr, dismissed);
+    }
+    banner.classList.add('hidden');
+    // Show next if any
+    setTimeout(renderAntidoteBanner, 200);
+}
+
+function runAntidotePractice() {
+    let banner = document.getElementById('antidote-banner');
+    let id = banner?.dataset?.antidoteId;
+    if(!id) return;
+    nav(15); // Go to antidote panel
+    setTimeout(()=>openPractice(id), 300);
+}
+
+function openPractice(id) {
+    let a = ANTIDOTES.find(x=>x.id===id);
+    if(!a) return;
+    currentPractice = id;
+    let card = document.getElementById('antidote-practice-card');
+    if(!card) return;
+    card.classList.remove('hidden');
+    document.getElementById('practice-title').innerText = '💊 ' + a.practiceTitle;
+    document.getElementById('practice-content').innerHTML = (typeof a.practiceContent === 'function') ? a.practiceContent() : a.practiceContent;
+    card.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+function closePractice() {
+    document.getElementById('antidote-practice-card').classList.add('hidden');
+    currentPractice = null;
+}
+
+function completePractice(patternId, note) {
+    let hist = gs('antidote_hist', []);
+    let a = ANTIDOTES.find(x=>x.id===patternId);
+    hist.push({d:todayStr, ts:Date.now(), id:patternId, name:a?a.name:patternId, note:note||''});
+    ss('antidote_hist', hist);
+    addXP(25);
+    closePractice();
+    toast('✓ Practice complete!','success');
+    // Mark this pattern as addressed today
+    let dismissed = gs('antidote_dismissed_'+todayStr, []);
+    if(!dismissed.includes(patternId)) dismissed.push(patternId);
+    ss('antidote_dismissed_'+todayStr, dismissed);
+    renderAntidoteBanner();
+    renderAntidotePanel();
+}
+
+function renderAntidotePanel() {
+    let active = runAntidoteDetection();
+    let activeEl = document.getElementById('antidote-active-list');
+    let cntEl = document.getElementById('antidote-active-count');
+    if(cntEl) cntEl.innerText = `${active.length} patterns`;
+    
+    if(activeEl){
+        if(active.length === 0){
+            activeEl.innerHTML = '<div class="text-success text-center" style="padding:1rem">✓ Không có pattern nào kích hoạt. Tâm trí cân bằng.</div>';
+        } else {
+            activeEl.innerHTML = active.map(a=>`
+                <div style="padding:1rem; background:var(--danger-light); border-left:4px solid var(--danger); border-radius:var(--radius-sm)">
+                    <div class="font-bold mb-1">${a.name}</div>
+                    <div class="text-sm mb-3">${a.diagnosis}</div>
+                    <div class="flex gap-2">
+                        <button class="btn btn-danger btn-small" onclick="openPractice('${a.id}')">💊 Practice ngay</button>
+                        <button class="btn btn-small" onclick="nav(${a.linkTo})">→ ${a.linkLabel}</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+    }
+    
+    // All patterns reference
+    let allEl = document.getElementById('antidote-all-list');
+    if(allEl){
+        let isActive = (id)=>active.some(a=>a.id===id);
+        allEl.innerHTML = ANTIDOTES.map(a=>`
+            <div style="padding:0.75rem; background:${isActive(a.id)?'var(--danger-light)':'var(--bg-body)'}; border-radius:var(--radius-sm); border:1px solid var(--border)">
+                <div class="flex justify-between align-center">
+                    <div style="flex:1; min-width:0">
+                        <div class="font-bold text-sm">${a.name}${isActive(a.id)?' <span class="badge badge-red">ACTIVE</span>':''}</div>
+                        <div class="text-xs text-muted" style="margin-top:2px">${esc(a.diagnosis.substring(0,100))}${a.diagnosis.length>100?'...':''}</div>
+                    </div>
+                    <button class="btn btn-small btn-outline" onclick="openPractice('${a.id}')" style="flex-shrink:0">Try</button>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    // History
+    let histEl = document.getElementById('antidote-history');
+    if(histEl){
+        let hist = gs('antidote_hist', []).slice().reverse();
+        if(hist.length === 0){
+            histEl.innerHTML = '<div class="text-muted text-center" style="padding:1rem">Chưa có practice nào</div>';
+        } else {
+            // Count occurrences for pattern detection
+            let counts = {};
+            hist.forEach(h=>{ counts[h.id] = (counts[h.id]||0)+1; });
+            let topPattern = Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
+            let summary = '';
+            if(topPattern && topPattern[1] >= 3){
+                let p = ANTIDOTES.find(x=>x.id===topPattern[0]);
+                summary = `<div class="alert-box mb-4" style="background:var(--accent-light); border-color:var(--accent)"><div class="alert-icon">📊</div><div><b>Pattern lặp lại:</b> ${p?p.name:topPattern[0]} — ${topPattern[1]} lần. Đây có thể là <i>core pattern</i> cần làm việc dài hạn.</div></div>`;
+            }
+            histEl.innerHTML = summary + hist.slice(0,30).map(h=>`
+                <div class="list-row" style="padding:0.75rem 0">
+                    <div class="date-block"><span class="dt">DATE</span><span class="tm">${(h.d||'').substring(5)}</span></div>
+                    <div class="row-info">
+                        <div class="row-title text-sm">${esc(h.name||h.id)}</div>
+                        ${h.note?`<div class="row-sub">${esc(h.note)}</div>`:''}
+                    </div>
+                </div>
+            `).join('');
+        }
+    }
+}
+
+
+function saveBanMenh() {
+    const fields = ['tv-menh','tv-cc','tv-dv','hd-type','hd-strategy','hd-auth','hd-profile','hd-notself','hd-url','banmenh-notes'];
+    let data = {};
+    fields.forEach(f=>{ let el = document.getElementById(f); if(el) data[f] = el.value; });
+    ss('ban_menh', data);
+}
+function loadBanMenh() {
+    let data = gs('ban_menh', {});
+    if(typeof data !== 'object') return;
+    Object.keys(data).forEach(f=>{ let el = document.getElementById(f); if(el) el.value = data[f]||''; });
+}
+
+/* ================= NOTES HUB ================= */
+let notesFilter = 'all';
+function setNotesFilter(f) {
+    notesFilter = f;
+    document.querySelectorAll('[id^="nh-filter-"]').forEach(b=>b.classList.remove('btn-primary'));
+    let active = document.getElementById('nh-filter-'+f); if(active) active.classList.add('btn-primary');
+    rNotesHub();
+}
+function collectAllNotes() {
+    let all = [];
+    let bd = gs('brain_dump','');
+    if(bd) all.push({src:'dump', icon:'🧠', label:'Brain Dump', d:'', text:bd, color:'var(--text-muted)'});
+    gs('l_log',[]).forEach(l=>all.push({src:'insight', icon:'💡', label:`Insight (${l.tg||''})`, d:l.d||'', text:l.t||'', sub:l.src?`Nguồn: ${l.src} · ⭐${l.b||7}`:'', color:'var(--primary)'}));
+    gs('win_log',[]).forEach(w=>all.push({src:'win', icon:'🏆', label:`Win (${w.s||''})`, d:w.d||'', text:w.t||'', color:'var(--success)'}));
+    gs('grat_log',[]).forEach(g=>(g.items||[]).forEach(item=>all.push({src:'grat', icon:'🙏', label:'Gratitude', d:g.d||'', text:item, color:'var(--accent)'})));
+    gs('issue_log',[]).forEach(i=>all.push({src:'issue', icon:i.resolved?'✓':'🔥', label:`Issue (${i.area||''})`, d:i.d||'', text:i.title||'', sub:i.root?`Gốc: ${i.root}`:'', color:i.resolved?'var(--success)':'var(--danger)'}));
+    gs('pm_log',[]).forEach(p=>all.push({src:'pm', icon:'💀', label:'Post-Mortem', d:p.dt||'', text:p.d||'', sub:p.w5?`Gốc rễ: ${p.w5}`:(p.q2||''), color:'var(--danger)'}));
+    gs('dec_log',[]).forEach(d=>all.push({src:'dec', icon:'⚖️', label:`Decision (${d.o||''})`, d:d.d||'', text:d.t||'', sub:`Conf ${d.c||0}% · Data ${d.p||0}%`, color:'var(--primary)'}));
+    gs('net_log',[]).forEach(n=>all.push({src:'net', icon:'🤝', label:'Network', d:n.d||'', text:n.who||'', sub:n.topic||'', color:'var(--info)'}));
+    gs('obt_hist',[]).forEach(o=>all.push({src:'obt', icon:o.done?'🎯':'⚠️', label:`OBT (${o.c||'?'})`, d:o.d||'', text:o.t||'', sub:o.done?'Completed':'Failed', color:o.done?'var(--success)':'var(--danger)'}));
+    let bm = gs('ban_menh',{});
+    if(bm && bm['banmenh-notes']) all.push({src:'menh', icon:'🔮', label:'Bản Mệnh Notes', d:'', text:bm['banmenh-notes'], color:'var(--info)'});
+    return all.sort((a,b)=>(b.d||'').localeCompare(a.d||''));
+}
+function rNotesHub() {
+    let all = collectAllNotes();
+    let search = (document.getElementById('notes-search')?.value || '').toLowerCase();
+    let filtered = all.filter(n=>{
+        if(notesFilter !== 'all' && n.src !== notesFilter) return false;
+        if(search && !(n.text||'').toLowerCase().includes(search) && !(n.sub||'').toLowerCase().includes(search) && !(n.label||'').toLowerCase().includes(search)) return false;
+        return true;
+    });
+    let cnt = document.getElementById('notes-count');
+    if(cnt) cnt.innerText = `${filtered.length} notes`;
+    let el = document.getElementById('notes-hub-list');
+    if(!el) return;
+    if(filtered.length===0){ el.innerHTML='<div class="text-muted text-center" style="padding:2rem">Không có notes phù hợp</div>'; return;}
+    el.innerHTML = filtered.slice(0,200).map(n=>`
+        <div class="list-row" style="padding:0.85rem 0; gap:0.75rem; align-items:flex-start">
+            <div style="font-size:1.5rem; min-width:36px; text-align:center; line-height:1.5">${n.icon}</div>
+            <div class="row-info">
+                <div class="flex justify-between align-center mb-1">
+                    <span class="font-bold text-sm" style="color:${n.color}">${esc(n.label)}</span>
+                    <span class="text-xs text-muted">${n.d||''}</span>
+                </div>
+                <div class="text-sm" style="line-height:1.4; white-space:pre-wrap">${esc((n.text||'').substring(0,400))}${(n.text||'').length>400?'...':''}</div>
+                ${n.sub?`<div class="text-xs text-muted mt-1">${esc(n.sub)}</div>`:''}
+            </div>
+        </div>`).join('');
+}
+
+/* ================= MORNING AFFIRMATION (chart-aligned) ================= */
+const AFFIRMATIONS_GROUNDED = [
+    "Hôm nay tôi cho phép mình tốt ở mức 80%. 80% giao đi tốt hơn 100% giữ trong đầu.",
+    "Tôi không cần đợi được phép mới được nghỉ.",
+    "Sự tử tế với bản thân là kỷ luật cao nhất.",
+    "Việc tôi mệt không có nghĩa là tôi kém.",
+    "Hôm nay tôi sẽ làm 1 việc đủ tốt, không cần hoàn hảo.",
+    "Tôi đang xây cho người 42 tuổi của tôi. Từng viên gạch nhỏ.",
+    "Tôi không cần chứng minh gì với ai hôm nay.",
+    "Phá để Dựng. Biến động để tìm Tĩnh. Sáng tạo trên nền Kỷ luật.",
+    "Tôi không một mình. Có quý nhân trong lá số của tôi.",
+    "Hôm nay tôi tin: đại vận 22-31 là vận xây nền, không phải đạt đỉnh.",
+    "Tôi có quyền không biết. Khiêm tốn = sức mạnh.",
+    "Mỗi hành động nhỏ hôm nay là 1 viên gạch trong 20 năm.",
+    "Thủy Dương trong tôi: bền bỉ như sông lớn, không cần ồn ào.",
+    "An nhiên không phải khi mọi thứ ổn — an nhiên là khi bão táp vẫn giữ được trung tâm.",
+    "Tôi nhận lời khen mà không deflect. Nhận là một kỷ luật.",
+    "Việc thuần pleasure hôm nay không cần lý do."
+];
+function showAffirmation() {
+    let day = new Date().getDate() + new Date().getMonth() * 31;
+    let aff = AFFIRMATIONS_GROUNDED[day % AFFIRMATIONS_GROUNDED.length];
+    let el = document.getElementById('affirmation-text');
+    if(el) el.innerText = aff;
+}
+
+
 window.onload = () => {
     try {
         let savedTheme = document.getElementById('theme-toggle'); if(savedTheme) savedTheme.checked = gs('dark_mode',false);
         if(gs('perf_mode',false)){ let pt = document.getElementById('perf-toggle'); if(pt) pt.checked = true; document.body.classList.add('perf-mode');}
         let savedZoomSel = document.getElementById('zoom-sel'); if(savedZoomSel) savedZoomSel.value = gs('zoom_level', '14px');
+        
+        runLRUGarbageCollector();
+        
         addXP(0); 
         i0(); i1(); i2(); i34(); i567(); i89();
+        if(typeof rEV==='function') rEV();
+        if(typeof renderWeeklyToday==='function') renderWeeklyToday();
+        
+        loadBanMenh();
+        showAffirmation();
+        setNotesFilter('all');
+        rNotesHub();
+        
+        // Antidote auto-detection
+        renderAntidoteBanner();
+        renderAntidotePanel();
+        
         updateSyncUI();
-        // Save last week plan snapshot every Monday
+        
         let lastSnap = gs('wplan_snap_date',null);
         if(new Date().getDay()===1 && lastSnap !== todayStr){
             ss('wplan_last', gs('wplan',[]));
             ss('wplan_snap_date', todayStr);
         }
+        
+        console.log("[SYSTEM] All modules initialized successfully.");
     } catch(e) { console.error("FATAL Init Error: ", e); }
 };
 </script>
