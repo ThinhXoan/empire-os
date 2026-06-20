@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Empire OS | Focus & Project System</title>
-    <meta name="app-build" content="single-file-v26-2026-06-20">
+    <meta name="app-build" content="single-file-v39-final-ux-cohesion-2026-06-20">
     <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -51,7 +51,7 @@
         }
 
         body.dark-mode {
-            --bg-body: #020617; --bg-card: #0f172a; 
+            --bg-body: #0f172a; --bg-card: #1e293b; 
             --text-main: #f8fafc; --text-muted: #94a3b8;
             --border: #1e293b; 
             --primary: #8b5cf6; --primary-light: rgba(139, 92, 246, 0.15);
@@ -64,7 +64,7 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { background-color: var(--bg-body); color: var(--text-main); font-size: var(--font-scale); overflow-x: hidden; }
+        body { background-color: var(--bg-body); color: var(--text-main); font-size: var(--font-scale); line-height: 1.55; overflow-x: hidden; }
 
         h1, h2, h3, h4 { font-weight: 700; margin-bottom: 0.25rem; color: var(--text-main); }
         .text-sm { font-size: 0.85rem; } .text-xs { font-size: 0.75rem; }
@@ -100,6 +100,7 @@
         .sidebar-header h2 { color: white; font-size: 1.25rem; letter-spacing: -0.5px; margin:0;}
         .build-badge { margin-left:auto; padding:.2rem .42rem; border:1px solid rgba(255,255,255,.14); border-radius:999px; color:#c4b5fd; font-size:.62rem; font-weight:850; letter-spacing:.04em; }
         .single-file-banner {
+            display:none;
             position:fixed;
             left:50%;
             top:10px;
@@ -452,6 +453,25 @@
         .today-glance-card small { display:block; color:var(--text-muted); font-size:.62rem; font-weight:900; letter-spacing:.08em; text-transform:uppercase; }
         .today-glance-card b { display:block; margin-top:.35rem; color:var(--text-main); font-size:1.12rem; letter-spacing:-.03em; }
         .today-glance-card span { display:block; margin-top:.2rem; color:var(--text-muted); font-size:.65rem; line-height:1.4; }
+        .daily-builder {
+            margin-bottom:1rem;
+            padding:1rem;
+            border:1px solid rgba(124,58,237,.22);
+            border-radius:18px;
+            background:linear-gradient(135deg,var(--bg-card),rgba(124,58,237,.075));
+            box-shadow:var(--shadow-sm);
+        }
+        .daily-builder-head { display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; margin-bottom:.8rem; }
+        .daily-builder-kicker { color:var(--primary); font-size:.68rem; font-weight:900; letter-spacing:.08em; text-transform:uppercase; }
+        .daily-builder h3 { margin:.2rem 0; font-size:1.08rem; }
+        .daily-builder p { color:var(--text-muted); font-size:.82rem; line-height:1.45; }
+        .daily-builder-grid { display:grid; grid-template-columns:1.1fr repeat(3,minmax(0,1fr)); gap:.65rem; }
+        .daily-builder-card { min-width:0; padding:.85rem; border:1px solid var(--border); border-radius:13px; background:var(--bg-card); }
+        .daily-builder-card.primary { border-color:rgba(124,58,237,.26); background:var(--primary-light); }
+        .daily-builder-card small { display:block; color:var(--text-muted); font-size:.64rem; font-weight:900; letter-spacing:.06em; text-transform:uppercase; }
+        .daily-builder-card b { display:block; margin:.22rem 0; color:var(--text-main); font-size:.92rem; line-height:1.35; overflow-wrap:anywhere; }
+        .daily-builder-card span { display:block; color:var(--text-muted); font-size:.74rem; line-height:1.45; }
+        .daily-builder input { margin:.55rem 0 0; min-height:40px; font-size:.88rem; }
         .today-shell { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(320px,.75fr); gap:1rem; align-items:start; }
         .today-main,.today-side { display:flex; flex-direction:column; gap:1rem; min-width:0; }
         .focus-hero { position:relative; overflow:hidden; padding:clamp(1.35rem,3.4vw,2.25rem); border-radius:26px; background:radial-gradient(circle at 85% 10%,rgba(168,85,247,.45),transparent 34%),linear-gradient(145deg,#020617 0%,#111827 38%,#312e81 74%,#6d28d9 100%); color:#fff; box-shadow:0 28px 80px rgba(15,23,42,.28); border:1px solid rgba(255,255,255,.12); }
@@ -1376,6 +1396,9 @@
             .sub-tab { padding:.68rem .9rem; font-size:.86rem; }
             .today-glance { grid-template-columns:1fr; }
             .today-glance-card { min-height:96px; padding:1rem; }
+            .daily-builder-head { flex-direction:column; }
+            .daily-builder-grid,
+            .daily-builder-grid.mt-2 { grid-template-columns:1fr !important; }
             .week-days-board { grid-template-columns:1fr; gap:.85rem; }
             .operating-week-grid { grid-template-columns:repeat(4,190px); }
             .plan-cascade { grid-template-columns:repeat(5,190px); }
@@ -1534,35 +1557,422 @@
             .weekly-day-pill span { margin-top:0; }
             .daily-plan-board { grid-template-columns:1fr; }
         }
+        /* UX v29: calmer IA, readable text, safer mobile nav, clearer focus states */
+        .main-content { overscroll-behavior:contain; }
+        .panel {
+            animation:panelEnter .16s cubic-bezier(.2,.8,.2,1);
+            will-change:opacity,transform;
+            contain:layout paint;
+        }
+        @keyframes panelEnter {
+            from { opacity:.72; transform:translate3d(0,4px,0); }
+            to { opacity:1; transform:translate3d(0,0,0); }
+        }
+        .nav-item,.btn,.tool-btn,.sub-tab,.directory-item,.week-day-card {
+            transition-property:background-color,border-color,color,box-shadow,transform,opacity;
+            transition-duration:.14s;
+            transition-timing-function:cubic-bezier(.2,.8,.2,1);
+        }
+        .nav-item:active,.btn:active,.tool-btn:active { transform:scale(.98); }
+        .card-section p,.module-hero p,.directory-section>p,.alert-box p,.text-sm,.text-xs { line-height:1.55; }
+        .card-section p,.module-hero p,.alert-box p,.setup-banner span { max-width:65ch; }
+        .card-section,.directory-section,.module-card,.module-tier-card { box-shadow:none; }
+        .focus-hero,.modal-content,.stat-card { border-color:transparent; box-shadow:0 18px 45px rgba(15,23,42,.12); }
+        .badge-purple,.badge-blue,.badge-gray { background:var(--bg-body); color:var(--text-muted); border:1px solid var(--border); }
+        .badge-green { background:var(--success-light); color:#047857; border:1px solid rgba(16,185,129,.35); }
+        .badge-red,.badge-gold { background:var(--accent-light); color:#b45309; border:1px solid rgba(245,158,11,.35); }
+        .btn-gold { background:var(--accent); border-color:var(--accent); }
+        :focus-visible { outline:2px solid var(--primary); outline-offset:3px; border-radius:10px; }
+        button:focus-visible,.btn:focus-visible,.nav-item:focus-visible,.sub-tab:focus-visible { box-shadow:0 0 0 4px var(--primary-light); }
+        .empty-state {
+            display:grid; place-items:center; gap:.65rem; min-height:150px; padding:1.4rem;
+            border:1px dashed var(--border); border-radius:16px; background:var(--bg-card);
+            color:var(--text-muted); text-align:center;
+        }
+        .empty-state b { color:var(--text-main); }
+        .skeleton {
+            position:relative; overflow:hidden; background:linear-gradient(90deg,var(--bg-body),var(--border),var(--bg-body));
+            background-size:220% 100%; animation:skeletonPulse 1.25s infinite linear;
+        }
+        .english-flow-strip {
+            display:grid;
+            grid-template-columns:repeat(4,minmax(0,1fr));
+            gap:.55rem;
+            margin-bottom:.85rem;
+        }
+        .module-flow-strip {
+            display:grid;
+            grid-template-columns:repeat(4,minmax(0,1fr));
+            gap:.55rem;
+            margin-bottom:.85rem;
+        }
+        .module-flow-step {
+            min-height:46px;
+            padding:.75rem .85rem;
+            border:1px solid var(--border);
+            border-radius:13px;
+            background:var(--bg-card);
+            color:var(--text-main);
+            font-size:.78rem;
+            font-weight:850;
+            cursor:pointer;
+            text-align:left;
+        }
+        .module-flow-step.primary {
+            border-color:var(--primary);
+            background:var(--primary-light);
+            color:var(--primary);
+        }
+        .module-flow-step span {
+            display:block;
+            margin-top:.18rem;
+            color:var(--text-muted);
+            font-size:.62rem;
+            font-weight:650;
+            line-height:1.35;
+        }
+        .english-flow-step {
+            min-height:44px;
+            padding:.7rem .8rem;
+            border:1px solid var(--border);
+            border-radius:12px;
+            background:var(--bg-card);
+            color:var(--text-main);
+            font-size:.78rem;
+            font-weight:850;
+            cursor:pointer;
+            text-align:left;
+        }
+        .english-flow-step.active {
+            border-color:var(--primary);
+            background:var(--primary-light);
+            color:var(--primary);
+        }
+        .english-flow-step { text-align:left; }
+        @keyframes skeletonPulse { from{background-position:220% 0;} to{background-position:-220% 0;} }
+        @media (max-width:768px) {
+            .sidebar-nav .nav-section-title { display:none; }
+            .sidebar-nav .nav-item[onclick="nav(20)"] { display:none; }
+            .sidebar-nav { grid-template-columns:repeat(5,minmax(0,1fr)); display:grid; align-items:center; }
+            .sidebar-nav .nav-item { justify-content:center; flex-direction:column; text-align:center; }
+            .main-wrapper { padding-bottom:calc(74px + env(safe-area-inset-bottom)); }
+            .top-header { display:grid; grid-template-columns:minmax(0,1fr) auto; }
+            .module-flow-strip { grid-template-columns:1fr 1fr; }
+            .english-flow-strip { grid-template-columns:1fr 1fr; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { animation-duration:.01ms !important; transition-duration:.01ms !important; scroll-behavior:auto !important; }
+            .panel { animation:none; }
+        }
+        /* --- Smooth Flow v37 --- */
+        :root { --flow-ease:cubic-bezier(.22,.8,.24,1); }
+        .main-content { scroll-behavior:auto; }
+        .panel {
+            animation:none !important;
+            opacity:1;
+            transform:none;
+            will-change:auto;
+        }
+        .panel.page-enter {
+            animation:pageEnterV37 .18s var(--flow-ease) both !important;
+            will-change:transform,opacity;
+        }
+        body.is-navigating .main-content { cursor:progress; }
+        body.is-navigating .panel.page-enter .card-section,
+        body.is-navigating .panel.page-enter .queue-shell,
+        body.is-navigating .panel.page-enter .module-hero {
+            transition:none !important;
+        }
+        @keyframes pageEnterV37 {
+            from { opacity:.86; transform:translate3d(0,6px,0) scale(.998); }
+            to { opacity:1; transform:translate3d(0,0,0) scale(1); }
+        }
+        .sub-enter {
+            animation:subEnterV37 .14s var(--flow-ease) both;
+            will-change:opacity,transform;
+        }
+        @keyframes subEnterV37 {
+            from { opacity:.78; transform:translate3d(4px,0,0); }
+            to { opacity:1; transform:translate3d(0,0,0); }
+        }
+        .nav-item.active {
+            transition:background-color .16s var(--flow-ease), color .16s var(--flow-ease), transform .16s var(--flow-ease);
+        }
+        .nav-item.active::before {
+            animation:navMarkerV37 .18s var(--flow-ease) both;
+        }
+        @keyframes navMarkerV37 {
+            from { opacity:0; transform:scaleY(.45); }
+            to { opacity:1; transform:scaleY(1); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .panel.page-enter,.sub-enter,.nav-item.active::before { animation:none !important; }
+            body.is-navigating .main-content { cursor:auto; }
+        }
+        /* --- Command Palette + Focus Mode v38 --- */
+        .command-palette-overlay,
+        .focus-mode-overlay {
+            position:fixed;
+            inset:0;
+            z-index:100000;
+            display:none;
+            align-items:flex-start;
+            justify-content:center;
+            padding:8vh 1rem 1rem;
+            background:rgba(2,6,23,.58);
+            backdrop-filter:blur(12px);
+        }
+        .command-palette-overlay.show,
+        .focus-mode-overlay.show { display:flex; animation:overlayInV38 .14s var(--flow-ease) both; }
+        @keyframes overlayInV38 { from{opacity:0;} to{opacity:1;} }
+        .command-palette-box {
+            width:min(720px,100%);
+            overflow:hidden;
+            border:1px solid rgba(255,255,255,.14);
+            border-radius:22px;
+            background:var(--bg-card);
+            box-shadow:0 30px 90px rgba(2,6,23,.35);
+            animation:paletteInV38 .16s var(--flow-ease) both;
+        }
+        @keyframes paletteInV38 { from{opacity:.88;transform:translateY(8px) scale(.99);} to{opacity:1;transform:translateY(0) scale(1);} }
+        .command-palette-input-row {
+            display:grid;
+            grid-template-columns:auto minmax(0,1fr) auto;
+            align-items:center;
+            gap:.7rem;
+            padding:.8rem;
+            border-bottom:1px solid var(--border);
+        }
+        .command-palette-input-row > span {
+            width:34px;
+            height:34px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            border-radius:10px;
+            background:var(--primary-light);
+            color:var(--primary);
+            font-weight:900;
+        }
+        .command-palette-input-row input {
+            margin:0;
+            border:0;
+            background:transparent;
+            box-shadow:none;
+            font-size:1rem;
+            font-weight:750;
+        }
+        .command-palette-list { max-height:min(54vh,430px); overflow:auto; padding:.45rem; }
+        .command-item {
+            width:100%;
+            display:grid;
+            grid-template-columns:38px minmax(0,1fr) auto;
+            align-items:center;
+            gap:.75rem;
+            padding:.72rem;
+            border:0;
+            border-radius:14px;
+            background:transparent;
+            color:var(--text-main);
+            text-align:left;
+            cursor:pointer;
+        }
+        .command-item:hover,.command-item.active { background:var(--primary-light); }
+        .command-item-icon {
+            width:38px;
+            height:38px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            border-radius:12px;
+            background:var(--bg-body);
+            color:var(--primary);
+            font-size:.75rem;
+            font-weight:900;
+        }
+        .command-item b { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:.84rem; }
+        .command-item span { display:block; margin-top:.12rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--text-muted); font-size:.68rem; }
+        .command-item kbd {
+            padding:.22rem .42rem;
+            border:1px solid var(--border);
+            border-radius:7px;
+            background:var(--bg-body);
+            color:var(--text-muted);
+            font-size:.62rem;
+            font-weight:800;
+        }
+        .command-palette-help {
+            padding:.65rem .9rem;
+            border-top:1px solid var(--border);
+            color:var(--text-muted);
+            font-size:.68rem;
+        }
+        .focus-mode-overlay { align-items:center; padding:1rem; }
+        .focus-mode-shell {
+            position:relative;
+            width:min(760px,100%);
+            min-height:min(620px,92vh);
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            gap:1rem;
+            padding:clamp(1.4rem,5vw,3rem);
+            border:1px solid rgba(255,255,255,.14);
+            border-radius:32px;
+            background:radial-gradient(circle at 80% 0%,rgba(168,85,247,.34),transparent 34%),linear-gradient(145deg,#020617,#111827 48%,#312e81);
+            color:white;
+            box-shadow:0 30px 100px rgba(2,6,23,.5);
+            text-align:center;
+        }
+        .focus-mode-shell h2 {
+            max-width:16ch;
+            color:white;
+            font-size:clamp(2rem,7vw,4.8rem);
+            line-height:.98;
+            letter-spacing:-.06em;
+        }
+        .focus-mode-kicker {
+            color:#c4b5fd;
+            font-size:.75rem;
+            font-weight:900;
+            letter-spacing:.18em;
+        }
+        .focus-mode-shell p { max-width:58ch; color:#cbd5e1; font-size:.95rem; line-height:1.55; }
+        .focus-mode-timer {
+            min-width:220px;
+            padding:.8rem 1.2rem;
+            border:1px solid rgba(255,255,255,.14);
+            border-radius:22px;
+            background:rgba(255,255,255,.08);
+            color:#a7f3d0;
+            font-size:clamp(2.3rem,8vw,5.2rem);
+            font-weight:900;
+            letter-spacing:-.06em;
+            font-variant-numeric:tabular-nums;
+        }
+        .focus-mode-actions { display:flex; flex-wrap:wrap; justify-content:center; gap:.6rem; }
+        .focus-mode-actions .btn-outline { background:rgba(255,255,255,.08); color:white; border-color:rgba(255,255,255,.14); }
+        .focus-distraction {
+            width:min(520px,100%);
+            display:grid;
+            grid-template-columns:minmax(0,1fr) auto;
+            gap:.5rem;
+            margin-top:.3rem;
+            padding:.45rem;
+            border:1px solid rgba(255,255,255,.12);
+            border-radius:15px;
+            background:rgba(255,255,255,.07);
+        }
+        .focus-distraction input {
+            margin:0;
+            border:0;
+            background:transparent;
+            color:white;
+            box-shadow:none;
+        }
+        .focus-distraction input::placeholder { color:#94a3b8; }
+        .focus-mode-close {
+            position:absolute;
+            top:1rem;
+            right:1rem;
+            border:1px solid rgba(255,255,255,.14);
+            border-radius:999px;
+            background:rgba(255,255,255,.08);
+            color:white;
+            padding:.5rem .75rem;
+            font-size:.72rem;
+            font-weight:850;
+            cursor:pointer;
+        }
+        .focus-mode-rule { color:#94a3b8; font-size:.72rem; font-weight:750; }
+        body.focus-mode-active .app-layout { filter:saturate(.8); }
+        .empty-action {
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:1rem;
+            padding:1rem;
+            border:1px dashed var(--border);
+            border-radius:16px;
+            background:linear-gradient(135deg,var(--bg-card),rgba(124,58,237,.055));
+            color:var(--text-main);
+        }
+        .empty-action b { display:block; font-size:.85rem; }
+        .empty-action span { display:block; margin-top:.18rem; color:var(--text-muted); font-size:.7rem; line-height:1.45; }
+        .app-surface-unified .card-section,
+        .app-surface-unified .queue-shell,
+        .app-surface-unified .directory-section,
+        .app-surface-unified .module-card,
+        .app-surface-unified .stat-card {
+            border:1px solid var(--border);
+            border-radius:18px;
+            background:var(--bg-card);
+            box-shadow:var(--shadow-sm);
+        }
+        .app-surface-unified .section-header h3,
+        .app-surface-unified .queue-head h3 {
+            letter-spacing:-.015em;
+        }
+        @media (max-width:640px) {
+            .command-palette-overlay { padding-top:5vh; }
+            .command-item { grid-template-columns:32px minmax(0,1fr); }
+            .command-item kbd { display:none; }
+            .focus-mode-shell { min-height:88vh; border-radius:24px; }
+            .focus-mode-actions { width:100%; }
+            .focus-mode-actions .btn { flex:1 1 100%; }
+            .focus-distraction { grid-template-columns:1fr; }
+            .empty-action { align-items:stretch; flex-direction:column; }
+        }
     </style>
 </head>
-<body>
+<body class="app-surface-unified">
 
 <div id="toast-container"></div>
-
+<div id="command-palette" class="command-palette-overlay" onclick="if(event.target===this) closeCommandPalette()">
+    <div class="command-palette-box" role="dialog" aria-modal="true" aria-label="Command Palette">
+        <div class="command-palette-input-row">
+            <span>/</span>
+            <input id="command-palette-input" type="text" placeholder="Go to Today, add task, English, finance..." autocomplete="off" oninput="renderCommandPalette()" onkeydown="handleCommandPaletteKey(event)">
+            <button class="btn btn-small btn-outline" onclick="closeCommandPalette()">Esc</button>
+        </div>
+        <div id="command-palette-list" class="command-palette-list"></div>
+        <div class="command-palette-help">Ctrl+K hoặc / để mở · Enter để chạy · ↑↓ để chọn</div>
+    </div>
+</div>
+<div id="focus-mode-overlay" class="focus-mode-overlay">
+    <div class="focus-mode-shell">
+        <button class="focus-mode-close" onclick="closeFocusMode()">Thoát</button>
+        <div class="focus-mode-kicker">FOCUS MODE</div>
+        <h2 id="focus-mode-title">Chưa có việc đang chạy</h2>
+        <p id="focus-mode-meta">Chọn một việc trong Today để bắt đầu.</p>
+        <div class="focus-mode-timer" id="focus-mode-timer">90:00</div>
+        <div class="focus-mode-actions">
+            <button class="btn btn-primary" onclick="startPomo();renderFocusMode()">Start / Pause</button>
+            <button class="btn btn-success" onclick="completeFocusModeTask()">Xong việc này</button>
+            <button class="btn btn-outline" onclick="resetPomo();renderFocusMode()">Reset</button>
+        </div>
+        <div class="focus-distraction">
+            <input id="focus-distraction-input" placeholder="Y tuong/viec xen ngang? Ghi vao backlog, khong pha focus..." onkeydown="if(event.key==='Enter') captureFocusDistraction()">
+            <button class="btn btn-outline" onclick="captureFocusDistraction()">Capture</button>
+        </div>
+        <div class="focus-mode-rule">Một việc. Một timer. Không sidebar, không module, không tự kéo thêm việc.</div>
+    </div>
+</div>
+<div class="single-file-banner">SINGLE FILE v39</div>
 
 <div class="app-layout">
     <!-- SIDEBAR -->
     <aside class="sidebar">
-        <div class="sidebar-header"><div class="icon">E</div><h2>Empire OS</h2><small class="build-badge">v26</small></div>
+        <div class="sidebar-header"><div class="icon">E</div><h2>Empire OS</h2><small class="build-badge">v39</small></div>
         <nav class="sidebar-nav">
-            <div class="nav-section-title">Luồng chính</div>
-            <div class="nav-item active" onclick="nav(0)"><span class="nav-icon">☀️</span> <span>Hôm nay</span></div>
-            <div class="nav-item" onclick="nav(6)"><span class="nav-icon">🗓️</span> <span>Tuần</span></div>
-            <div class="nav-item" onclick="nav(21)"><span class="nav-icon">🚀</span> <span>Projects</span></div>
-            <div class="nav-item" onclick="nav(5)"><span class="nav-icon">✅</span> <span>Review</span></div>
-            <div class="nav-item" onclick="nav(14)"><span class="nav-icon">📝</span> <span>Notes</span></div>
-            <div class="sidebar-tools">
-                <div class="sidebar-tools-title">Tầng 2 · Hay dùng</div>
-                <div class="nav-item" onclick="nav(17)"><span class="nav-icon">🇬🇧</span> <span>English</span></div>
-                <div class="nav-item" onclick="nav(18)"><span class="nav-icon">🧭</span> <span>Tất cả việc</span></div>
-                <div class="nav-item" onclick="nav(20)"><span class="nav-icon">▦</span> <span>Công cụ</span></div>
-                <div class="nav-item deep-module" onclick="nav(7)"><span class="nav-icon">📚</span> <span>Tri thức</span></div>
-                <div class="nav-item deep-module" onclick="nav(3)"><span class="nav-icon">⚖️</span> <span>Quyết định</span></div>
-                <div class="nav-item deep-module" onclick="nav(9);switchSubTab('p9',2)"><span class="nav-icon">💰</span> <span>Tài chính</span></div>
-                <div class="nav-item deep-module" onclick="nav(10)"><span class="nav-icon">⚙️</span> <span>Sync</span></div>
-            </div>
-            <button class="advanced-mode-toggle" id="advanced-mode-toggle" onclick="toggleAdvancedMode()">Chế độ chuyên sâu: Tắt</button>
+            <div class="nav-section-title">5 trụ chính</div>
+            <div class="nav-item active" onclick="nav(0)"><span class="nav-icon">●</span> <span>NOW</span></div>
+            <div class="nav-item" onclick="nav(6)"><span class="nav-icon">◆</span> <span>PLAN</span></div>
+            <div class="nav-item" onclick="nav(17)"><span class="nav-icon">EN</span> <span>ENGLISH</span></div>
+            <div class="nav-item" onclick="nav(21)"><span class="nav-icon">▲</span> <span>PROJECTS</span></div>
+            <div class="nav-item" onclick="nav(5)"><span class="nav-icon">✓</span> <span>REVIEW</span></div>
+            <div class="nav-item" onclick="nav(20)"><span class="nav-icon">▦</span> <span>LIBRARY</span></div>
         </nav>
     </aside>
 
@@ -1575,7 +1985,7 @@
                 <p class="page-subtitle" id="page-subtitle">Mở app, làm việc, đóng app.</p>
             </div>
             <div class="header-tools">
-                <button class="btn btn-outline module-menu-btn" onclick="nav(20)" title="Xem toàn bộ chức năng">▦ Module</button>
+                <button class="btn btn-outline module-menu-btn" onclick="openCommandPalette()" title="Command Palette: tìm nhanh mọi thứ">⌘ Menu</button>
                 <button class="btn btn-primary" onclick="focusOpsCapture()" title="Thêm nhanh một việc">＋ Thêm việc</button>
                 <button class="btn btn-outline" onclick="openQuickNote()" title="Ghi note linh tinh trong 10 giây">📝 Note</button>
                 <button class="tool-btn notification-button" onclick="openNotificationCenter()" title="Thông báo"><span>🔔</span><span class="notification-badge" id="notification-badge">0</span></button>
@@ -1589,6 +1999,12 @@
             <!-- P0: TODAY DASHBOARD -->
             <div id="p0" class="panel">
                 <section class="focus-home">
+                    <section class="module-flow-strip" aria-label="Today flow">
+                        <button class="module-flow-step primary" onclick="focusOpsCapture()">1 · Capture<span>Ghi việc phát sinh trong 10 giây</span></button>
+                        <button class="module-flow-step" onclick="document.getElementById('ops-next-card')?.scrollIntoView({behavior:'smooth',block:'start'})">2 · Focus<span>Làm đúng việc ngay bây giờ</span></button>
+                        <button class="module-flow-step" onclick="document.getElementById('daily-plan-board')?.scrollIntoView({behavior:'smooth',block:'start'})">3 · Queue<span>Xem plan chi tiết hôm nay</span></button>
+                        <button class="module-flow-step" onclick="nav(5)">4 · Close<span>Kết ngày trong 2 phút</span></button>
+                    </section>
                     <div id="setup-banner" class="setup-banner hidden">
                         <div><b>Hoàn tất setup một lần để app tự dẫn đường</b><span>Khoảng 5 phút: lộ trình, project, English, sync và thông báo. Sau đó chỉ dùng Today → Week → Review.</span></div>
                         <button class="btn btn-small btn-primary" onclick="nav(22)">Setup ngay</button>
@@ -1599,6 +2015,7 @@
                         <article class="today-glance-card"><small>Deadline</small><b id="today-glance-deadline">0</b><span id="today-glance-deadline-copy">Không có việc quá hạn.</span></article>
                         <article class="today-glance-card"><small>Deep work</small><b id="today-glance-focus">0/180p</b><span id="today-glance-focus-copy">Chưa bắt đầu phiên tập trung.</span></article>
                     </section>
+                    <section class="daily-builder" id="daily-plan-builder"></section>
                     <section class="today-shell">
                     <div class="today-main">
                     <article class="focus-hero" id="ops-next-card">
@@ -1887,7 +2304,7 @@
 
             <!-- P18: 18-MONTH WORKSTREAMS -->
             <div id="p18" class="panel hidden">
-                <details class="advanced-shell">
+                <details class="advanced-shell" id="ops-cycle-config-shell">
                     <summary><span>Chu kỳ vận hành · <b id="ops-cycle-label">Y-- · Q-- · M--</b></span></summary>
                     <div class="advanced-content">
                         <div class="ops-cycle-progress"><span id="ops-cycle-progress" style="width:0%"></span></div>
@@ -1955,6 +2372,12 @@
                     <h2>Một chuỗi project, không phải nhiều danh sách rời</h2>
                     <p>Project năm tạo hướng đi; project quý tạo năng lực; project tháng tạo sản phẩm. Một năm vận hành = 4 quý · 12 tháng · 48 tuần.</p>
                 </div>
+                <section class="module-flow-strip" aria-label="Projects flow">
+                    <button class="module-flow-step primary" onclick="document.getElementById('project-active-chain')?.scrollIntoView({behavior:'smooth',block:'start'})">1 · Direction<span>Xem project chain active</span></button>
+                    <button class="module-flow-step" onclick="document.getElementById('goal-portfolio-title')?.focus()">2 · Goals<span>Focus / duy trì / để sau</span></button>
+                    <button class="module-flow-step" onclick="document.getElementById('project-title')?.focus()">3 · Project<span>Tạo năm/quý/tháng</span></button>
+                    <button class="module-flow-step" onclick="nav(6)">4 · Run Week<span>Qua Plan để chạy</span></button>
+                </section>
 
                 <section class="week-project-guide">
                     <article class="week-project-guide-card active">
@@ -2084,13 +2507,19 @@ Q4: Security + simplification"></textarea>
             <!-- P20: MODULE DIRECTORY -->
             <div id="p20" class="panel hidden">
                 <div class="module-hero">
-                    <h2>Module Hub · 3 tầng sử dụng</h2>
-                    <p>Mặc định chỉ hiện thứ dùng thường xuyên. Bật chế độ chuyên sâu khi cần Codex, Bản Mệnh, System Config hoặc các tracker ít dùng.</p>
+                    <h2>Library · mọi thứ không phải việc đang chạy</h2>
+                    <p>Notes, finance, knowledge và tools nằm ở đây. NOW/PLAN/ENGLISH/PROJECTS/REVIEW là luồng vận hành; Library là kho nhớ và công cụ khi cần.</p>
                 </div>
+                <section class="module-flow-strip" aria-label="Library flow">
+                    <button class="module-flow-step primary" onclick="document.getElementById('module-search')?.focus()">1 - Search<span>Tim module hoac du lieu</span></button>
+                    <button class="module-flow-step" onclick="openQuickNote()">2 - Capture<span>Ghi note linh tinh</span></button>
+                    <button class="module-flow-step" onclick="nav(7)">3 - Knowledge<span>Tri thuc, insight va skill practice</span></button>
+                    <button class="module-flow-step" onclick="nav(10)">4 - Systems<span>Sync, thong bao, du lieu</span></button>
+                </section>
                 <div class="module-tier-strip">
-                    <article class="module-tier-card"><b>Tầng 1 · Hằng ngày</b><span>Hôm nay, Tuần, Projects, Review, Notes. Đây là app chính.</span></article>
-                    <article class="module-tier-card"><b>Tầng 2 · Hằng tuần/khi cần</b><span>English, tất cả việc, mục tiêu, tài chính, tri thức.</span></article>
-                    <article class="module-tier-card"><b>Tầng 3 · Chuyên sâu</b><span>Codex, Bản Mệnh, System Config, cảnh báo bẫy, tracker phụ. Ẩn mặc định.</span></article>
+                    <article class="module-tier-card"><b>Capture</b><span>Quick note, Notes Hub va learning inbox.</span></article>
+                    <article class="module-tier-card"><b>Knowledge</b><span>Tri thuc, insight va skill practice. English da co module rieng.</span></article>
+                    <article class="module-tier-card"><b>Systems</b><span>Tai chinh, sync, thong bao, du lieu va cau hinh chuyen sau.</span></article>
                 </div>
                 <button class="btn btn-outline w-100 mb-4" onclick="toggleAdvancedMode()" id="module-advanced-toggle">Bật chế độ chuyên sâu</button>
                 <div class="directory-search-shell">
@@ -2100,45 +2529,45 @@ Q4: Security + simplification"></textarea>
                 <div id="directory-empty" class="directory-empty">Không tìm thấy. Thử từ khóa ngắn hơn như “tiền”, “học”, “gym” hoặc “note”.</div>
                 <div class="directory-grid">
                     <section class="directory-section">
-                        <h3>Thực thi</h3>
-                        <p>Quản lý việc, lịch và quyết định trong ngày.</p>
+                        <h3>Capture & Notes</h3>
+                        <p>Chi de ghi nhanh va tim lai. Viec trong tuan nam o PLAN, khong nam o day.</p>
                         <div class="directory-items">
-                            <button class="directory-item" onclick="nav(18)"><span class="directory-icon">🧭</span><span class="directory-copy"><b>Tất cả việc</b><span>Backlog và việc đang làm</span></span></button>
-                            <button class="directory-item deep-module" onclick="nav(4)"><span class="directory-icon">🔔</span><span class="directory-copy"><b>Nhắc việc</b><span>Chu kỳ và việc lặp lại</span></span></button>
-                            <button class="directory-item deep-module" onclick="nav(3)"><span class="directory-icon">⚖️</span><span class="directory-copy"><b>Decision Journal</b><span>Quyết định lớn và postmortem</span></span></button>
-                            <button class="directory-item" onclick="nav(14)"><span class="directory-icon">📓</span><span class="directory-copy"><b>Notes Hub</b><span>Tìm mọi ghi chú</span></span></button>
+                            <button class="directory-item" onclick="openQuickNote()"><span class="directory-icon">+</span><span class="directory-copy"><b>Note nhanh</b><span>Ghi linh tinh trong 10 giay</span></span></button>
+                            <button class="directory-item" onclick="nav(14)"><span class="directory-icon">N</span><span class="directory-copy"><b>Notes Hub</b><span>Tim moi ghi chu</span></span></button>
+                            <button class="directory-item deep-module" onclick="nav(18)"><span class="directory-icon">T</span><span class="directory-copy"><b>Tat ca viec</b><span>Chi mo khi can sua hang loat</span></span></button>
+                            <button class="directory-item deep-module" onclick="nav(4)"><span class="directory-icon">R</span><span class="directory-copy"><b>Nhac viec</b><span>Chu ky va viec lap lai</span></span></button>
+                            <button class="directory-item deep-module" onclick="nav(3)"><span class="directory-icon">D</span><span class="directory-copy"><b>Decision Journal</b><span>Quyet dinh lon va postmortem</span></span></button>
                         </div>
                     </section>
                     <section class="directory-section">
-                        <h3>Phát triển</h3>
-                        <p>Rèn kỹ năng, thể lực và năng lực chuyên môn.</p>
+                        <h3>Knowledge & Practice</h3>
+                        <p>Nguon hoc va log luyen tap. English da tach thanh module rieng.</p>
                         <div class="directory-items">
-                            <button class="directory-item" onclick="nav(17)"><span class="directory-icon">🇬🇧</span><span class="directory-copy"><b>English</b><span>Lộ trình và luyện tập</span></span></button>
-                            <button class="directory-item" onclick="nav(7)"><span class="directory-icon">📚</span><span class="directory-copy"><b>Tri thức</b><span>Library và mastery</span></span></button>
-                            <button class="directory-item deep-module" onclick="nav(2)"><span class="directory-icon">🏋️</span><span class="directory-copy"><b>Thể lực</b><span>Lịch và log buổi tập</span></span></button>
-                            <button class="directory-item deep-module" onclick="nav(1)"><span class="directory-icon">⭐</span><span class="directory-copy"><b>Habits & Tracking</b><span>Thói quen, XP và log phụ</span></span></button>
+                            <button class="directory-item" onclick="nav(7)"><span class="directory-icon">K</span><span class="directory-copy"><b>Tri thuc</b><span>Sach, podcast, insight, mastery</span></span></button>
+                            <button class="directory-item deep-module" onclick="nav(19)"><span class="directory-icon">G</span><span class="directory-copy"><b>Phat trien</b><span>Inner Circle va public output</span></span></button>
+                            <button class="directory-item deep-module" onclick="nav(2)"><span class="directory-icon">B</span><span class="directory-copy"><b>The luc</b><span>Lich va log buoi tap</span></span></button>
+                            <button class="directory-item deep-module" onclick="nav(1)"><span class="directory-icon">H</span><span class="directory-copy"><b>Habits & Tracking</b><span>Thoi quen, XP va log phu</span></span></button>
                         </div>
                     </section>
                     <section class="directory-section">
-                        <h3>Định hướng và đo lường</h3>
-                        <p>Biết mình đang đi đúng hướng và còn đủ nguồn lực.</p>
+                        <h3>Money & Settings</h3>
+                        <p>Tai chinh va cau hinh ky thuat. Muc tieu/project nam o PROJECTS.</p>
                         <div class="directory-items">
-                            <button class="directory-item" onclick="nav(21)"><span class="directory-icon">🚀</span><span class="directory-copy"><b>Projects</b><span>Năm → quý → tháng → task</span></span></button>
-                            <button class="directory-item" onclick="nav(8)"><span class="directory-icon">🎯</span><span class="directory-copy"><b>Mục tiêu</b><span>OKR và roadmap</span></span></button>
-                            <button class="directory-item" onclick="nav(9);switchSubTab('p9',2)"><span class="directory-icon">💰</span><span class="directory-copy"><b>Tài chính</b><span>Thu chi và runway</span></span></button>
-                            <button class="directory-item deep-module" onclick="nav(9)"><span class="directory-icon">📈</span><span class="directory-copy"><b>Chỉ số cá nhân</b><span>Sức khỏe và business</span></span></button>
-                            <button class="directory-item deep-module" onclick="nav(15)"><span class="directory-icon">⚠️</span><span class="directory-copy"><b>Cảnh báo bẫy</b><span>Phát hiện lệch hướng</span></span></button>
+                            <button class="directory-item" onclick="nav(9);switchSubTab('p9',2)"><span class="directory-icon">$</span><span class="directory-copy"><b>Tai chinh</b><span>Thu chi va runway</span></span></button>
+                            <button class="directory-item" onclick="nav(10)"><span class="directory-icon">S</span><span class="directory-copy"><b>Thiet lap & Sync</b><span>Cloud, thong bao va du lieu</span></span></button>
+                            <button class="directory-item deep-module" onclick="nav(8)"><span class="directory-icon">O</span><span class="directory-copy"><b>Muc tieu cu</b><span>Legacy OKR, chi doi chieu khi can</span></span></button>
+                            <button class="directory-item deep-module" onclick="nav(9)"><span class="directory-icon">M</span><span class="directory-copy"><b>Chi so ca nhan</b><span>Suc khoe va business metrics</span></span></button>
+                            <button class="directory-item deep-module" onclick="nav(15)"><span class="directory-icon">!</span><span class="directory-copy"><b>Canh bao bay</b><span>Phat hien lech huong</span></span></button>
                         </div>
                     </section>
                     <section class="directory-section deep-module">
-                        <h3>Chuyên sâu</h3>
-                        <p>Framework cá nhân, hồ sơ, tâm linh/định hướng và đồng bộ dữ liệu.</p>
+                        <h3>Chuyen sau</h3>
+                        <p>Framework ca nhan, ho so dinh huong va cac loi vao du phong.</p>
                         <div class="directory-items">
-                            <button class="directory-item" onclick="nav(22)"><span class="directory-icon">🧭</span><span class="directory-copy"><b>Hướng dẫn & Setup</b><span>Bắt đầu đúng trong 5 phút</span></span></button>
-                            <button class="directory-item" onclick="nav(11)"><span class="directory-icon">📜</span><span class="directory-copy"><b>Codex</b><span>Nguyên tắc vận hành</span></span></button>
-                            <button class="directory-item" onclick="nav(13)"><span class="directory-icon">🧭</span><span class="directory-copy"><b>Hồ sơ cá nhân</b><span>Dữ liệu định hướng</span></span></button>
-                            <button class="directory-item" onclick="nav(10)"><span class="directory-icon">⚙️</span><span class="directory-copy"><b>Thiết lập & Sync</b><span>Supabase và giao diện</span></span></button>
-                            <button class="directory-item" onclick="nav(19)"><span class="directory-icon">🚀</span><span class="directory-copy"><b>Phát triển</b><span>Quan hệ và public output</span></span></button>
+                            <button class="directory-item" onclick="nav(22)"><span class="directory-icon">?</span><span class="directory-copy"><b>Huong dan & Setup</b><span>Bat dau dung trong 5 phut</span></span></button>
+                            <button class="directory-item" onclick="nav(11)"><span class="directory-icon">C</span><span class="directory-copy"><b>Codex</b><span>Nguyen tac van hanh</span></span></button>
+                            <button class="directory-item" onclick="nav(13)"><span class="directory-icon">P</span><span class="directory-copy"><b>Ho so ca nhan</b><span>Du lieu dinh huong</span></span></button>
+                            <button class="directory-item" onclick="nav(21)"><span class="directory-icon">Pj</span><span class="directory-copy"><b>Projects</b><span>Loi tat du phong</span></span></button>
                         </div>
                     </section>
                 </div>
@@ -2566,6 +2995,12 @@ Q4: Security + simplification"></textarea>
                     <h2>Review nhanh · 2 phút</h2>
                     <p>Chốt ngày bằng ba câu: đã tạo ra gì, học được gì, và việc đầu tiên của ngày mai. Chỉ mở review chuyên sâu khi thật sự cần.</p>
                 </div>
+                <section class="module-flow-strip" aria-label="Review flow">
+                    <button class="module-flow-step primary" onclick="document.getElementById('review-auto-summary')?.scrollIntoView({behavior:'smooth',block:'start'})">1 · Summary<span>App tự gom task và focus</span></button>
+                    <button class="module-flow-step" onclick="document.getElementById('simple-review-output')?.focus()">2 · 3 Questions<span>Tạo ra gì, học gì, mai làm gì</span></button>
+                    <button class="module-flow-step" onclick="document.getElementById('fired-note')?.focus()">3 · Reset<span>FIRED + To-be nếu bị lệch</span></button>
+                    <button class="module-flow-step" onclick="document.querySelector('#p5 .review-depth-shell')?.scrollIntoView({behavior:'smooth',block:'start'})">4 · Deep<span>Weekly/monthly khi cần</span></button>
+                </section>
                 <div class="card-section">
                     <div class="section-header">
                         <div><h3>App đã tổng hợp hôm nay</h3><p class="text-xs text-muted mt-1">Dữ liệu lấy trực tiếp từ task và focus timer.</p></div>
@@ -2669,6 +3104,12 @@ Q4: Security + simplification"></textarea>
 
             <!-- P6: PLAN -->
             <div id="p6" class="panel hidden">
+                <section class="module-flow-strip" aria-label="Plan flow">
+                    <button class="module-flow-step primary" onclick="document.getElementById('plan-cascade')?.scrollIntoView({behavior:'smooth',block:'start'})">1 · Map<span>Năm → quý → tháng → tuần</span></button>
+                    <button class="module-flow-step" onclick="scrollToFlowSection('weekly-outcomes-card')">2 · Outcomes<span>Chốt tối đa 3 kết quả tuần</span></button>
+                    <button class="module-flow-step" onclick="scrollToFlowSection('weekly-day-plan-card')">3 · 7 Days<span>Fill đủ việc từng ngày</span></button>
+                    <button class="module-flow-step" onclick="document.getElementById('weekly-learning-card')?.scrollIntoView({behavior:'smooth',block:'start'})">4 · Learn<span>Kết học + soạn English tuần sau</span></button>
+                </section>
                 <section class="operating-map" id="operating-map-week" data-operating-map="week"></section>
                 <section class="plan-cascade" id="plan-cascade" aria-label="Chuỗi kế hoạch Năm Quý Tháng Tuần Ngày"></section>
                 <section class="week-project-guide">
@@ -3380,16 +3821,22 @@ WITH CHECK (
             <!-- P17: ENGLISH C2 LAB -->
             <div id="p17" class="panel hidden">
                 <div class="sub-nav">
-                    <div class="sub-tab active" onclick="switchSubTab('p17', 0, this)">Hôm nay</div>
-                    <div class="sub-tab" onclick="switchSubTab('p17', 10, this)">Các tuần tới</div>
-                    <div class="sub-tab" onclick="switchSubTab('p17', 2, this)">Đo tuần</div>
-                    <div class="sub-tab" onclick="switchSubTab('p17', 8, this)">Lũy tiến Nghe & Nói</div>
-                    <div class="sub-tab deep-module" onclick="switchSubTab('p17', 11, this)">IELTS 4 kỹ năng</div>
-                    <div class="sub-tab deep-module" onclick="switchSubTab('p17', 9, this)">Công cụ</div>
+                    <div class="sub-tab active" onclick="switchSubTab('p17', 0, this)">Today Session</div>
+                    <div class="sub-tab" onclick="switchSubTab('p17', 10, this)">Week Plan</div>
+                    <div class="sub-tab" onclick="switchSubTab('p17', 2, this)">Evidence</div>
+                    <div class="sub-tab" onclick="switchSubTab('p17', 8, this)">Roadmap</div>
+                    <div class="sub-tab deep-module" onclick="switchSubTab('p17', 11, this)">Skills</div>
+                    <div class="sub-tab deep-module" onclick="switchSubTab('p17', 9, this)">Tools</div>
                 </div>
                 
                 <!-- TAB 0: DASHBOARD -->
                 <div id="p17-sub0">
+                    <section class="english-flow-strip">
+                        <button class="english-flow-step active" onclick="switchSubTab('p17',0)">1 · Today Session</button>
+                        <button class="english-flow-step" onclick="switchSubTab('p17',10)">2 · Week Plan</button>
+                        <button class="english-flow-step" onclick="switchSubTab('p17',2)">3 · Evidence</button>
+                        <button class="english-flow-step" onclick="switchSubTab('p17',8)">4 · Roadmap</button>
+                    </section>
                     <section class="eng-mission-hero">
                         <div class="eng-mission-top">
                             <div>
@@ -3408,6 +3855,70 @@ WITH CHECK (
                         </div>
                         <div class="eng-progress-shell"><span id="eng-mission-progress" style="width:0%"></span></div>
                         <div class="eng-day-summary"><span id="eng-mission-count">0/0 việc</span><span id="eng-mission-total">0 phút</span></div>
+                    </section>
+
+                    <section class="card-section english-compass">
+                        <div class="section-header">
+                            <div><h3>English Compass · thước đo thật</h3><p class="text-xs text-muted mt-1">Theo roadmap mới: số đẹp không có nghĩa là giỏi. Đo chính bằng khả năng hiểu lẫn nhau và output thật.</p></div>
+                            <span class="badge badge-purple">41 tháng</span>
+                        </div>
+                        <div class="grid-4">
+                            <article class="matrix-box">
+                                <b>1 · Mutual comprehension</b>
+                                <p class="text-xs text-muted mt-1">Bạn hiểu người khác bao nhiêu, và người khác hiểu bạn bao nhiêu.</p>
+                            </article>
+                            <article class="matrix-box">
+                                <b>2 · Daily pillars</b>
+                                <p class="text-xs text-muted mt-1">Shadowing, AI Voice, Human Practice, Recording Review.</p>
+                            </article>
+                            <article class="matrix-box">
+                                <b>3 · Khi thiếu giờ</b>
+                                <p class="text-xs text-muted mt-1">Giữ Speaking + Shadowing + Anki. Cắt Coursera trước, Reading sau.</p>
+                            </article>
+                            <article class="matrix-box">
+                                <b>4 · Evidence</b>
+                                <p class="text-xs text-muted mt-1">Course chỉ done khi có LinkedIn post, essay, memo, recording hoặc output thật.</p>
+                            </article>
+                        </div>
+                    </section>
+
+                    <section class="card-section english-learner-profile" id="eng-learner-profile-card">
+                        <div class="section-header">
+                            <div>
+                                <h3>Learner Profile · xương sống English</h3>
+                                <p class="text-xs text-muted mt-1">Today đọc hồ sơ này để chọn bài; mỗi buổi học cập nhật lại cho ngày mai.</p>
+                            </div>
+                            <button class="btn btn-small btn-outline" onclick="saveEnglishLearnerProfile()">Lưu profile</button>
+                        </div>
+                        <div class="grid-4">
+                            <label class="text-xs font-bold">Pronunciation focus
+                                <input id="eng-profile-pronunciation" placeholder="VD: /θ/, word stress, intonation">
+                            </label>
+                            <label class="text-xs font-bold">Skill đang thích
+                                <select id="eng-profile-preferred">
+                                    <option value="speaking">Speaking</option>
+                                    <option value="listening">Listening</option>
+                                    <option value="pronunciation">Pronunciation</option>
+                                    <option value="writing">Writing</option>
+                                    <option value="reading">Reading</option>
+                                </select>
+                            </label>
+                            <label class="text-xs font-bold">Mentor / human feedback
+                                <input id="eng-profile-mentor" placeholder="Tên người sửa / lịch gặp">
+                            </label>
+                            <label class="text-xs font-bold">Tải hiện tại
+                                <select id="eng-profile-load">
+                                    <option value="normal">Normal</option>
+                                    <option value="push">Push skill mình thích</option>
+                                    <option value="lighter">Giảm độ khó trước khi nghỉ</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div class="grid-2">
+                            <textarea id="eng-profile-chunks" rows="2" placeholder="Chunks đang học / hay miss khi shadowing..."></textarea>
+                            <textarea id="eng-profile-reflection" rows="2" placeholder="Reflection gần nhất: người nghe hiểu không, mình vấp ở đâu, lỗi chính là gì..."></textarea>
+                        </div>
+                        <div id="eng-profile-summary" class="compact-card-list mt-3"></div>
                     </section>
 
                     <div class="eng-mission-layout">
@@ -3431,7 +3942,7 @@ WITH CHECK (
                             <div class="eng-side-card" id="eng-weekly-due-card">
                                 <div class="eng-side-label">Đo tiến bộ</div>
                                 <h3 id="eng-weekly-due-title">Weekly recording</h3>
-                                <p id="eng-weekly-due-text">Mỗi thứ Bảy record một lần. Chỉ nhập 3 số WPM, filler và error.</p>
+                                <p id="eng-weekly-due-text">Mỗi thứ Bảy record một lần. Ưu tiên mutual comprehension + nhận xét định tính; số chỉ để tham khảo.</p>
                                 <button class="btn btn-outline w-100 mt-2" onclick="switchSubTab('p17',2)">Mở đo tuần</button>
                             </div>
                             <div class="eng-side-card">
@@ -3671,7 +4182,18 @@ WITH CHECK (
                                 <input type="number" id="eng-w-error-quick" placeholder="Ví dụ: 4" step="0.5" style="margin:0">
                             </label>
                         </div>
-                        <button class="btn btn-primary w-100 mt-3" onclick="saveEngWeeklyQuick()">Lưu 3 số và xem xu hướng</button>
+                        <div class="grid-2 mt-3">
+                            <label>
+                                <span class="text-xs font-bold">Listener understood me (1-5)</span>
+                                <input type="number" id="eng-w-listener-quick" min="1" max="5" placeholder="VD: 3" style="margin:0">
+                            </label>
+                            <label>
+                                <span class="text-xs font-bold">I understood them (1-5)</span>
+                                <input type="number" id="eng-w-understand-quick" min="1" max="5" placeholder="VD: 3" style="margin:0">
+                            </label>
+                        </div>
+                        <textarea id="eng-w-qual-quick" rows="2" placeholder="Qualitative note: fluency, rhythm/intonation, main repeated error, mentor/AI feedback..."></textarea>
+                        <button class="btn btn-primary w-100 mt-3" onclick="saveEngWeeklyQuick()">Lưu weekly evidence</button>
                     </div>
                     <div class="alert-box info mb-4">
                         <div class="alert-icon">📊</div>
@@ -3707,7 +4229,11 @@ WITH CHECK (
                         </div>
                         <div class="text-xs font-bold mb-1 mt-2">Topic + Note</div>
                         <input type="text" id="eng-w-topic" placeholder="Topic monologue (vd: 'My career plan')" class="mb-2">
-                        <textarea id="eng-w-note" rows="2" placeholder="Note: AI feedback chính, 2-3 lỗi điển hình..."></textarea>
+                        <div class="grid-2">
+                            <input type="number" id="eng-w-listener" min="1" max="5" placeholder="Listener understood me? 1-5">
+                            <input type="number" id="eng-w-understand" min="1" max="5" placeholder="I understood them? 1-5">
+                        </div>
+                        <textarea id="eng-w-note" rows="2" placeholder="Note: AI/mentor feedback, fluency, intonation, 2-3 repeated errors..."></textarea>
                         <button class="btn btn-primary w-100" onclick="saveEngWeekly()">💾 Lưu Weekly Metrics</button>
                     </div>
                     
@@ -4149,6 +4675,9 @@ WITH CHECK (
                 <option value="learning">Bài học</option>
                 <option value="english">English</option>
                 <option value="project">Project</option>
+                <option value="fired">FIRED thought</option>
+                <option value="comm3a">Pyramid 3A</option>
+                <option value="decision">Decision seed</option>
             </select>
             <button class="btn btn-primary" onclick="saveQuickNote()">Lưu note</button>
         </div>
@@ -4194,7 +4723,7 @@ WITH CHECK (
 
 <script>
 /* ================= DATA ================= */
-const PAGE_TITLES = {0:{t:"Hôm nay",s:"Mở app, làm việc, đóng app."},1:{t:"Habits & Tracking",s:"Thói quen, XP và các tracker phụ."},2:{t:"Thể lực",s:"Lịch tập và log buổi tập."},3:{t:"Decision Journal",s:"Ghi quyết định lớn, review kết quả và postmortem."},4:{t:"Nhắc việc",s:"Chu kỳ và việc lặp lại."},5:{t:"Review",s:"App tổng hợp trước; bạn chỉ xác nhận và học hỏi."},6:{t:"Tuần",s:"Plan tuần, chạy hàng đợi, chốt kết học. Không để học nối đuôi vô thức."},7:{t:"Tri thức",s:"Library, mastery và ghi chú học tập."},8:{t:"Mục tiêu",s:"Đối chiếu mục tiêu với project và task."},9:{t:"Tài chính & Chỉ số",s:"Thu chi, runway, sức khỏe và business metrics."},10:{t:"Thiết lập & Sync",s:"Supabase, giao diện và dữ liệu."},11:{t:"Nguyên tắc",s:"Framework và doctrine để đọc khi cần định hướng."},13:{t:"Hồ sơ định hướng",s:"Bát Tự · Tử Vi · Human Design · dữ liệu cá nhân."},14:{t:"Notes Hub",s:"Tất cả ghi chú ở một chỗ."},15:{t:"Cảnh báo bẫy",s:"Pattern detection và hành động sửa lệch hướng."},17:{t:"English",s:"Mở ra, làm nhiệm vụ kế tiếp, đánh dấu xong."},18:{t:"Tất cả việc",s:"Tìm, lọc hoặc chỉnh việc khi cần."},19:{t:"Phát triển",s:"Rèn luyện, xây Inner Circle và xuất bản đầu ra thật."},20:{t:"Module Hub",s:"3 tầng: hằng ngày, khi cần, chuyên sâu."},21:{t:"Projects",s:"Project năm → quý → tháng → task, cùng một luồng."},22:{t:"Hướng dẫn & Setup",s:"Thiết lập một lần, dùng theo một luồng duy nhất."}};
+const PAGE_TITLES = {0:{t:"NOW",s:"Làm gì tiếp theo? Một việc, một phiên tập trung."},1:{t:"Habits & Tracking",s:"Thói quen, XP và các tracker phụ."},2:{t:"Thể lực",s:"Lịch tập và log buổi tập."},3:{t:"Decision Journal",s:"Ghi quyết định lớn, review kết quả và postmortem."},4:{t:"Nhac viec phu",s:"Chu ky lap lai. Viec tuan/ngay nam o PLAN va NOW."},5:{t:"REVIEW",s:"Hôm nay tốt hơn hôm qua ở đâu?"},6:{t:"PLAN",s:"Tuần này tôi sẽ trở thành ai hơn?"},7:{t:"Tri thức",s:"Library, mastery và ghi chú học tập."},8:{t:"Muc tieu cu",s:"Legacy OKR. Mac dinh dung PROJECTS lam nguon muc tieu chinh."},9:{t:"Tài chính & Chỉ số",s:"Thu chi, runway, sức khỏe và business metrics."},10:{t:"Thiết lập & Sync",s:"Supabase, giao diện và dữ liệu."},11:{t:"Nguyên tắc",s:"Framework và doctrine để đọc khi cần định hướng."},13:{t:"Hồ sơ định hướng",s:"Bát Tự · Tử Vi · Human Design · dữ liệu cá nhân."},14:{t:"Notes Hub",s:"Tất cả ghi chú ở một chỗ."},15:{t:"Cảnh báo bẫy",s:"Pattern detection và hành động sửa lệch hướng."},17:{t:"ENGLISH",s:"Today session, week plan, evidence và roadmap 41 tháng."},18:{t:"Sua viec hang loat",s:"Chi mo khi can loc, sua deadline hoac doi trang thai."},19:{t:"Phát triển",s:"Rèn luyện, xây Inner Circle và xuất bản đầu ra thật."},20:{t:"LIBRARY",s:"Notes, finance, tools và knowledge trong một nơi."},21:{t:"PROJECTS",s:"Project năm → quý → tháng → task, cùng một luồng."},22:{t:"Hướng dẫn & Setup",s:"Thiết lập một lần, dùng theo một luồng duy nhất."}};
 const DEF_HABITS = [{id:"s",n:"Dậy 5:30 + Thiền",x:30},{id:"w",n:"Nước 3L",x:20},{id:"r",n:"Đọc 30 trang",x:25},{id:"e",n:"Vận động",x:30},{id:"en",n:"English 60'",x:25},{id:"d",n:"Deep Work 3h",x:30},{id:"sv",n:"Tiết kiệm",x:15},{id:"so",n:"1 cuộc gặp",x:20}];
 const DEF_SCORES = ["Dậy 5:30 + Thiền 15'","Nước 3L + Ngủ 7h+","Vận động 4 buổi/tuần","Deep Work ≥3h/ngày","English ≥60'/ngày","Đọc ≥30 trang/ngày","0 ngày zero habits","Tiết kiệm ≥40% thu","2 cuộc gặp/tuần","Không tự lừa mình"];
 const LEVELS = [{n:"Recruit",x:0},{n:"Soldier",x:500},{n:"Knight",x:2000},{n:"Captain",x:5000},{n:"Commander",x:10000},{n:"General",x:25000},{n:"Legend",x:50000},{n:"Emperor",x:100000}];
@@ -4261,8 +4790,8 @@ function filterModuleDirectory(value){
     document.getElementById('directory-empty')?.classList.toggle('visible',visibleCount===0);
 }
 
-const MAIN_PAGE_IDS=[0,6,21,5,14];
-const PARENT_PAGE={1:20,2:20,7:20,17:20,11:20,13:20,19:20,18:6,3:5,9:5,15:5,4:6,8:21,10:20,20:14,22:20};
+const MAIN_PAGE_IDS=[0,6,17,21,5,20];
+const PARENT_PAGE={1:20,2:20,7:20,14:20,11:20,13:20,19:20,18:6,3:5,9:20,15:5,4:6,8:21,10:20,22:20};
 let currentPageIdx=0,lastNavSource=0,lastMainPage=0,contextBackTarget=0;
 
 function isAdvancedMode(){return gs('advanced_mode',false)===true;}
@@ -4308,22 +4837,20 @@ function scrollToFlowSection(id){
     el.animate([{boxShadow:'0 0 0 0 rgba(124,58,237,.35)'},{boxShadow:'0 0 0 8px rgba(124,58,237,.12)'},{boxShadow:'var(--shadow-sm)'}],{duration:900,easing:'ease-out'});
 }
 
-function nav(idx){
-    lastNavSource=currentPageIdx;
-    if(MAIN_PAGE_IDS.includes(idx))lastMainPage=idx;
-    currentPageIdx=idx;
-    document.querySelectorAll('.panel').forEach(e=>e.classList.add('hidden'));
-    const target = document.getElementById(`p${idx}`); if(target) target.classList.remove('hidden');
-    document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active'));
-    const activeIdx=MAIN_PAGE_IDS.includes(idx)?idx:(PARENT_PAGE[idx]??idx);
-    let cl=document.querySelector(`.sidebar-nav > .nav-item[onclick="nav(${activeIdx})"]`);
-    if(!cl)cl=document.querySelector(`.nav-item[onclick="nav(${idx})"]`);
-    if(cl)cl.classList.add('active');
-    let i=PAGE_TITLES[idx]||PAGE_TITLES[0];
-    document.getElementById('page-title').innerText=i.t; document.getElementById('page-subtitle').innerText=i.s;
-    updateContextNav(idx);
-    
-    // Refresh data when entering specific panels
+let navRenderToken=0;
+function schedulePageRefresh(idx){
+    const token=++navRenderToken;
+    const run=()=>{
+        if(token!==navRenderToken||idx!==currentPageIdx)return;
+        refreshPage(idx);
+    };
+    if('requestIdleCallback' in window){
+        requestIdleCallback(run,{timeout:180});
+    } else {
+        requestAnimationFrame(()=>setTimeout(run,0));
+    }
+}
+function refreshPage(idx){
     if(idx===8 && typeof renderHier==='function') renderHier();
     if(idx===3 && typeof renderQuitQuotient==='function') renderQuitQuotient();
     if(idx===14 && typeof rNotesHub==='function') rNotesHub();
@@ -4336,18 +4863,63 @@ function nav(idx){
     if(idx===19 && typeof renderGrowth==='function') renderGrowth();
     if(idx===21 && typeof renderProjects==='function') renderProjects();
     if(idx===22 && typeof renderOnboarding==='function') renderOnboarding();
-    
-    document.querySelector('.main-content').scrollTo(0,0);
+}
+
+function nav(idx){
+    if(idx===currentPageIdx){
+        const scroller=document.querySelector('.main-content');
+        if(scroller)scroller.scrollTo({top:0,left:0,behavior:'smooth'});
+        schedulePageRefresh(idx);
+        return;
+    }
+    lastNavSource=currentPageIdx;
+    if(MAIN_PAGE_IDS.includes(idx))lastMainPage=idx;
+    currentPageIdx=idx;
+    document.body.classList.add('is-navigating');
+    document.querySelectorAll('.panel').forEach(e=>{
+        e.classList.add('hidden');
+        e.classList.remove('page-enter');
+    });
+    const target = document.getElementById(`p${idx}`);
+    if(target){
+        target.classList.remove('hidden');
+        target.classList.remove('page-enter');
+        void target.offsetWidth;
+        target.classList.add('page-enter');
+    }
+    document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active'));
+    const activeIdx=MAIN_PAGE_IDS.includes(idx)?idx:(PARENT_PAGE[idx]??idx);
+    let cl=document.querySelector(`.sidebar-nav > .nav-item[onclick="nav(${activeIdx})"]`);
+    if(!cl)cl=document.querySelector(`.nav-item[onclick="nav(${idx})"]`);
+    if(cl)cl.classList.add('active');
+    let i=PAGE_TITLES[idx]||PAGE_TITLES[0];
+    document.getElementById('page-title').innerText=i.t; document.getElementById('page-subtitle').innerText=i.s;
+    updateContextNav(idx);
+    const scroller=document.querySelector('.main-content');
+    if(scroller){scroller.scrollTop=0;scroller.scrollLeft=0;}
+    schedulePageRefresh(idx);
+    window.setTimeout(()=>document.body.classList.remove('is-navigating'),220);
 }
 function switchSubTab(pid,idx,tabEl){
     const p=document.getElementById(pid);
-    p.querySelectorAll(`[id^="${pid}-sub"]`).forEach(e=>e.classList.add('hidden'));
-    document.getElementById(`${pid}-sub${idx}`).classList.remove('hidden');
+    p.querySelectorAll(`[id^="${pid}-sub"]`).forEach(e=>{
+        e.classList.add('hidden');
+        e.classList.remove('sub-enter');
+    });
+    const target=document.getElementById(`${pid}-sub${idx}`);
+    if(target){
+        target.classList.remove('hidden');
+        void target.offsetWidth;
+        target.classList.add('sub-enter');
+    }
     p.querySelectorAll('.sub-tab').forEach((e,i)=>{
         const handler=e.getAttribute('onclick')||'';
         const active=tabEl ? e===tabEl : (handler.includes(`, ${idx},`)||handler.includes(`, ${idx})`)||i===idx);
         e.classList.toggle('active',active);
     });
+    if(pid==='p17'){
+        document.querySelectorAll('.english-flow-step').forEach(btn=>btn.classList.toggle('active',(btn.getAttribute('onclick')||'').includes(`,${idx})`)));
+    }
     if(pid==='p17'&&idx===10&&typeof renderEnglishWeekPlanner==='function')renderEnglishWeekPlanner();
     if(pid==='p17'&&idx===8&&typeof renderEngAudioProgression==='function'){renderEngAudioProgression();renderEngRoadmap();}
     if(pid==='p17'&&idx===11&&typeof renderIELTSLadder==='function')renderIELTSLadder();
@@ -4370,7 +4942,7 @@ function getOnboardingSteps(){
     const weeklyWins=gs('weekly_wins',[]);
     const notificationReady=('Notification' in window)&&Notification.permission==='granted';
     return [
-        {id:'scope',done:!!(opsConfig&&opsConfig.start&&opsConfig.end),title:'Chốt phạm vi vận hành',detail:'Ngày bắt đầu, ngày kết thúc và tên các môn xuyên suốt. App tự chia thành năm 48 tuần.',action:'nav(0);setTimeout(()=>document.querySelector(\".advanced-shell\")?.setAttribute(\"open\",\"\"),100)',label:'Thiết lập'},
+        {id:'scope',done:!!(opsConfig&&opsConfig.start&&opsConfig.end),title:'Chốt phạm vi vận hành',detail:'Ngày bắt đầu, ngày kết thúc và tên các môn xuyên suốt. App tự chia thành năm 48 tuần.',action:'openOpsConfigSetup()',label:'Thiết lập'},
         {id:'focus-goal',done:!!focusGoal,title:'Chọn một mục tiêu Focus',detail:'Chỉ mục tiêu này chạy full chuỗi Năm → Quý → Tháng. Các mục tiêu khác Duy trì hoặc Để sau.',action:'nav(21)',label:'Chọn Focus'},
         {id:'project',done:projectChain.every(Boolean),title:'Nối project Năm → Quý → Tháng',detail:'Năm tạo hướng, quý tạo năng lực, tháng tạo sản phẩm. Mỗi cấp một project active.',action:"openProjectCreator('year')",label:'Tạo chuỗi'},
         {id:'week',done:(Array.isArray(weeklyPlan)&&weeklyPlan.some(Boolean))||(Array.isArray(weeklyWins)&&weeklyWins.length>0),title:'Chốt 3 kết quả tuần',detail:'Đây là nguồn để Today chọn đúng việc thay vì một to-do list dài.',action:'nav(6)',label:'Lập tuần'},
@@ -4396,6 +4968,20 @@ function renderOnboarding(){
     if(bar)bar.style.width=`${Math.round(completed/steps.length*100)}%`;
     const banner=document.getElementById('setup-banner');
     if(banner)banner.classList.toggle('hidden',coreDone||!!gs('onboarding_done',false));
+}
+
+function openOpsConfigSetup(){
+    nav(18);
+    setTimeout(()=>{
+        const shell=document.getElementById('ops-cycle-config-shell');
+        if(shell){
+            shell.open=true;
+            shell.scrollIntoView({behavior:'smooth',block:'start'});
+        }
+        const start=document.getElementById('ops-cycle-start');
+        if(start)start.focus();
+        toast('Điền ngày bắt đầu/kết thúc và tên môn, rồi bấm Lưu cấu hình.','success');
+    },120);
 }
 
 function completeOnboarding(){
@@ -4430,6 +5016,65 @@ function toggleTheme(){
     let el = document.getElementById('theme-toggle'); if(el) el.checked = isDark;
 } 
 if(gs('dark_mode',false)) { document.body.classList.add('dark-mode'); }
+function applyA11yLabels(){
+    const firstNavTitle=document.querySelector('.sidebar-nav .nav-section-title');
+    if(firstNavTitle)firstNavTitle.textContent='Today / Focus';
+    const reviewNav=document.querySelector('.sidebar-nav .nav-item[onclick="nav(5)"]');
+    if(reviewNav&&!document.querySelector('.nav-systems-title')){
+        const systems=document.createElement('div');
+        systems.className='nav-section-title nav-systems-title';
+        systems.textContent='Systems';
+        reviewNav.parentNode.insertBefore(systems,reviewNav);
+    }
+    const labels=[
+        ['.notification-button','Mo thong bao'],
+        ['.sync-mobile','Dong bo cloud'],
+        ['button[onclick="toggleTheme()"]','Doi giao dien sang toi'],
+        ['button[onclick="closeQuickNote()"]','Dong note nhanh'],
+        ['button[onclick="closeGTDModal()"]','Dong quick capture'],
+        ['button[onclick="closeNotificationCenter()"]','Dong notification center'],
+        ['button[onclick="closeEmergencyModal()"]','Dong bang dieu chinh ngay']
+    ];
+    labels.forEach(([selector,label])=>{
+        document.querySelectorAll(selector).forEach(btn=>{
+            if(!btn.getAttribute('aria-label'))btn.setAttribute('aria-label',label);
+        });
+    });
+}
+document.addEventListener('DOMContentLoaded',applyA11yLabels);
+setTimeout(applyA11yLabels,0);
+const AUTO_MODULE_FLOWS={
+    1:[['1 · Habits','Tick thói quen hôm nay',"document.getElementById('habits-list')?.scrollIntoView({behavior:'smooth',block:'start'})"],['2 · Water','Ghi nước / health nhỏ',"document.getElementById('water-grid')?.scrollIntoView({behavior:'smooth',block:'start'})"],['3 · Network','Log một kết nối',"document.getElementById('net-who')?.focus()"],['4 · Rewards','Xem mốc thưởng',"document.getElementById('reward-list')?.scrollIntoView({behavior:'smooth',block:'start'})"]],
+    2:[['1 · Workout','Log buổi tập hôm nay',"switchSubTab('p2',0)"],['2 · Schedule','Chỉnh lịch tuần',"switchSubTab('p2',1)"],['3 · Exercise Pool','Thêm bài tập',"switchSubTab('p2',2)"],['4 · Power Score','Chấm tuần',"switchSubTab('p2',3)"]],
+    3:[['1 · Decision','Ghi quyết định lớn',"switchSubTab('p3',0);document.getElementById('dec-title')?.focus()"],['2 · Issue','Log vấn đề gốc',"switchSubTab('p3',1);document.getElementById('iss-title')?.focus()"],['3 · Quit','Chấm nên bỏ/giữ',"switchSubTab('p3',0);document.getElementById('qq-title')?.focus()"],['4 · Firewall','Chặn quyết định cảm xúc',"switchSubTab('p3',2)"]],
+    4:[['1 · Due List','Xem việc tới hạn',"document.getElementById('rem-list-container')?.scrollIntoView({behavior:'smooth',block:'start'})"],['2 · Add','Tạo nhắc việc lặp lại',"document.getElementById('rem-name')?.focus()"],['3 · Templates','Dùng mẫu nhanh',"document.getElementById('rem-templates')?.scrollIntoView({behavior:'smooth',block:'start'})"],['4 · Notify','Bật thông báo',"requestNotifPermission()"]],
+    7:[['1 · Capture','Ghi insight mới',"document.getElementById('learn-log-text')?.focus()"],['2 · Library','Sách / nguồn học',"switchSubTab('p7',0)"],['3 · Practice','Log giờ luyện skill',"switchSubTab('p7',1)"],['4 · Notes','Đưa về Notes Hub',"nav(14)"]],
+    8:[['1 · Portfolio','Nguồn mục tiêu chính',"switchSubTab('p8',0)"],['2 · Identity','Căn tính hành động',"document.getElementById('identity-input')?.focus()"],['3 · Roadmap','Mốc đời / năm',"switchSubTab('p8',2)"],['4 · Filter','Lọc dự án mới',"switchSubTab('p8',3)"]],
+    9:[['1 · Health','Log biometric',"switchSubTab('p9',0)"],['2 · Business','P&L kinh doanh',"switchSubTab('p9',1)"],['3 · Finance','Thu chi / runway',"switchSubTab('p9',2)"],['4 · Review','Xem lại số liệu',"document.getElementById('fin-list')?.scrollIntoView({behavior:'smooth',block:'start'})"]],
+    10:[['1 · UI','Giao diện / cỡ chữ',"document.getElementById('zoom-sel')?.focus()"],['2 · Cloud','Cấu hình đồng bộ',"document.getElementById('sb-url')?.focus()"],['3 · Notify','Thông báo / PWA',"requestNotifPermission()"],['4 · Backup','Export / import dữ liệu',"document.getElementById('import-file')?.scrollIntoView({behavior:'smooth',block:'center'})"]],
+    11:[['1 · Principles','Đọc nguyên tắc chính',"document.querySelector('#p11 .card-section')?.scrollIntoView({behavior:'smooth',block:'start'})"],['2 · Frameworks','Tìm playbook cần dùng',"nav(20);setTimeout(()=>document.getElementById('module-search')?.focus(),80)"],['3 · Apply','Biến thành task',"focusOpsCapture()"],['4 · Review','Xem lại khi lệch',"nav(5)"]],
+    13:[['1 · Bát Tự','Xem nền cá nhân',"document.querySelector('#p13 .card-section')?.scrollIntoView({behavior:'smooth',block:'start'})"],['2 · Tử Vi','Cập nhật dữ liệu',"document.getElementById('tv-menh')?.focus()"],['3 · Human Design','Paste hồ sơ',"document.getElementById('hd-type')?.focus()"],['4 · Notes','Ghi diễn giải',"document.getElementById('banmenh-notes')?.focus()"]],
+    14:[['1 · Capture','Ghi note mới',"openQuickNote()"],['2 · Triage','Xử lý Learning Inbox',"document.getElementById('learning-inbox-list')?.scrollIntoView({behavior:'smooth',block:'start'})"],['3 · Search','Tìm mọi ghi chú',"document.getElementById('notes-search')?.focus()"],['4 · Convert','Đưa thành task/tuần',"nav(6)"]],
+    15:[['1 · Active','Xem bẫy đang bật',"document.getElementById('antidote-active-list')?.scrollIntoView({behavior:'smooth',block:'start'})"],['2 · Practice','Làm bài giải 2 phút',"runAntidotePractice()"],['3 · Reference','Xem 11 pattern',"document.getElementById('antidote-all-list')?.scrollIntoView({behavior:'smooth',block:'start'})"],['4 · History','Xem pattern lặp lại',"document.getElementById('antidote-history')?.scrollIntoView({behavior:'smooth',block:'start'})"]],
+    18:[['1 · Capture','Tạo task chi tiết',"document.getElementById('ops-task-title')?.focus()"],['2 · List','Xem mọi việc mở',"document.getElementById('ops-task-list')?.scrollIntoView({behavior:'smooth',block:'start'})"],['3 · Streams','Lọc 7 dòng hoạt động',"document.getElementById('ops-workstream-grid')?.scrollIntoView({behavior:'smooth',block:'start'})"],['4 · Today','Đưa việc vào hôm nay',"nav(0)"]],
+    19:[['1 · Training','Rèn kỹ năng chính',"document.getElementById('growth-training-summary')?.scrollIntoView({behavior:'smooth',block:'start'})"],['2 · Inner Circle','Giữ quan hệ quan trọng',"document.getElementById('inner-name')?.focus()"],['3 · Public Output','Ghi đầu ra công khai',"document.getElementById('public-output-title')?.focus()"],['4 · Review','Kiểm tuần phát triển',"nav(5)"]],
+    22:[['1 · Checklist','Setup lõi ban đầu',"document.getElementById('setup-checklist')?.scrollIntoView({behavior:'smooth',block:'start'})"],['2 · Rules','Cách dùng app',"document.querySelector('#p22 .guide-routine')?.scrollIntoView({behavior:'smooth',block:'start'})"],['3 · App Flow','Luồng toàn app',"document.querySelector('#p22 .app-flow-rail')?.scrollIntoView({behavior:'smooth',block:'start'})"],['4 · Start','Vào Today',"nav(0)"]]
+};
+function applyAutoModuleFlows(){
+    Object.entries(AUTO_MODULE_FLOWS).forEach(([pageId,steps])=>{
+        const panel=document.getElementById(`p${pageId}`);
+        if(!panel||panel.querySelector(':scope > .module-flow-strip.auto-flow'))return;
+        const strip=document.createElement('section');
+        strip.className='module-flow-strip auto-flow';
+        strip.setAttribute('aria-label',`${PAGE_TITLES[pageId]?.t||'Module'} flow`);
+        strip.innerHTML=steps.map((step,index)=>`<button class="module-flow-step ${index===0?'primary':''}" onclick="${step[2]}">${esc(step[0])}<span>${esc(step[1])}</span></button>`).join('');
+        const hero=panel.querySelector(':scope > .module-hero');
+        if(hero)hero.insertAdjacentElement('afterend',strip);
+        else panel.insertAdjacentElement('afterbegin',strip);
+    });
+}
+document.addEventListener('DOMContentLoaded',applyAutoModuleFlows);
+setTimeout(applyAutoModuleFlows,0);
 function togglePerfMode(isActive){ss('perf_mode', isActive); if(isActive) document.body.classList.add('perf-mode'); else document.body.classList.remove('perf-mode');}
 if(gs('perf_mode',false)) { document.body.classList.add('perf-mode'); }
 function changeZoom(val){document.documentElement.style.setProperty('--font-scale', val); ss('zoom_level', val);}
@@ -5476,7 +6121,7 @@ function renderProjects(){
             const stream=opsStreamById(project.streamId);
             const alignment=projectAlignmentResult(project);
             return `<div class="project-row"><div><div class="project-row-title">${esc(project.title)}</div><div class="project-row-meta">${projectLevelLabel(project.level)} · ${esc(project.periodKey||'Legacy')} · ${esc(stream.name)} · ${projectStatusLabel(project.status)} · ${stats.done}/${stats.total} task · Matching ${alignment.score}%</div>${projectDeliverablesHTML(project)}</div><div class="flex gap-2"><button class="btn btn-small btn-outline" onclick="editProjectAlignment('${project.id}')">Matching</button>${project.status!=='active'?`<button class="btn btn-small btn-outline" onclick="setOpsProjectStatus('${project.id}','active')">Kích hoạt</button>`:''}${project.status!=='done'?`<button class="btn btn-small btn-success" onclick="finishOpsProject('${project.id}')">Đóng chu kỳ</button>`:''}</div></div>`;
-        }).join(''):'<div class="text-sm text-muted">Chưa có project. Bắt đầu bằng project tháng nếu bạn muốn dùng ngay, sau đó mới nối lên quý và năm.</div>';
+        }).join(''):emptyActionHTML('Chua co project','Bat dau bang project thang neu ban muon dung ngay, sau do noi len quy va nam.','Tao project thang',"openProjectCreator('month')");
     }
     renderOperatingMaps();
     renderPlanningCascade();
@@ -5657,6 +6302,30 @@ function renderPlanningDeadlines(){
 }
 function getOpsTasks(){ return gs('ops_tasks',[]); }
 function saveOpsTasks(tasks){ ss('ops_tasks',tasks); renderOps(); renderPlanningDeadlines(); }
+function seedFirstRunDemoData(){
+    if(gs('demo_seeded_v39',false))return false;
+    const hasRealData=[
+        getOpsTasks().length,
+        getOpsProjects().length,
+        gs('weekly_wins',[]).length,
+        gs('eng_mission_days',[]).length,
+        gs('quick_notes',[]).length
+    ].some(Boolean);
+    if(hasRealData){ss('demo_seeded_v39',true);return false;}
+    const today=localISODate();
+    const tomorrow=addDaysISO(today,1);
+    const week=currentWeekStart();
+    ss('ops_config',{start:today,end:addDaysISO(today,18*30),streams:getOpsStreams().map(s=>s.name)});
+    ss('weekly_wins',[{week,wins:['Ship one small working feature','Finish English listening + speaking floor','Review deadlines before Friday'],projectIds:['','',''],goalIds:['','',''],assignmentScores:[0,0,0],updatedAt:new Date().toISOString()}]);
+    ss('ops_tasks',[
+        {id:'demo-task-1',streamId:'personal',projectId:'',title:'Demo: chon 1 viec that su quan trong hom nay',due:today,estimateMinutes:50,priority:'high',status:'today',source:'demo',createdAt:Date.now()-3000},
+        {id:'demo-task-2',streamId:'english',projectId:'',title:'Demo: English shadowing 20p + record 2p',due:today,estimateMinutes:25,priority:'normal',status:'today',source:'demo',createdAt:Date.now()-2000},
+        {id:'demo-task-3',streamId:'personal',projectId:'',title:'Demo: ghi 1 note hoc duoc vao Library',due:tomorrow,estimateMinutes:10,priority:'low',status:'backlog',source:'demo',createdAt:Date.now()-1000}
+    ]);
+    ss('quick_notes',[{id:'demo-note-1',text:'Demo note: moi thu linh tinh cu ghi vao Note nhanh, sau do triage sau.',type:'note',createdAt:Date.now(),date:today}]);
+    ss('demo_seeded_v39',true);
+    return true;
+}
 function opsStreamById(id){ return getOpsStreams().find(stream=>stream.id===id)||getOpsStreams()[0]; }
 function opsWip(tasks=getOpsTasks()){ return tasks.filter(task=>task.status==='today'||task.status==='doing').length; }
 function opsStatusLabel(status){ return ({backlog:'Backlog',today:'Hôm nay',doing:'Đang làm',done:'Đã xong'})[status]||status; }
@@ -5834,12 +6503,13 @@ function renderOpsDashboard(streams,tasks,cycle){
             <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.78rem;color:var(--text-main)">${esc(task.title)}</span>
             <button onclick="${task.status==='doing'?`advanceOpsTask('${task.id}')`:`startOpsFocus('${task.id}')`}" title="${task.status==='doing'?'Hoàn thành':'Bắt đầu tập trung'}">${task.status==='doing'?'✓':'▶'}</button>
         </div>`;
-    }).join(''):'<div class="ops-empty" style="padding:1rem">Trống. Nhập một việc phía trên để bắt đầu.</div>';
+    }).join(''):emptyActionHTML('Chua co viec quan trong hom nay','Ghi mot viec dau tien, app se tu nhan mon, deadline va do uu tien.','Ghi viec','focusOpsCapture()');
     const miscQueue=document.getElementById('ops-misc-queue');
     if(miscQueue)miscQueue.innerHTML=miscToday.length?miscToday.slice(0,8).map(task=>{
         const stream=opsStreamById(task.streamId);
         return `<div class="misc-queue-row"><span>${esc(task.title)}<small>${esc(stream.name)}${task.due?` · hạn ${esc(task.due)}`:''}</small></span><button class="btn btn-small btn-outline" onclick="promoteOpsTask('${task.id}')">Ưu tiên</button></div>`;
-    }).join(''):'<div class="text-xs text-muted">Không có việc phụ đang chen vào hôm nay.</div>';
+    }).join(''):emptyActionHTML('Khong co viec linh tinh','Tot. Hom nay chi can tap trung vao viec chinh dang mo.','Them neu can','focusOpsCapture()');
+    renderDailyPlanBuilder(active,miscToday,tasks);
     renderDailyPlanBoard(active,miscToday,tasks);
     const strip=document.getElementById('ops-stream-strip');
     if(strip)strip.innerHTML=streams.map(stream=>{
@@ -5915,6 +6585,46 @@ function renderDailyPlanBoard(deepTasks=[],miscTasks=[],allTasks=getOpsTasks()){
     cards.push(card('','Review · 10p','Kết ngày','Ghi tạo ra gì, học gì, việc đầu tiên ngày mai. Giữ chuỗi, không tự trách.',`<button class="btn btn-small btn-outline mt-2" onclick="nav(5)">Review</button>`));
     box.innerHTML=cards.join('');
 }
+function renderDailyPlanBuilder(deepTasks=[],miscTasks=[],allTasks=getOpsTasks()){
+    const box=document.getElementById('daily-plan-builder');
+    if(!box)return;
+    const today=localISODate();
+    const saved=gs(`daily_builder_${today}`,{discomfort:'',compound:''});
+    const weekly=gs('weekly_wins',[]).find(item=>item.week===currentWeekStart());
+    const wins=(weekly?.wins||[]).filter(Boolean);
+    const focusWin=wins[0]||'Chưa chốt outcome tuần. Vào PLAN để chọn tuần này thắng bằng gì.';
+    const openToday=opsSort(allTasks.filter(task=>task.status!=='done'&&(task.status==='today'||task.status==='doing'||task.due===today)));
+    const important=openToday.filter(isImportantTask).slice(0,3);
+    const deep1=important[0]||openToday[0]||null;
+    const deep2=important[1]||openToday.find(task=>deep1&&task.id!==deep1.id)||null;
+    const admin=miscTasks[0]||openToday.find(task=>!important.some(item=>item.id===task.id))||null;
+    const slot=(label,task,detail,kind='')=>`<article class="daily-builder-card ${kind}">
+        <small>${esc(label)}</small>
+        <b>${esc(task?task.title:'Trống')}</b>
+        <span>${esc(task?detail:'Nếu trống, đừng tự nhồi thêm. Chỉ thêm khi thật sự có việc cần chạy hôm nay.')}</span>
+        ${task?`<button class="btn btn-small btn-primary mt-2" onclick="startOpsFocus('${task.id}')">Start</button>`:''}
+    </article>`;
+    box.innerHTML=`<div class="daily-builder-head">
+        <div><div class="daily-builder-kicker">Daily Plan Builder · 60s</div><h3>Chọn ít, làm sâu</h3><p>Hard cap: tối đa 3 task chính. Muốn thêm task thứ 4 thì phải bỏ bớt một task khác trong NOW.</p></div>
+        <button class="btn btn-small btn-outline" onclick="nav(6)">Sửa PLAN</button>
+    </div>
+    <div class="daily-builder-grid">
+        <article class="daily-builder-card primary"><small>Outcome tuần hôm nay phục vụ</small><b>${esc(focusWin)}</b><span>Đây là câu trả lời cho “hôm nay làm để cộng dồn vào đâu?”.</span></article>
+        ${slot('Deep block 1 · 90p',deep1,'Điện thoại xa người. Xong block này mới đổi việc.','')}
+        ${slot('Deep block 2 · 90p',deep2,'Chỉ chạy nếu còn năng lượng. Không biến ngày thành sprint nông.','')}
+        ${slot('Shallow/Admin · 30p',admin,'Gom việc nhỏ vào một cửa sổ, không để phá deep work.','')}
+    </div>
+    <div class="daily-builder-grid mt-2" style="grid-template-columns:1fr 1fr">
+        <article class="daily-builder-card"><small>Deliberate Discomfort hôm nay</small><b>Việc đang né tránh nhất</b><input value="${esc(saved.discomfort||'')}" placeholder="VD: gọi mentor, sửa bug khó, gửi bản demo..." onblur="saveDailyBuilderField('discomfort',this.value)"></article>
+        <article class="daily-builder-card"><small>Compound 1%</small><b>Habit không được phá chuỗi</b><input value="${esc(saved.compound||'')}" placeholder="VD: English listening 20p, đọc 10 trang..." onblur="saveDailyBuilderField('compound',this.value)"></article>
+    </div>`;
+}
+window.saveDailyBuilderField=(key,value)=>{
+    const date=localISODate();
+    const current=gs(`daily_builder_${date}`,{});
+    current[key]=value.trim();
+    ss(`daily_builder_${date}`,current);
+};
 const OPS_BRIEF_QUESTIONS = [
     "Nếu hôm nay chỉ hoàn thành một điều, điều nào tạo ra tiến bộ thật?",
     "Việc đang làm có phục vụ chu kỳ vận hành hay chỉ tạo cảm giác bận?",
@@ -6157,6 +6867,7 @@ function logDeepWork(minutes,quiet=false){
     if(!quiet)toast(`Đã ghi nhận ${minutes} phút Deep Work.`,'success');
 }
 function renderOps(){
+    seedFirstRunDemoData();
     const streams=getOpsStreams(),tasks=getOpsTasks(),cycle=getOpsCycleState();
     if(ensureDailyGeneratedTasks(tasks))ss('ops_tasks',tasks);
     const availableSlots=Math.max(0,3-opsWip(tasks));
@@ -6276,27 +6987,52 @@ function inferOpsEstimate(text){
     if(hour)return Math.max(5,Math.round(Number(hour[1].replace(',','.'))*60));
     return 50;
 }
+function createOpsTaskFromText(raw,options={}){
+    const title=String(raw||'').trim();
+    if(!title)return null;
+    const streamId=options.streamId||inferOpsStream(title);
+    const project=options.projectId?null:getDefaultProjectForStream(streamId);
+    const tasks=getOpsTasks();
+    const dayClosed=gs('simple_daily_reviews',[]).some(item=>item.date===localISODate());
+    const due=options.due||inferOpsDueDate(title);
+    const important=options.priority==='high'||isImportantText(title)||due<=localISODate();
+    const status=options.status||(dayClosed||!important||opsWip(tasks)>=3?'backlog':'today');
+    const task={
+        id:`ops-${Date.now()}-${Math.floor(Math.random()*1000)}`,
+        streamId,
+        projectId:options.projectId||(project?.id||''),
+        title,
+        due,
+        estimateMinutes:options.estimateMinutes||inferOpsEstimate(title),
+        priority:options.priority||(important?'high':'normal'),
+        status,
+        createdAt:Date.now(),
+        source:options.source||''
+    };
+    tasks.push(task);
+    localStorage.setItem('ops_last_stream',streamId);
+    saveOpsTasks(tasks);
+    return task;
+}
+
+function emptyActionHTML(title,detail,label,action){
+    return `<div class="empty-action"><div><b>${esc(title)}</b><span>${esc(detail)}</span></div><button class="btn btn-small btn-primary" onclick="${action}">${esc(label)}</button></div>`;
+}
+
 function addOpsQuickTask(){
     const input=document.getElementById('ops-quick-task');
     if(!input||!input.value.trim())return;
     const raw=input.value.trim();
-    const streamId=inferOpsStream(raw);
-    const project=getDefaultProjectForStream(streamId);
-    const tasks=getOpsTasks();
-    const dayClosed=gs('simple_daily_reviews',[]).some(item=>item.date===localISODate());
-    const due=inferOpsDueDate(raw);
-    const important=isImportantText(raw)||due<=localISODate();
-    const status=dayClosed||!important||opsWip(tasks)>=3?'backlog':'today';
-    localStorage.setItem('ops_last_stream',streamId);
-    tasks.push({id:`ops-${Date.now()}`,streamId,projectId:project?.id||'',title:raw,due,estimateMinutes:inferOpsEstimate(raw),priority:important?'high':'normal',status,createdAt:Date.now()});
+    const task=createOpsTaskFromText(raw);
+    if(!task)return;
     input.value='';
     opsCaptureExpanded=false;
-    saveOpsTasks(tasks);
-    const stream=opsStreamById(streamId);
-    toast(status==='today'
-        ?`Đã nhận diện ${stream.name} và đưa vào Top 3 hôm nay.`
-        :(dayClosed?'Hôm nay đã kết ngày. Việc mới được lưu vào Backlog.':(!important?'Đã lưu vào việc linh tinh/backlog, chưa chen vào Top 3.':'WIP đã đủ 3. Việc mới được đưa về Backlog.')),
-        status==='today'?'success':(dayClosed?'success':'error'));
+    const stream=opsStreamById(task.streamId);
+    const dayClosed=gs('simple_daily_reviews',[]).some(item=>item.date===localISODate());
+    toast(task.status==='today'
+        ?`Da nhan dien ${stream.name} va dua vao Top 3 hom nay.`
+        :(dayClosed?'Hom nay da ket ngay. Viec moi duoc luu vao Backlog.':'Da luu vao backlog, chua chen vao Top 3.'),
+        task.status==='today'?'success':(dayClosed?'success':'error'));
 }
 function addOpsTask(){
     const title=document.getElementById('ops-task-title').value.trim();if(!title)return toast('Nhập đầu ra cần hoàn thành.','error');
@@ -6428,7 +7164,13 @@ function focusOpsCapture(){
 /* ================= POMODORO ================= */
 let pomoSessionSeconds=90*60, pomoTime=pomoSessionSeconds, pomoInt=null, isPomoRun=false;
 function fTime(s){let m=Math.floor(s/60),sc=s%60;return `${m<10?'0':''}${m}:${sc<10?'0':''}${sc}`;}
-function updatePomoDisplay(){document.getElementById('pomo-display').innerText=fTime(pomoTime);}
+function updatePomoDisplay(){
+    const text=fTime(pomoTime);
+    const display=document.getElementById('pomo-display');
+    if(display)display.innerText=text;
+    const focusTimer=document.getElementById('focus-mode-timer');
+    if(focusTimer)focusTimer.innerText=text;
+}
 function startPomo(){
     let btn=document.querySelector('#p0 .focus-timer .btn:first-of-type');
     if(!btn)return;
@@ -6455,6 +7197,189 @@ function startPomo(){
     }
 }
 function resetPomo(){clearInterval(pomoInt);isPomoRun=false;pomoSessionSeconds=90*60;pomoTime=pomoSessionSeconds;activeOpsFocusTaskId=null;updatePomoDisplay();const button=document.querySelector('#p0 .focus-timer .btn:first-of-type');if(button)button.innerText="Bắt đầu";}
+let commandPaletteIndex=0;
+let focusModeSyncInterval=null;
+
+function getCommandPaletteCommands(){
+    const next=getOpsNextTask();
+    const base=[
+        {id:'today',icon:'NOW',title:'Go to Today',detail:'Mở màn hình làm việc hiện tại',key:'G T',run:()=>nav(0)},
+        {id:'plan',icon:'PLAN',title:'Go to Plan',detail:'Tuần, tháng, deadline và 7 ngày',key:'G W',run:()=>nav(6)},
+        {id:'english',icon:'EN',title:'Go to English',detail:'Today session, week plan, evidence',key:'G E',run:()=>nav(17)},
+        {id:'projects',icon:'PJ',title:'Go to Projects',detail:'Mục tiêu năm, quý, tháng',key:'G P',run:()=>nav(21)},
+        {id:'review',icon:'RV',title:'Go to Review',detail:'Đóng ngày và phản tư',key:'G R',run:()=>nav(5)},
+        {id:'library',icon:'LIB',title:'Go to Library',detail:'Notes, finance, settings, knowledge',key:'G L',run:()=>nav(20)},
+        {id:'new-task',icon:'+',title:'Add quick task',detail:'Ghi nhanh một việc mới',key:'N',run:()=>focusOpsCapture()},
+        {id:'note',icon:'N',title:'Quick note',detail:'Ghi note linh tinh trong 10 giây',key:'',run:()=>openQuickNote()},
+        {id:'focus',icon:'FO',title:next?'Open Focus Mode':'Start next task',detail:next?next.title:'Tạo hoặc chọn một task trước',key:'F',run:()=>openFocusMode()},
+        {id:'finance',icon:'$',title:'Finance',detail:'Thu chi, runway, net worth',key:'',run:()=>{nav(9);setTimeout(()=>switchSubTab('p9',2),80);}},
+        {id:'settings',icon:'S',title:'Settings & Sync',detail:'Cloud sync, notification, backup',key:'',run:()=>nav(10)}
+    ];
+    const tasks=opsSort(getOpsTasks().filter(task=>task.status!=='done')).slice(0,8).map(task=>({
+        id:`task-${task.id}`,
+        icon:'T',
+        title:`Task: ${task.title}`,
+        detail:`${opsStatusLabel(task.status)} · ${opsStreamById(task.streamId).name}${task.due?` · hạn ${task.due}`:''}`,
+        key:'',
+        run:()=>startOpsFocus(task.id)
+    }));
+    return [...base,...tasks];
+}
+
+function commandMatches(command,query){
+    if(!query)return true;
+    const haystack=normalizeSearchText([command.title,command.detail,command.icon].join(' '));
+    return normalizeSearchText(query).split(/\s+/).every(term=>haystack.includes(term));
+}
+
+function openCommandPalette(initial=''){
+    const overlay=document.getElementById('command-palette');
+    const input=document.getElementById('command-palette-input');
+    if(!overlay||!input)return;
+    overlay.classList.add('show');
+    commandPaletteIndex=0;
+    input.value=initial;
+    renderCommandPalette();
+    setTimeout(()=>input.focus(),30);
+}
+
+function closeCommandPalette(){
+    document.getElementById('command-palette')?.classList.remove('show');
+}
+
+function renderCommandPalette(){
+    const input=document.getElementById('command-palette-input');
+    const list=document.getElementById('command-palette-list');
+    if(!input||!list)return;
+    const query=input.value||'';
+    let commands=getCommandPaletteCommands().filter(command=>commandMatches(command,query));
+    const clean=query.trim();
+    if(clean.length>=3){
+        commands=[
+            {id:'create-from-query',icon:'+',title:`Create task: ${clean}`,detail:'Nhan Enter de tao task truc tiep tu Command Palette',key:'Enter',run:()=>createTaskFromCommandPalette(clean)},
+            ...commands
+        ];
+    }
+    if(commandPaletteIndex>=commands.length)commandPaletteIndex=Math.max(0,commands.length-1);
+    list.innerHTML=commands.length?commands.map((command,index)=>`<button class="command-item ${index===commandPaletteIndex?'active':''}" onclick="runCommandPalette(${index})">
+        <span class="command-item-icon">${esc(command.icon)}</span>
+        <span><b>${esc(command.title)}</b><span>${esc(command.detail)}</span></span>
+        ${command.key?`<kbd>${esc(command.key)}</kbd>`:'<kbd>Enter</kbd>'}
+    </button>`).join(''):'<div class="directory-empty visible">Không tìm thấy lệnh phù hợp.</div>';
+    window.__commandPaletteVisible=commands;
+}
+
+function createTaskFromCommandPalette(text){
+    const task=createOpsTaskFromText(text);
+    if(!task)return;
+    closeCommandPalette();
+    toast(task.status==='today'?'Da tao task va dua vao Today.':'Da tao task trong Backlog.','success');
+    nav(0);
+}
+
+function runCommandPalette(index=commandPaletteIndex){
+    const commands=window.__commandPaletteVisible||[];
+    const command=commands[index];
+    if(!command)return;
+    closeCommandPalette();
+    command.run();
+}
+
+function handleCommandPaletteKey(event){
+    const commands=window.__commandPaletteVisible||[];
+    if(event.key==='ArrowDown'){
+        event.preventDefault();
+        commandPaletteIndex=Math.min(commands.length-1,commandPaletteIndex+1);
+        renderCommandPalette();
+    } else if(event.key==='ArrowUp'){
+        event.preventDefault();
+        commandPaletteIndex=Math.max(0,commandPaletteIndex-1);
+        renderCommandPalette();
+    } else if(event.key==='Enter'){
+        event.preventDefault();
+        runCommandPalette();
+    } else if(event.key==='Escape'){
+        event.preventDefault();
+        closeCommandPalette();
+    }
+}
+
+function getFocusModeTask(){
+    const tasks=getOpsTasks();
+    return tasks.find(task=>task.id===activeOpsFocusTaskId)||getOpsNextTask(tasks);
+}
+
+function renderFocusMode(){
+    const task=getFocusModeTask();
+    const title=document.getElementById('focus-mode-title');
+    const meta=document.getElementById('focus-mode-meta');
+    const timer=document.getElementById('focus-mode-timer');
+    if(title)title.innerText=task?task.title:'Chưa có việc đang chạy';
+    if(meta){
+        if(task){
+            const stream=opsStreamById(task.streamId);
+            meta.innerText=`${stream.name} · ${task.estimateMinutes||50} phút${task.due?` · hạn ${task.due}`:''}`;
+        } else {
+            meta.innerText='Bấm Add task hoặc quay lại Today để chọn một việc.';
+        }
+    }
+    if(timer)timer.innerText=fTime(pomoTime);
+}
+
+function openFocusMode(){
+    let task=getFocusModeTask();
+    if(!task){
+        focusOpsCapture();
+        toast('Chưa có task để focus. Ghi một việc trước.','error');
+        return;
+    }
+    if(task.status!=='doing'){
+        const tasks=getOpsTasks();
+        const found=tasks.find(item=>item.id===task.id);
+        if(found){
+            found.status='doing';
+            found.startedAt=found.startedAt||Date.now();
+            saveOpsTasks(tasks);
+            task=found;
+        }
+    }
+    activeOpsFocusTaskId=task.id;
+    if(!isPomoRun&&pomoTime===90*60){
+        pomoSessionSeconds=Math.max(5,Number(task.estimateMinutes||50))*60;
+        pomoTime=pomoSessionSeconds;
+        updatePomoDisplay();
+    }
+    document.body.classList.add('focus-mode-active');
+    document.getElementById('focus-mode-overlay')?.classList.add('show');
+    renderFocusMode();
+    clearInterval(focusModeSyncInterval);
+    focusModeSyncInterval=setInterval(renderFocusMode,500);
+}
+
+function closeFocusMode(){
+    document.body.classList.remove('focus-mode-active');
+    document.getElementById('focus-mode-overlay')?.classList.remove('show');
+    clearInterval(focusModeSyncInterval);
+    focusModeSyncInterval=null;
+}
+
+function completeFocusModeTask(){
+    const task=getFocusModeTask();
+    if(!task)return closeFocusMode();
+    advanceOpsTask(task.id);
+    renderFocusMode();
+}
+
+function captureFocusDistraction(){
+    const input=document.getElementById('focus-distraction-input');
+    const text=(input?.value||'').trim();
+    if(!text)return;
+    const task=createOpsTaskFromText(text,{status:'backlog',priority:'normal',source:'focus-distraction'});
+    if(input)input.value='';
+    toast(task?'Da capture vao Backlog. Quay lai focus.':'Chua co noi dung.','success');
+    renderFocusMode();
+}
+
 function stopPomoAndLog(){
     const elapsed=pomoSessionSeconds-pomoTime;
     clearInterval(pomoInt);
@@ -7698,11 +8623,47 @@ function saveGTD() {
     if(typeof window.rGTD === 'function') window.rGTD();
     toast('Đã lưu Inbox','success');
 }
+let navChordPending=false;
 document.addEventListener('keydown', e=>{
-    if(e.key==='Escape') closeGTDModal();
-    // Press 'g' to open Quick Capture (when not in input)
-    if(e.key==='g' && !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)){
-        e.preventDefault(); openGTDModal();
+    const tag=document.activeElement?.tagName||'';
+    const isTyping=['INPUT','TEXTAREA','SELECT'].includes(tag);
+    const key=(e.key||'').toLowerCase();
+    if(e.key==='Escape'){ closeCommandPalette(); closeFocusMode(); closeGTDModal(); closeQuickNote(); navChordPending=false; return; }
+    if((e.ctrlKey||e.metaKey)&&key==='k'){
+        e.preventDefault();
+        openCommandPalette();
+        return;
+    }
+    if(isTyping)return;
+    if(navChordPending){
+        navChordPending=false;
+        const map={t:0,w:6,e:17,p:21,r:5,l:20};
+        if(Object.prototype.hasOwnProperty.call(map,key)){
+            e.preventDefault();
+            nav(map[key]);
+            return;
+        }
+    }
+    if(key==='g'){
+        e.preventDefault();
+        navChordPending=true;
+        toast('G roi T/W/E/P/R/L de chuyen man hinh.','success');
+        setTimeout(()=>{navChordPending=false;},1200);
+        return;
+    }
+    if(key==='n'){
+        e.preventDefault();
+        focusOpsCapture();
+        return;
+    }
+    if(key==='f'){
+        e.preventDefault();
+        openFocusMode();
+        return;
+    }
+    if(key==='/'){
+        e.preventDefault();
+        openCommandPalette();
     }
 });
 
@@ -7928,7 +8889,7 @@ const ENG_PHASES = [
         ],
         exit: [
             '6 khóa Decision/Strategy hoàn tất cùng output',
-            'IELTS thật ≥6.5',
+            'Mock #1 là data point; mentor xác nhận Speaking tiến bộ quanh 6.0-6.5',
             'Anki 1,500 cards, retention ≥86%',
             '2 essays + 1 causal loop diagram',
             'WPM ≥110, filler <8/min'
@@ -8254,7 +9215,13 @@ function getEnglishDayPlan(phase, month, date=new Date()) {
     const dateKey=localDateString(date);
     const custom=gs('eng_plan_overrides',{})[dateKey];
     const minimum=gs(`eng_minimum_${dateKey}`,false);
+    const profile=getEnglishLearnerProfile();
     const load=phase.load||{ankiNew:5,shadow:30,voice:20,total:90};
+    const shadowMinutes=profile.load==='lighter'?Math.max(15,Math.round((load.shadow||30)*0.7)):load.shadow;
+    const voiceMinutes=profile.load==='lighter'?Math.max(10,Math.round((load.voice||20)*0.7)):load.voice;
+    const profilePronunciation=profile.pronunciation?`Pronunciation focus: ${profile.pronunciation}. `:'Chẩn đoán phát âm: IPA/stress/intonation 15p. ';
+    const profileChunks=profile.chunks?` Chunks hôm nay: ${profile.chunks}`:'';
+    const humanFeedback=profile.mentor?` Ưu tiên xin feedback từ: ${profile.mentor}.`:' Nếu có thể, lấy feedback từ một người thật.';
     const task=(id,type,label,minutes,detail)=>({id,type,label,minutes,detail});
     if(minimum){
         return [
@@ -8280,23 +9247,23 @@ function getEnglishDayPlan(phase, month, date=new Date()) {
     }
     if(day===6){
         return [
-            task('sat-shadow','shadow','Shadowing',Math.min(30,load.shadow),'Nguồn đang học trong phase.'),
-            task('sat-human','speak',month>=3?'Human conversation':'AI voice nhẹ',month>=3?60:20,month>=3?'Meetup, language exchange hoặc conversation thật.':'Warm-up bằng một cuộc nói chuyện ngắn.'),
+            task('sat-shadow','shadow','Shadowing',Math.min(30,shadowMinutes),`Nguon dang hoc trong phase.${profileChunks}`),
+            task('sat-human','speak',month>=3?'Human conversation':'AI voice nhe',month>=3?60:20,month>=3?`Meetup, language exchange hoac conversation that.${humanFeedback}`:'Warm-up bang mot cuoc noi chuyen ngan.'),
             task('sat-review','speak','Recording + weekly review',35,'Record 5–8 phút, nhập 3 số rồi chọn một điểm cần sửa.'),
             task('sat-anki','anki',`Anki review + ${load.ankiNew} cards`,20,'Dọn card đến hạn, chỉ thêm chunks có context.')
         ];
     }
     const tasks=[
-        task('shadow','shadow','Listening + shadowing',load.shadow,month<=6?'Nghe có transcript, bỏ transcript, rồi shadow và sửa âm nổi bật nhất.':'Nghe nguồn đúng phase, kiểm tra hiểu rồi shadow chính xác.'),
-        task('speaking','speak',day===1||day===3||day===5?'Speaking recall':'AI Voice scenario',day===1||day===3||day===5?15:load.voice,day===1||day===3||day===5?'Kể lại điều vừa nghe không nhìn note.':'Dùng framework đang học; không chuẩn bị script hoàn chỉnh.'),
+        task('shadow','shadow','Listening + shadowing',shadowMinutes,month<=6?`${profilePronunciation}Nghe transcript -> bo transcript -> shadow.${profileChunks}`:`Nghe nguon dung phase, kiem tra hieu roi shadow chinh xac.${profileChunks}`),
+        task('speaking','speak',day===1||day===3||day===5?'Speaking recall':'AI Voice scenario',day===1||day===3||day===5?15:voiceMinutes,day===1||day===3||day===5?`Ke lai dieu vua nghe khong nhin note.${humanFeedback}`:'Dung framework dang hoc; khong chuan bi script hoan chinh.'),
         task('anki','anki',`Anki review + ${load.ankiNew} cards`,20,'Chỉ giữ chunks lấy từ phần Nghe/Nói hôm nay.')
     ];
     if(day===1||day===3||day===5){
-        const focusMinutes=Math.max(20,load.total-20-load.shadow-15);
+        const focusMinutes=Math.max(20,load.total-20-shadowMinutes-15);
         if(month<=18)tasks.push(task('course-focus','course','Coursera → apply → kể lại',focusMinutes,'Học một phần, áp dụng vào việc thật rồi nói lại không nhìn note.'));
         else tasks.push(task('output-focus','write','Deep reading → output tháng',focusMinutes,'Chỉ làm milestone tháng: essay, podcast, op-ed hoặc ebook.'));
     } else {
-        const applyMinutes=Math.max(20,load.total-20-load.shadow-load.voice);
+        const applyMinutes=Math.max(20,load.total-20-shadowMinutes-voiceMinutes);
         const stage=getIELTSStageForMonth(month);
         if(day===2)tasks.push(task('ielts-reading','read',stage.readingLabel,applyMinutes,stage.reading));
         else tasks.push(task('ielts-writing','write',stage.writingLabel,applyMinutes,stage.writing));
@@ -8456,6 +9423,70 @@ function syncEnglishMissionDailyLog(tasks,record){
     ss('eng_daily',daily);
 }
 
+function getEnglishLearnerProfile(){
+    return gs('eng_learner_profile',{
+        pronunciation:'',
+        preferred:'speaking',
+        mentor:'',
+        load:'normal',
+        chunks:'',
+        reflection:'',
+        updatedAt:null
+    });
+}
+
+function saveEnglishLearnerProfile(){
+    const profile={
+        pronunciation:(document.getElementById('eng-profile-pronunciation')?.value||'').trim(),
+        preferred:document.getElementById('eng-profile-preferred')?.value||'speaking',
+        mentor:(document.getElementById('eng-profile-mentor')?.value||'').trim(),
+        load:document.getElementById('eng-profile-load')?.value||'normal',
+        chunks:(document.getElementById('eng-profile-chunks')?.value||'').trim(),
+        reflection:(document.getElementById('eng-profile-reflection')?.value||'').trim(),
+        updatedAt:new Date().toISOString()
+    };
+    ss('eng_learner_profile',profile);
+    renderEnglishLearnerProfile();
+    const current=getCurrentEngPhase();
+    renderEnglishMission(current.phase,current.month);
+    toast('Đã lưu Learner Profile.','success');
+}
+
+function renderEnglishLearnerProfile(){
+    const profile=getEnglishLearnerProfile();
+    const setValue=(id,val)=>{const el=document.getElementById(id);if(el&&el.value!==(val||''))el.value=val||'';};
+    setValue('eng-profile-pronunciation',profile.pronunciation);
+    setValue('eng-profile-mentor',profile.mentor);
+    setValue('eng-profile-chunks',profile.chunks);
+    setValue('eng-profile-reflection',profile.reflection);
+    const preferred=document.getElementById('eng-profile-preferred');
+    if(preferred)preferred.value=profile.preferred||'speaking';
+    const load=document.getElementById('eng-profile-load');
+    if(load)load.value=profile.load||'normal';
+    const box=document.getElementById('eng-profile-summary');
+    if(!box)return;
+    const loadLabel=profile.load==='lighter'?'Giảm độ khó trước khi nghỉ':profile.load==='push'?'Đẩy skill đang thích':'Bình thường';
+    box.innerHTML=[
+        {t:'Pronunciation',v:profile.pronunciation||'Chưa chẩn đoán lỗi phát âm chính'},
+        {t:'Skill ưu tiên',v:profile.preferred||'speaking'},
+        {t:'Human feedback',v:profile.mentor||'Chưa có mentor / người nghe thật'},
+        {t:'Load hôm nay',v:loadLabel}
+    ].map(item=>`<div class="compact-item"><div class="compact-item-main"><div class="compact-item-title">${esc(item.t)}</div><div class="compact-item-meta">${esc(item.v)}</div></div></div>`).join('');
+}
+
+function appendEnglishReflectionFromWeekly(log){
+    const profile=getEnglishLearnerProfile();
+    const note=[
+        log.note?`Reflection: ${log.note}`:'',
+        log.listener?`Người nghe hiểu: ${log.listener}/5`:'',
+        log.understand?`Mình hiểu lại: ${log.understand}/5`:''
+    ].filter(Boolean).join(' · ');
+    if(!note)return;
+    profile.reflection=note;
+    profile.updatedAt=new Date().toISOString();
+    ss('eng_learner_profile',profile);
+}
+
 function renderEnglishMission(phase,month){
     const tasks=getEnglishDayPlan(phase,month);
     const record=getEnglishMissionRecord();
@@ -8492,7 +9523,7 @@ function renderEnglishMission(phase,month){
     const weekly=gs('eng_weekly',[]);
     const daysSinceWeekly=weekly.length?daysSince(weekly[weekly.length-1].d):999;
     setText('eng-weekly-due-title',daysSinceWeekly>=7?'Đến hạn weekly recording':'Weekly recording đã xong');
-    setText('eng-weekly-due-text',daysSinceWeekly>=7?'Record 5–8 phút rồi nhập 3 số WPM, filler và error.':`Lần gần nhất ${daysSinceWeekly} ngày trước. Không cần nhập gì thêm.`);
+    setText('eng-weekly-due-text',daysSinceWeekly>=7?'Record 5-8 phút rồi ghi mutual comprehension, fluency/intonation và lỗi lặp lại.':`Lần gần nhất ${daysSinceWeekly} ngày trước. Không cần nhập gì thêm.`);
 }
 
 function toggleEnglishMissionTask(id,force){
@@ -8574,6 +9605,7 @@ function startEnglishMissionTimer(){
 
 function renderEngLab() {
     let {phase, month} = getCurrentEngPhase();
+    renderEnglishLearnerProfile();
     renderEnglishMission(phase,month);
     
     // Set start date input
@@ -8865,7 +9897,7 @@ const ENG_ROADMAP = [
     {m:9, p:'P2', mile:'System Dynamics', work:'Vẽ causal loop cho một vấn đề thật và trình bày lại bằng English.'},
     {m:10, p:'P2', mile:'Competitive Strategy', work:'Phân tích một công ty bằng framework cạnh tranh, có bài viết và phần bảo vệ quan điểm.'},
     {m:11, p:'P2', mile:'Blue Ocean Strategy', work:'Tạo strategy canvas và một proposal có thể dùng cho project thật.'},
-    {m:12, p:'P2', mile:'GATE P2: Corporate Strategy', work:'Hoàn tất corporate strategy output và thi IELTS thật để chốt gap cho giai đoạn chuyên sâu.'},
+    {m:12, p:'P2', mile:'GATE P2: Corporate Strategy', work:'Hoàn tất corporate strategy output; dùng mentor/mock để chốt gap, không bắt buộc thi thật.'},
     {m:13, p:'P3', mile:'Successful Negotiation', work:'Thực hành BATNA, negotiation memo và xuất bản một op-ed.'},
     {m:14, p:'P3', mile:'Influencing People', work:'Thiết kế influence plan cho một stakeholder thật và đo kết quả.'},
     {m:15, p:'P3', mile:'Persuasion', work:'Viết và trình bày một lập luận thuyết phục, phản biện được khi dữ kiện chưa đủ.'},
@@ -9092,20 +10124,28 @@ function saveEngWeeklyQuick() {
     const wpm = document.getElementById('eng-w-wpm-quick');
     const filler = document.getElementById('eng-w-filler-quick');
     const error = document.getElementById('eng-w-error-quick');
-    if(!wpm.value || filler.value === '' || error.value === ''){
-        return toast('Nhập đủ WPM, filler/phút và lỗi/100 từ','error');
+    const listener = document.getElementById('eng-w-listener-quick');
+    const understand = document.getElementById('eng-w-understand-quick');
+    const qual = document.getElementById('eng-w-qual-quick');
+    if(!qual.value.trim() && !listener.value && !understand.value){
+        return toast('Ghi it nhat 1 nhan xet dinh tinh hoac diem hieu lan nhau.','error');
     }
     document.getElementById('eng-w-date').value = todayStr;
     document.getElementById('eng-w-duration').value = 5;
     document.getElementById('eng-w-wpm').value = wpm.value;
     document.getElementById('eng-w-filler').value = filler.value;
     document.getElementById('eng-w-error').value = error.value;
+    document.getElementById('eng-w-listener').value = listener.value;
+    document.getElementById('eng-w-understand').value = understand.value;
     document.getElementById('eng-w-topic').value = 'Weekly English mission';
-    document.getElementById('eng-w-note').value = '';
+    document.getElementById('eng-w-note').value = qual.value;
     saveEngWeekly();
     wpm.value = '';
     filler.value = '';
     error.value = '';
+    listener.value = '';
+    understand.value = '';
+    qual.value = '';
 }
 
 function saveEngWeekly() {
@@ -9115,17 +10155,20 @@ function saveEngWeekly() {
         wpm: parseFloat(document.getElementById('eng-w-wpm').value)||0,
         filler: parseFloat(document.getElementById('eng-w-filler').value)||0,
         error: parseFloat(document.getElementById('eng-w-error').value)||0,
+        listener: parseFloat(document.getElementById('eng-w-listener')?.value)||0,
+        understand: parseFloat(document.getElementById('eng-w-understand')?.value)||0,
         topic: document.getElementById('eng-w-topic').value,
         note: document.getElementById('eng-w-note').value
     };
-    if(!log.wpm) return toast('Cần nhập WPM','error');
+    if(!log.note && !log.listener && !log.understand && !log.wpm) return toast('Can nhap evidence: note, diem hieu lan nhau hoac WPM.','error');
     let wL = gs('eng_weekly', []);
     wL.push(log);
     ss('eng_weekly', wL);
-    ['eng-w-date','eng-w-wpm','eng-w-filler','eng-w-error','eng-w-topic','eng-w-note'].forEach(id=>document.getElementById(id).value='');
+    appendEnglishReflectionFromWeekly(log);
+    ['eng-w-date','eng-w-wpm','eng-w-filler','eng-w-error','eng-w-topic','eng-w-note','eng-w-listener','eng-w-understand'].forEach(id=>{const el=document.getElementById(id); if(el)el.value='';});
     document.getElementById('eng-w-duration').value = 5;
     addXP(100);
-    toast('✓ Weekly metrics saved','success');
+    toast('Weekly evidence saved','success');
     renderEngLab();
 }
 
@@ -9922,9 +10965,23 @@ function saveQuickNote(){
     const input=document.getElementById('quick-note-text');
     const text=(input?.value||'').trim();
     if(!text){toast('Note đang trống.','error');return;}
-    const type=document.getElementById('quick-note-type')?.value||'note';
+    let type=document.getElementById('quick-note-type')?.value||'note';
+    if(type==='fired'){
+        const records=gs('fired_checks',[]);
+        records.unshift({id:`fired-${Date.now()}`,date:localDateString(),types:['Quick'],note:text,createdAt:Date.now()});
+        ss('fired_checks',records.slice(0,300));
+        if(input)input.value='';
+        closeQuickNote();
+        if(typeof renderFiredCheck==='function')renderFiredCheck();
+        toast('Da luu FIRED vao Review.','success');
+        return;
+    }
+    let finalText=text;
+    if(type==='comm3a'){
+        finalText=`Pyramid 3A\nAnswer: ${text}\nArguments:\n- \n- \nAdd-ons:\n- `;
+    }
     const notes=gs('quick_notes',[]);
-    notes.unshift({id:`qn-${Date.now()}`,type,text,d:localDateString(),createdAt:new Date().toISOString()});
+    notes.unshift({id:`qn-${Date.now()}`,type,text:finalText,d:localDateString(),createdAt:new Date().toISOString()});
     ss('quick_notes',notes.slice(0,500));
     if(input)input.value='';
     closeQuickNote();
